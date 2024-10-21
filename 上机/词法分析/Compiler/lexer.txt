@@ -1,0 +1,4 @@
+INTTK int
+MAINTK main
+LPARENT (
+IDENFR a
