@@ -1,0 +1,19 @@
+INTTK int
+IDENFR a
+ASSIGN =
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+CONSTTK const
+<ConstDef>
+SEMICN ;
+<ConstDecl>
+<CompUnit>
