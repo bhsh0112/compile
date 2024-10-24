@@ -113,6 +113,7 @@ public class Compiler {
         if (token_index<totleTokens.length-1) nextToken=totleTokens[token_index+1];
         if(token_index<totleTokens.length-2) nnextToken=totleTokens[token_index+2];
         token_index++;
+        
     }
     private static void backToken(){
         token_index--;
@@ -169,8 +170,9 @@ public class Compiler {
         //String first_patteString="(\\s+[\\S ]{1,}\\s+)";// 左右均为空格的字符串
         // 定义正则表达式模式
         String patternString = 
-            "(\\b(main|const|int|char|break|continue|if|else|for|return|void|while)\\b)|" + // 关键字
+            "(\\b(main|const|int|char|break|continue|if|else|for|return|void|while|repeat|until)\\b)|" + // 关键字
             "(\\b(getint|getchar|printf)\\b)|"+//函数
+            "(\\b0[Xx][0-9A-Fa-f]+\\b)|" + // 十六进制常量
             "(\\b[a-zA-Z_][a-zA-Z0-9_]*\\b)|" + // 标识符
             "(\\b\\d+\\b)|" + // 常量
             "(\".*?\")|" +
@@ -205,7 +207,6 @@ public class Compiler {
         
         root=new NNode("CompUnit");
         if(isDecl()){
-            System.out.println(currentToken+" "+lineNumber);
             while(isDecl()){
                 parserDecl(root);
                 get3Token();
@@ -628,12 +629,10 @@ public class Compiler {
         else if(currentToken.equals("return")){
             addNode(curNode, new TNode("return","leaf"));
             get3Token();
-            System.out.println(currentToken+" "+lineNumber);
             if(isExp()&&(!totleTokens[token_index-2].equals("\n"))){
                 parserExp(curNode);
                 get3Token();
             }
-            System.out.println(currentToken+" "+lineNumber);
             if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf"));
             else{
                 backToken();
@@ -734,6 +733,25 @@ public class Compiler {
                 } 
             }
         }
+        else if(isRepeat(currentToken)){
+            addNode(curNode, new TNode("repeat","leaf"));
+            get3Token();
+            parserStmt(curNode);
+            get3Token();
+            if(currentToken.equals("until")) addNode(curNode, new TNode("until","leaf"));
+            else addNode(curNode, new ENode("i",lineNumber,"error"));
+            get3Token();
+            if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf"));
+            else addNode(curNode, new ENode("i",lineNumber,"error"));
+            get3Token();
+            parserCond(curNode);
+            get3Token();
+            if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf"));
+            else addNode(curNode, new ENode("i",lineNumber,"error"));
+            get3Token();
+            if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf"));
+            else addNode(curNode, new ENode("i",lineNumber,"error"));
+        }
         else{
             parserExp(curNode);
             get3Token();
@@ -809,6 +827,7 @@ public class Compiler {
     public static void parserNumber(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Number"));
         if(isIntConst(currentToken)) addNode(curNode, new TNode(currentToken,"leaf"));
+        else if(isHexConst(currentToken)) parserHexConst(curNode);
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -820,6 +839,31 @@ public class Compiler {
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
+        }
+    }
+    public static void parserHexConst(ASTNode parent){
+        ASTNode curNode = addNode(parent, new NNode("HEXCON"));
+        // parserHexPrefix(curNode);
+        // int hexIndex=3;
+        // while(hexIndex<currentToken.length()){
+        //     parserHexDigit(hexIndex,curNode);
+        //     hexIndex++;
+        // }
+        addNode(curNode, new TNode(currentToken,"leaf"));
+    }
+    public static void parserHexPrefix(ASTNode parent){
+        if(currentToken.startsWith("0x")||currentToken.startsWith("0X")){
+            addNode(parent, new TNode(currentToken,"leaf"));
+        }
+        else{
+            
+        }
+    }
+    public static void parserHexDigit(int hexIndex,ASTNode parent){
+        if((currentToken.charAt(hexIndex) >= '0' && currentToken.charAt(hexIndex) <= '9') || // 检查是否是数字0-9
+        (currentToken.charAt(hexIndex) >= 'a' && currentToken.charAt(hexIndex) <= 'f') || // 检查是否是小写字母a-f
+        (currentToken.charAt(hexIndex) >= 'A' && currentToken.charAt(hexIndex) <= 'F')){
+            addNode(parent, new TNode(currentToken.charAt(hexIndex)+"","leaf"));
         }
     }
     public static void parserUnaryExp(ASTNode parent){
@@ -1047,7 +1091,7 @@ public class Compiler {
         return isLVal();
     }
     public static boolean isNumber(){
-        return isIntConst(currentToken);
+        return isIntConst(currentToken)||isHexConst(currentToken);
     }
     public static boolean isFuncRParams(){
         return isExp();
@@ -1070,7 +1114,15 @@ public class Compiler {
     public static boolean isLOrExp(){
         return isLAndExp();
     }
-
+    public static boolean isHexConst(String token){ 
+        return token.startsWith("0x")||token.startsWith("0X");
+    }
+    public static boolean isRepeat(String token){
+        return token.equals("repeat");
+    }
+    public static boolean isUntil(String token){
+        return token.equals("until");
+    }
     //tree node
     private static ASTNode addNode(ASTNode Parent,ASTNode Child){
         if(Child instanceof TNode){
@@ -1104,6 +1156,7 @@ public class Compiler {
         } 
         else if(parent instanceof TNode){
             String tmp_token=((TNode)parent).token;
+            System.out.println(tmp_token+" "+"output");
             if (isWords(tmp_token)) {
                 writeFile(parserFile, words.get(tmp_token) + " " + tmp_token + "\n");
             } else if (isIntConst(tmp_token)) {
@@ -1112,12 +1165,21 @@ public class Compiler {
                 writeFile(parserFile, "STRCON"+" " + tmp_token + "\n");
             } else if (isCharConst(tmp_token)) {
                 writeFile(parserFile, "CHRCON " + tmp_token + "\n");
+            }
+            else if(isRepeat(tmp_token)){
+                writeFile(parserFile, "REPEATTK " + tmp_token + "\n");
+            }
+            else if(isUntil(tmp_token)){
+                writeFile(parserFile, "UNTILTK " + tmp_token + "\n");
+            }
+            else if(isHexConst(tmp_token)){
+                writeFile(parserFile, "HEXCON " + tmp_token + "\n");
             }  else if (isIdentifier(tmp_token)) {
                 writeFile(parserFile, "IDENFR " + tmp_token + "\n");
             } 
         }
         else{
-            if(parent.name.equals("<StringConst>")||parent.name.equals("<Ident>")||parent.name.equals("<BType>")||parent.name.equals("<Decl>")||parent.name.equals("<BlockItem>")){
+            if(parent.name.equals("<StringConst>")||parent.name.equals("<Ident>")||parent.name.equals("<BType>")||parent.name.equals("<Decl>")||parent.name.equals("<BlockItem>")||parent.name.equals("<HEXCON>")){
 
             }
             else writeFile(parserFile, parent.name + "\n");
