@@ -4,21 +4,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-import dataStructure.ASTNode.ASTNode;
-import dataStructure.ASTNode.ENode;
-import dataStructure.ASTNode.NNode;
-import dataStructure.ASTNode.TNode;
-
-import dataStructure.STT.STTNode;
-import dataStructure.STT.STTStack;
+import dataStructure.ASTNode;
+import dataStructure.ENode;
+import dataStructure.NNode;
+import dataStructure.TNode;
 
 public class Compiler {
     
     private static final Map<String, String> words = new HashMap<>();
-    private static final Map<String, String> constSymbolType = new HashMap<>();
-    private static final Map<String, String> varSymbolType = new HashMap<>();
-    private static final Map<String, String> funcSymbolType = new HashMap<>();
-
     
     public static String currentToken;
     public static String nextToken;
@@ -30,13 +23,7 @@ public class Compiler {
     public static boolean zhuflag=false;
     public static String parserFile="parser.txt";
     public static String errorFile="error.txt";
-    public static ASTNode ASTRoot;
-
-    public static STTStack currentSTTStack;
-    public static STTNode STTRoot;
-    public static STTNode currentSTTNode;
-    public static int currentLevel=0;
-    public static ArrayList<STTStack> funcSymbolTable=new ArrayList<>();
+    public static ASTNode root;
 
     //build the directory "words"
     static {
@@ -78,20 +65,7 @@ public class Compiler {
         words.put("-", "MINU");
         words.put("=", "ASSIGN");
     }
-    //build the directory "SymbolType"
-    static{
-        constSymbolType.put("int", "ConstInt");
-        constSymbolType.put("char", "ConstChar");
-        constSymbolType.put("intR", "ConstIntArray");
-        constSymbolType.put("charR", "ConstCharArray");
-        varSymbolType.put("int", "Int");
-        varSymbolType.put("char", "Char");
-        varSymbolType.put("intR", "IntArray");
-        varSymbolType.put("charR", "CharArray");
-        funcSymbolType.put("int", "FuncInt");
-        funcSymbolType.put("char", "FuncChar");
-        funcSymbolType.put("void", "VoidFunc");
-    }
+
     public static void main(String[] args) throws IOException{   
         File inputFile = new File("testfile.txt");
 
@@ -126,9 +100,7 @@ public class Compiler {
 
         get3Token();
         parserComunit(); 
-        STTRoot = new STTNode(new STTStack(-1));
-        currentSTTNode = STTRoot;
-        ASTPreorder(ASTRoot);       
+        postTraversal(root);       
 
     }
     private static void get3Token(){
@@ -231,22 +203,22 @@ public class Compiler {
 
     public static void parserComunit() {
         
-        ASTRoot=new NNode("CompUnit");
+        root=new NNode("CompUnit");
         if(isDecl()){
             System.out.println(currentToken+" "+lineNumber);
             while(isDecl()){
-                parserDecl(ASTRoot);
+                parserDecl(root);
                 get3Token();
             } 
         }
         if(isFuncDef()&&(!isMainFuncDef())){
             while(isFuncDef()&&(!isMainFuncDef())){
-                parserFuncDef(ASTRoot);
+                parserFuncDef(root);
                 get3Token();
             } 
         }
         if(isMainFuncDef()){
-            parserMainFuncDef(ASTRoot);
+            parserMainFuncDef(root);
         }
         
     }
@@ -991,7 +963,8 @@ public class Compiler {
     }
 
 
-    //isX-parser 以下判断仅满足X在所在语句中与其他有歧义语法成分的区分，不能作为X的判定标志
+    //isX-parser
+    //以下判断仅满足X在所在语句中与其他有歧义语法成分的区分，不能作为X的判定标志
     public static boolean isDecl(){
         return isConstDecl()||isVarDecl();
     }
@@ -1119,132 +1092,37 @@ public class Compiler {
     private static void delNode(ASTNode Parent, ASTNode Child){
         Parent.removeChild(Child);
     }
-    
-    private static void ASTPreorder(ASTNode parent){
+    private static void postTraversal(ASTNode parent){
+        // int flag=1;
+        for(ASTNode child:parent.children){
+            // if(child instanceof ENode) flag=0;
+            postTraversal(child);
+        }
+        
         if(parent instanceof ENode){
             if(!(((ENode)parent).errorType.equals("noType"))) writeError(((ENode)parent).errorType,((ENode)parent).lineNumber);
         } 
-        // else if(parent instanceof TNode){
-        //     String tmp_token=((TNode)parent).token;
-        //     if (isWords(tmp_token)) {
-        //         writeFile(parserFile, words.get(tmp_token) + " " + tmp_token + "\n");
-        //     } else if (isIntConst(tmp_token)) {
-        //         writeFile(parserFile, "INTCON"+ " " + tmp_token + "\n");
-        //     } else if (isStringConst(tmp_token)) {
-        //         writeFile(parserFile, "STRCON"+" " + tmp_token + "\n");
-        //     } else if (isCharConst(tmp_token)) {
-        //         writeFile(parserFile, "CHRCON " + tmp_token + "\n");
-        //     }  else if (isIdentifier(tmp_token)) {
-        //         writeFile(parserFile, "IDENFR " + tmp_token + "\n");
-        //     } 
-        // }
-        // else{
-        //     if(parent.name.equals("<StringConst>")||parent.name.equals("<Ident>")||parent.name.equals("<BType>")||parent.name.equals("<Decl>")||parent.name.equals("<BlockItem>")){
-
-        //     }
-        //     else writeFile(parserFile, parent.name + "\n");
-        // }
+        else if(parent instanceof TNode){
+            String tmp_token=((TNode)parent).token;
+            if (isWords(tmp_token)) {
+                writeFile(parserFile, words.get(tmp_token) + " " + tmp_token + "\n");
+            } else if (isIntConst(tmp_token)) {
+                writeFile(parserFile, "INTCON"+ " " + tmp_token + "\n");
+            } else if (isStringConst(tmp_token)) {
+                writeFile(parserFile, "STRCON"+" " + tmp_token + "\n");
+            } else if (isCharConst(tmp_token)) {
+                writeFile(parserFile, "CHRCON " + tmp_token + "\n");
+            }  else if (isIdentifier(tmp_token)) {
+                writeFile(parserFile, "IDENFR " + tmp_token + "\n");
+            } 
+        }
         else{
-            symbol(parent);
-        }
-        for(ASTNode child:parent.children){
-            ASTPreorder(child);
+            if(parent.name.equals("<StringConst>")||parent.name.equals("<Ident>")||parent.name.equals("<BType>")||parent.name.equals("<Decl>")||parent.name.equals("<BlockItem>")){
+
+            }
+            else writeFile(parserFile, parent.name + "\n");
         }
         
-        
-        
-    }
-    private static void symbol(ASTNode parent){
-        if(parent.name.equals("<VarDecl>")) {
-            int childrenNum=parent.children.size();
-            int varNum=(childrenNum-1)/2;
-            String tmpVarType=((TNode)(((NNode)parent.children.get(0)).children.get(0))).token;
-            String tmpVarName=((TNode)(((NNode)parent.children.get(1)).children.get(0).children.get(0))).token;
-            if(((TNode)(((NNode)parent.children.get(1)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-            currentSTTNode.stack.pushStack(currentLevel,tmpVarName,varSymbolType.get(tmpVarType));
-            for(int i=2;i<=varNum;i++){
-                tmpVarName=((TNode)(((NNode)parent.children.get(2*i-1)).children.get(0).children.get(0))).token;
-                if(((TNode)(((NNode)parent.children.get(2*i-1)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-                currentSTTNode.stack.pushStack(currentLevel,tmpVarName,varSymbolType.get(tmpVarType));
-            }
-        }
-        else if(parent.name.equals("<ConstDecl>")) {
-            int childrenNum=parent.children.size();
-            int varNum=(childrenNum-2)/2;
-            String tmpVarType=((TNode)(((NNode)parent.children.get(1)).children.get(0))).token;
-            String tmpVarName=((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(0))).token;
-            if(((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-            currentSTTNode.stack.pushStack(currentLevel,tmpVarName,constSymbolType.get(tmpVarType));
-            for(int i=2;i<=varNum;i++){
-                tmpVarName=((TNode)(((NNode)parent.children.get(2*i)).children.get(0).children.get(0))).token;
-                if(((TNode)(((NNode)parent.children.get(2*i)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-                currentSTTNode.stack.pushStack(currentLevel,tmpVarName,constSymbolType.get(tmpVarType));
-            }
-        }
-        else if(parent.name.equals("<FuncDef>")) {
-            STTStack newStack=new STTStack(-1);
-            newStack.pushStack(-1,((TNode)((NNode)parent.children.get(1)).children.get(0)).token,((TNode)((NNode)parent.children.get(0)).children.get(0)).token);
-            currentSTTStack=newStack;
-        }
-        else if(parent.name.equals("<FuncFParam>")) {
-            String tmpName=((TNode)(((NNode)parent.children.get(0)).children.get(0))).token;
-            String tmpType=((TNode)(((NNode)parent.children.get(1)).children.get(0))).token;
-            if((parent.children.size()>2)&&(((TNode)(((NNode)parent.children.get(3)).children.get(1))).token.equals("["))) tmpType=tmpType+"R";
-            currentSTTStack.pushStack(-1,tmpName,funcSymbolType.get(tmpType));
-        }
-        else if(parent.name.equals("<Block>")) {
-            if(currentSTTStack.level!=-1){//若不是函数定义内容，正常新建栈，新建树节点
-                STTStack newStack=new STTStack(currentLevel);
-                currentSTTStack=newStack;
-                STTNode newSTTNode=new STTNode(currentSTTStack);
-                currentSTTNode.addChild(newSTTNode);
-                currentSTTNode=newSTTNode;
-                currentLevel++;
-            }
-            else{//若是函数定义内容，将当前STTStack压入funcSymbolTable
-                funcSymbolTable.add(currentSTTStack);
-            }
-        }
-        //函数调用
-        else if(isFuncCall(parent)!=null) {
-            String funcName=isFuncCall(parent);
-            int len=funcSymbolTable.size();
-            STTStack newStack=null;
-            for(int i=0;i<len;i++){
-                if(funcSymbolTable.get(i).peekStack(0).name.equals(funcName)){
-                    newStack=funcSymbolTable.get(i);
-                    break;
-                }
-                
-            }
-            //在当前栈中加入存有函数调用的栈元素
-            currentSTTStack.pushStack(currentLevel, funcName, newStack.peekStack(0).type);
-            //去掉存函数名的栈元素，并更新栈中所有元素的level
-            newStack.stack.remove(0);
-            newStack.level=currentLevel+1;
-            for(int i=0;i<newStack.stack.size();i++){
-                newStack.stack.get(i).level=currentLevel+1;
-            }
-            STTNode newSTTNode=new STTNode(newStack);
-            currentSTTNode.addChild(newSTTNode);
-            currentSTTNode=newSTTNode;
-            currentLevel++;
-        }
-        else if(parent.name.equals("}")) {
-            if(currentSTTStack.level!=-1) currentLevel=0; //若是函数定义的结束，currentLevel回归0
-        }
-    }
-    private static String isFuncCall(ASTNode parent){
-        if(parent.name.equals("<Stmt>")){
-            if(((NNode)parent.children.get(0)).name.equals("<LVal>")&&((TNode)parent.children.get(1)).token.equals("=")){
-                if(((TNode)parent.children.get(2)).token.equals("getint")) return "getint";
-                else if(((TNode)parent.children.get(2)).token.equals("getchar")) return "getchar";
-                else if(((NNode)parent.children.get(2).children.get(0).children.get(0).children.get(0).children.get(0)).name.equals("<Ident>")){
-                    return ((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(0).children.get(0).children.get(0).children.get(0))).token;
-                }
-            }
-        }
-        return null;
     }
 }
 
