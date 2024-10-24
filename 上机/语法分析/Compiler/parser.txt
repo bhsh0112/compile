@@ -3,27 +3,39 @@ MAINTK main
 LPARENT (
 RPARENT )
 LBRACE {
-PRINTFTK printf
+IFTK if
 LPARENT (
-STRCON "//int"
-RPARENT )
-SEMICN ;
-<Stmt>
-IDENFR tmp2
+IDENFR a
 <LVal>
-ASSIGN =
-<Stmt>
-SEMICN ;
-<Stmt>
-RETURNTK return
-INTCON 0
-<Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
-<Exp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+OR ||
+OR ||
+IDENFR b
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
+RETURNTK return
 SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
 <Stmt>
 RBRACE }
 <Block>

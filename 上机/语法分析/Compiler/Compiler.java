@@ -197,6 +197,7 @@ public class Compiler {
         return tokens.toArray(new String[0]);
     }
     public static String getErrorType(String token){
+
         if(token.equals("&")||token.equals("|")) return "a";
         else return "invalid error";
     }
@@ -951,9 +952,10 @@ public class Compiler {
         ASTNode curNode = addNode(parent, new NNode("LOrExp"));
         parserLAndExp(curNode);
         get3Token();
-        while(currentToken.equals("||")){
+        while(currentToken.equals("||")||currentToken.equals("|")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("LOrExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            if(currentToken.equals("|")) addNode(newNode, new ENode("a",lineNumber,"error"));
+            else addNode(newNode, new TNode("||","leaf"));
             get3Token();
             parserLAndExp(newNode);
             get3Token();
