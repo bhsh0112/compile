@@ -3,12 +3,12 @@ package dataStructure.STT;
 import java.util.ArrayList;
 
 public class STTNode {
-    public STTStack stack;
+    public STTQue que;
     public STTNode parent;
     public ArrayList<STTNode> children;
 
-    public STTNode(STTStack stack) {
-        this.stack = stack;
+    public STTNode(STTQue que) {
+        this.que = que;
         this.children = new ArrayList<>();
     }
 

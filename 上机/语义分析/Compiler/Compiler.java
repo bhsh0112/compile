@@ -10,7 +10,8 @@ import dataStructure.ASTNode.NNode;
 import dataStructure.ASTNode.TNode;
 
 import dataStructure.STT.STTNode;
-import dataStructure.STT.STTStack;
+import dataStructure.STT.STTQue;
+import dataStructure.STT.STTQue.Element;
 
 public class Compiler {
     
@@ -30,13 +31,26 @@ public class Compiler {
     public static boolean zhuflag=false;
     public static String parserFile="parser.txt";
     public static String errorFile="error.txt";
+    public static String symbolFile="symbol.txt";
     public static ASTNode ASTRoot;
 
-    public static STTStack currentSTTStack;
+    public static STTQue currentSTTQue;
     public static STTNode STTRoot;
     public static STTNode currentSTTNode;
-    public static int currentLevel=0;
-    public static ArrayList<STTStack> funcSymbolTable=new ArrayList<>();
+    public static int currentLevel=1;
+    public static ArrayList<STTQue> funcSymbolTable=new ArrayList<>();
+    public static ArrayList<Element> constSymbolTable=new ArrayList<>();
+    public static ArrayList<Element> varSymbolTable=new ArrayList<>();
+
+    public static int funcDefineFlag=0;
+    public static int ISNOTFUNC=0;
+    public static int VOIDFUNC=1;
+    public static int OTHERFUNC=2;
+
+    public static boolean gErrorFlag=false;
+    public static boolean forFlag=false;
+    public static boolean inMainFlag=false;
+    public static int blockNum=0;
 
     //build the directory "words"
     static {
@@ -88,8 +102,8 @@ public class Compiler {
         varSymbolType.put("char", "Char");
         varSymbolType.put("intR", "IntArray");
         varSymbolType.put("charR", "CharArray");
-        funcSymbolType.put("int", "FuncInt");
-        funcSymbolType.put("char", "FuncChar");
+        funcSymbolType.put("int", "IntFunc");
+        funcSymbolType.put("char", "CharFunc");
         funcSymbolType.put("void", "VoidFunc");
     }
     public static void main(String[] args) throws IOException{   
@@ -107,6 +121,8 @@ public class Compiler {
         if (file.exists()) {
             file.delete();
         }
+        file=new File(symbolFile);
+        if(file.exists()) file.delete();
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -126,9 +142,10 @@ public class Compiler {
 
         get3Token();
         parserComunit(); 
-        STTRoot = new STTNode(new STTStack(-1));
+        STTRoot = new STTNode(new STTQue(1));
         currentSTTNode = STTRoot;
-        ASTPreorder(ASTRoot);       
+        ASTPreorder(ASTRoot);  
+        STTPreorder(STTRoot);     
 
     }
     private static void get3Token(){
@@ -233,7 +250,6 @@ public class Compiler {
         
         ASTRoot=new NNode("CompUnit");
         if(isDecl()){
-            System.out.println(currentToken+" "+lineNumber);
             while(isDecl()){
                 parserDecl(ASTRoot);
                 get3Token();
@@ -257,14 +273,14 @@ public class Compiler {
     }
     public static void parserConstDecl(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("ConstDecl"));
-        addNode(curNode, new TNode("const","leaf"));
+        addNode(curNode, new TNode("const","leaf",lineNumber));
         get3Token();
         parserBType(curNode);
         get3Token();
         parserConstDef(curNode);
         get3Token();
         while(currentToken.equals(",")){
-            addNode(curNode, new TNode(",","leaf"));
+            addNode(curNode, new TNode(",","leaf",lineNumber));
             get3Token();
             if(isConstDef()) parserConstDef(curNode);
             else{
@@ -274,7 +290,7 @@ public class Compiler {
             get3Token();
         }
         
-        if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf"));
+        if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -282,7 +298,7 @@ public class Compiler {
     }
     public static void parserBType(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("BType"));
-        if(isBType()) addNode(curNode, new TNode(currentToken,currentToken));
+        if(isBType()) addNode(curNode, new TNode(currentToken,currentToken,lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -297,7 +313,7 @@ public class Compiler {
         } 
         get3Token();
         if(currentToken.equals("[")){
-            addNode(curNode, new TNode("[","leaf"));
+            addNode(curNode, new TNode("[","leaf",lineNumber));
             get3Token();
             if(isConstExp()) parserConstExp(curNode);
             else {
@@ -305,7 +321,7 @@ public class Compiler {
                 addNode(curNode, new ENode("k",lineNumber,"error"));
             }
             get3Token();
-            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf"));
+            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("k",lineNumber,"error"));
@@ -313,7 +329,7 @@ public class Compiler {
             get3Token();
         }
         if(currentToken.equals("=")){
-            addNode(curNode, new TNode("=","leaf"));
+            addNode(curNode, new TNode("=","leaf",lineNumber));
             get3Token();
             
             parserConstInitVal(curNode);
@@ -328,18 +344,18 @@ public class Compiler {
         if(isConstExp()) parserConstExp(curNode);
         else if(isStringConst(currentToken)) parserStringConst(curNode);
         else{
-            if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf"));
+            if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
             } 
             get3Token();
-            if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf"));
+            if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf",lineNumber));
             else{
                 parserConstExp(curNode);
                 get3Token();
                 while(currentToken.equals(",")){
-                    addNode(curNode, new TNode(",","leaf"));
+                    addNode(curNode, new TNode(",","leaf",lineNumber));
                     get3Token();
                     if(isConstExp()) parserConstExp(curNode);
                     else{
@@ -348,7 +364,7 @@ public class Compiler {
                     } 
                     get3Token();
                 }
-                if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf"));
+                if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -363,12 +379,12 @@ public class Compiler {
         parserVarDef(curNode);
         get3Token();
         while(currentToken.equals(",")){
-            addNode(curNode, new TNode(",","leaf"));
+            addNode(curNode, new TNode(",","leaf",lineNumber));
             get3Token();
             parserVarDef(curNode);
             get3Token();
         }
-        if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf"));
+        if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -380,11 +396,11 @@ public class Compiler {
         parserIdent(curNode);
         get3Token();
         if(currentToken.equals("[")){
-            addNode(curNode, new TNode("[","leaf"));
+            addNode(curNode, new TNode("[","leaf",lineNumber));
             get3Token();
             parserConstExp(curNode);
             get3Token();
-            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf"));
+            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("k",lineNumber,"error"));
@@ -393,7 +409,7 @@ public class Compiler {
         }
         
         if(currentToken.equals("=")){
-            addNode(curNode, new TNode("=","leaf"));
+            addNode(curNode, new TNode("=","leaf",lineNumber));
             get3Token();
             parserInitVal(curNode);
         }
@@ -403,18 +419,18 @@ public class Compiler {
     }
     public static void parserIdent(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Ident"));
-        addNode(curNode, new TNode(currentToken,"leaf"));
+        addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
     }
     private static void parserStringConst(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("StringConst"));
-        addNode(curNode, new TNode(currentToken,"leaf"));
+        addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
     }
     private static void parserInitVal(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("InitVal"));
         if(isExp()) parserExp(curNode);
         else if(isStringConst(currentToken)) parserStringConst(curNode);
         else{
-            if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf"));
+            if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -424,13 +440,13 @@ public class Compiler {
                 parserExp(curNode);
                 get3Token();
                 while(currentToken.equals(",")){
-                    addNode(curNode, new TNode(",","leaf"));
+                    addNode(curNode, new TNode(",","leaf",lineNumber));
                     get3Token();
                     parserExp(curNode);
                     get3Token();
                 }
             }
-            if (currentToken.equals("}")) addNode(curNode, new TNode("}","leaf"));
+            if (currentToken.equals("}")) addNode(curNode, new TNode("}","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -443,25 +459,25 @@ public class Compiler {
     }
     public static void parserMainFuncDef(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("MainFuncDef"));
-        if(currentToken.equals("int")) addNode(curNode, new TNode(currentToken,"leaf"));
+        if(currentToken.equals("int")) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
         } 
         get3Token();
-        if(currentToken.equals("main")) addNode(curNode, new TNode("main","leaf"));
+        if(currentToken.equals("main")) addNode(curNode, new TNode("main","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
         } 
         get3Token();
-        if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf"));
+        if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
         } 
         get3Token();
-        if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf"));
+        if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -483,7 +499,7 @@ public class Compiler {
             addNode(curNode, new ENode("j",lineNumber,"error"));
         } 
         get3Token();
-        if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf"));
+        if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -494,7 +510,7 @@ public class Compiler {
             backToken();
         } 
         get3Token();
-        if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf"));
+        if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -504,9 +520,9 @@ public class Compiler {
     }
     public static void parserFuncType(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("FuncType"));
-        if(currentToken.equals("int")) addNode(curNode, new TNode(currentToken,"leaf"));
-        else if(currentToken.equals("char")) addNode(curNode, new TNode(currentToken,"leaf"));
-        else if(currentToken.equals("void")) addNode(curNode, new TNode(currentToken,"leaf"));
+        if(currentToken.equals("int")) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
+        else if(currentToken.equals("char")) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
+        else if(currentToken.equals("void")) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -517,7 +533,7 @@ public class Compiler {
         parserFuncFParam(curNode);
         get3Token();
         while(currentToken.equals(",")){
-            addNode(curNode, new TNode(",","leaf"));
+            addNode(curNode, new TNode(",","leaf",lineNumber));
             get3Token();
             if(isFuncFParams()){
                 parserFuncFParam(curNode);
@@ -536,10 +552,10 @@ public class Compiler {
         parserIdent(curNode);
         get3Token();
         if(currentToken.equals("[")){
-            addNode(curNode, new TNode("[","leaf"));
+            addNode(curNode, new TNode("[","leaf",lineNumber));
             get3Token();
             if(currentToken.equals("]")){
-                addNode(curNode, new TNode("]","leaf"));
+                addNode(curNode, new TNode("]","leaf",lineNumber));
             }
             else{
                 backToken();
@@ -553,7 +569,7 @@ public class Compiler {
     }
     public static void parserBlock(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Block"));
-        if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf"));
+        if(currentToken.equals("{")) addNode(curNode, new TNode("{","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -563,7 +579,7 @@ public class Compiler {
             parserBlockItem(curNode);
             get3Token();
         }
-        if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf"));
+        if(currentToken.equals("}")) addNode(curNode, new TNode("}","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -583,13 +599,13 @@ public class Compiler {
         
         ASTNode curNode = addNode(parent, new NNode("Stmt"));
         if(currentToken.equals("if")&&nextToken.equals("(")){
-            addNode(curNode, new TNode("if","leaf"));
+            addNode(curNode, new TNode("if","leaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode("(","leaf"));
+            addNode(curNode, new TNode("(","leaf",lineNumber));
             get3Token();
             parserCond(curNode);
             get3Token();
-            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf"));
+            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -598,23 +614,24 @@ public class Compiler {
             parserStmt(curNode);
             get3Token();
             if(currentToken.equals("else")){
-                addNode(curNode, new TNode("else","leaf"));
+                addNode(curNode, new TNode("else","leaf",lineNumber));
                 get3Token();
                 parserStmt(curNode);
             } 
             else backToken();
         }
         else if(currentToken.equals("for")&&nextToken.equals("(")){
-            addNode(curNode, new TNode("for","leaf"));
+            forFlag=true;
+            addNode(curNode, new TNode("for","leaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode("(","leaf"));
+            addNode(curNode, new TNode("(","leaf",lineNumber));
             get3Token();
             if(isForStmt()){
                 parserForStmt(curNode);
                 get3Token();
             }
             
-            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -625,7 +642,7 @@ public class Compiler {
                 get3Token();
             }
             
-            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -635,34 +652,35 @@ public class Compiler {
                 parserForStmt(curNode);
                 get3Token();
             }
-            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf"));
+            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("noType",lineNumber,"error"));
             } 
             get3Token();
             parserStmt(curNode);
+            forFlag=false;
         }
         else if(currentToken.equals("break")&&nextToken.equals(";")){
-            addNode(curNode, new TNode("break","leaf"));
+            if(forFlag) addNode(curNode, new TNode("break","leaf",lineNumber));
+            else addNode(curNode, new TNode("break","errorleaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode(";","leaf"));
+            addNode(curNode, new TNode(";","leaf",lineNumber));
         }
         else if(currentToken.equals("continue")&&nextToken.equals(";")){
-            addNode(curNode, new TNode("continue","leaf"));
+            if(forFlag) addNode(curNode, new TNode("continue","leaf",lineNumber));
+            else addNode(curNode, new TNode("continue","errorleaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode(";","leaf"));
+            addNode(curNode, new TNode(";","leaf",lineNumber));
         }
         else if(currentToken.equals("return")){
-            addNode(curNode, new TNode("return","leaf"));
+            addNode(curNode, new TNode("return","leaf",lineNumber));
             get3Token();
-            System.out.println(currentToken+" "+lineNumber);
             if(isExp()&&(!totleTokens[token_index-2].equals("\n"))){
                 parserExp(curNode);
                 get3Token();
             }
-            System.out.println(currentToken+" "+lineNumber);
-            if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf"));
+            if(currentToken.equals(";")) addNode(curNode, new TNode(";","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -670,25 +688,25 @@ public class Compiler {
             
         }
         else if(currentToken.equals("printf")&&nextToken.equals("(")){
-            addNode(curNode, new TNode("printf","leaf"));
+            addNode(curNode, new TNode("printf","leaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode("(","leaf"));
+            addNode(curNode, new TNode("(","leaf",lineNumber));
             get3Token();
             parserStringConst(curNode);
             get3Token();
             while(currentToken.equals(",")){
-                addNode(curNode, new TNode(",","leaf"));
+                addNode(curNode, new TNode(",","leaf",lineNumber));
                 get3Token();
                 parserExp(curNode);
                 get3Token();
             }
-            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf"));
+            if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("j",lineNumber,"error"));
             } 
             get3Token();
-            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -698,13 +716,13 @@ public class Compiler {
             parserBlock(curNode);
         }
         else if(currentToken.equals(";")){
-            addNode(curNode, new TNode(";","leaf"));
+            addNode(curNode, new TNode(";","leaf",lineNumber));
         }
         
         else if(isLVal()){
             parserLVal(curNode);
             get3Token();
-            if(currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf"));
+            if(currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -713,49 +731,49 @@ public class Compiler {
             if(isExp()&&(!currentToken.equals("getint"))&&(!currentToken.equals("getchar"))){
                 parserExp(curNode);
                 get3Token();
-                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("i",lineNumber,"error"));
                 } 
             }
             else if(currentToken.equals("getint")){
-                addNode(curNode, new TNode("getint","leaf"));
+                addNode(curNode, new TNode("getint","leaf",lineNumber));
                 get3Token();
-                if(currentToken.equals("("))addNode(curNode, new TNode("(","leaf"));
+                if(currentToken.equals("("))addNode(curNode, new TNode("(","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("j",lineNumber,"error"));
                 } 
                 get3Token();
-                if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf"));
+                if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("j",lineNumber,"error"));
                 } 
                 get3Token();
-                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("i",lineNumber,"error"));
                 } 
             }
             else if(currentToken.equals("getchar")){
-                addNode(curNode, new TNode("getchar","leaf"));
+                addNode(curNode, new TNode("getchar","leaf",lineNumber));
                 get3Token();
-                if(currentToken.equals("("))addNode(curNode, new TNode("(","leaf"));
+                if(currentToken.equals("("))addNode(curNode, new TNode("(","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("j",lineNumber,"error"));
                 } 
                 get3Token();
-                if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf"));
+                if(currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("j",lineNumber,"error"));
                 } 
                 get3Token();
-                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+                if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
                 else{
                     backToken();
                     addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -765,7 +783,7 @@ public class Compiler {
         else{
             parserExp(curNode);
             get3Token();
-            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf"));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -777,7 +795,7 @@ public class Compiler {
         
         parserLVal(curNode);
         get3Token();
-        if(currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf"));
+        if(currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("i",lineNumber,"error"));
@@ -798,11 +816,11 @@ public class Compiler {
         parserIdent(curNode);
         get3Token();
         if(currentToken.equals("[")){
-            addNode(curNode, new TNode("[","leaf"));
+            addNode(curNode, new TNode("[","leaf",lineNumber));
             get3Token();
             parserExp(curNode);
             get3Token();
-            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf"));
+            if(currentToken.equals("]")) addNode(curNode, new TNode("]","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("k",lineNumber,"error"));
@@ -813,11 +831,11 @@ public class Compiler {
     public static void parserPrimaryExp(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("PrimaryExp"));
         if(currentToken.equals("(")){
-            addNode(curNode, new TNode("(","leaf"));
+            addNode(curNode, new TNode("(","leaf",lineNumber));
             get3Token();
             parserExp(curNode);
             get3Token();
-            if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf"));
+            if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -836,7 +854,7 @@ public class Compiler {
     }
     public static void parserNumber(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Number"));
-        if(isIntConst(currentToken)) addNode(curNode, new TNode(currentToken,"leaf"));
+        if(isIntConst(currentToken)) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -844,7 +862,7 @@ public class Compiler {
     }
     public static void parserCharacter(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Character"));
-        if(isCharConst(currentToken)) addNode(curNode, new TNode(currentToken,"leaf"));
+        if(isCharConst(currentToken)) addNode(curNode, new TNode(currentToken,"leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("noType",lineNumber,"error"));
@@ -861,7 +879,7 @@ public class Compiler {
             parserIdent(curNode);
             
             get3Token();
-            if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf"));
+            if(currentToken.equals("(")) addNode(curNode, new TNode("(","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -871,7 +889,7 @@ public class Compiler {
                 parserFuncRParams(curNode);
                 get3Token();
             }
-            if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf"));
+            if(currentToken.equals(")")) addNode(curNode, new TNode(")","leaf",lineNumber));
             else{
                 backToken();
                 addNode(curNode, new ENode("j",lineNumber,"error"));
@@ -883,9 +901,9 @@ public class Compiler {
     }
     public static void parserUnaryOp(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("UnaryOp"));
-        if(currentToken.equals("-")) addNode(curNode, new TNode("-","leaf"));
-        else if(currentToken.equals("+")) addNode(curNode, new TNode("+","leaf"));
-        else if(currentToken.equals("!")) addNode(curNode, new TNode("!","leaf"));
+        if(currentToken.equals("-")) addNode(curNode, new TNode("-","leaf",lineNumber));
+        else if(currentToken.equals("+")) addNode(curNode, new TNode("+","leaf",lineNumber));
+        else if(currentToken.equals("!")) addNode(curNode, new TNode("!","leaf",lineNumber));
         else{
             backToken();
             addNode(curNode, new ENode("k",lineNumber,"error"));
@@ -896,7 +914,7 @@ public class Compiler {
         parserExp(curNode);
         get3Token();
         while(currentToken.equals(",")){
-            addNode(curNode, new TNode(",","leaf"));
+            addNode(curNode, new TNode(",","leaf",lineNumber));
             get3Token();
             parserExp(curNode);
             get3Token();
@@ -909,7 +927,7 @@ public class Compiler {
         get3Token();
         while(currentToken.equals("*")||currentToken.equals("/")||currentToken.equals("%")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("MulExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            addNode(newNode, new TNode(currentToken,"leaf",lineNumber));
             get3Token();
             parserUnaryExp(newNode);
             get3Token();
@@ -924,7 +942,7 @@ public class Compiler {
         get3Token();
         while(currentToken.equals("+")||currentToken.equals("-")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("AddExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            addNode(newNode, new TNode(currentToken,"leaf",lineNumber));
             get3Token();
             parserMulExp(newNode);
             get3Token();
@@ -938,7 +956,7 @@ public class Compiler {
         get3Token();
         while(currentToken.equals("<")||currentToken.equals(">")||currentToken.equals("<=")||currentToken.equals(">=")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("RelExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            addNode(newNode, new TNode(currentToken,"leaf",lineNumber));
             get3Token();
             parserAddExp(newNode);
             get3Token();
@@ -952,7 +970,7 @@ public class Compiler {
         get3Token();
         while(currentToken.equals("==")||currentToken.equals("!=")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("EqExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            addNode(newNode, new TNode(currentToken,"leaf",lineNumber));
             get3Token();
             parserRelExp(newNode);
             get3Token();
@@ -967,7 +985,7 @@ public class Compiler {
         while(currentToken.equals("&&")||currentToken.equals("&")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("LAndExp"));
             if(currentToken.equals("&")) addNode(newNode, new ENode("a",lineNumber,"error"));
-            else addNode(newNode, new TNode("&&","leaf"));
+            else addNode(newNode, new TNode("&&","leaf",lineNumber));
             get3Token();
             parserEqExp(newNode);
             get3Token();
@@ -979,9 +997,10 @@ public class Compiler {
         ASTNode curNode = addNode(parent, new NNode("LOrExp"));
         parserLAndExp(curNode);
         get3Token();
-        while(currentToken.equals("||")){
+        while(currentToken.equals("||")||currentToken.equals("|")){
             ASTNode newNode=insertNode(parent,curNode, new NNode("LOrExp"));
-            addNode(newNode, new TNode(currentToken,"leaf"));
+            if(currentToken.equals("|")) addNode(newNode, new ENode("a",lineNumber,"error"));
+            else addNode(newNode, new TNode("||","leaf",lineNumber));
             get3Token();
             parserLAndExp(newNode);
             get3Token();
@@ -1146,105 +1165,353 @@ public class Compiler {
         // }
         else{
             symbol(parent);
+            
         }
         for(ASTNode child:parent.children){
             ASTPreorder(child);
-        }
-        
-        
+        }  
         
     }
     private static void symbol(ASTNode parent){
-        if(parent.name.equals("<VarDecl>")) {
-            int childrenNum=parent.children.size();
-            int varNum=(childrenNum-1)/2;
-            String tmpVarType=((TNode)(((NNode)parent.children.get(0)).children.get(0))).token;
-            String tmpVarName=((TNode)(((NNode)parent.children.get(1)).children.get(0).children.get(0))).token;
-            if(((TNode)(((NNode)parent.children.get(1)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-            currentSTTNode.stack.pushStack(currentLevel,tmpVarName,varSymbolType.get(tmpVarType));
-            for(int i=2;i<=varNum;i++){
-                tmpVarName=((TNode)(((NNode)parent.children.get(2*i-1)).children.get(0).children.get(0))).token;
-                if(((TNode)(((NNode)parent.children.get(2*i-1)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-                currentSTTNode.stack.pushStack(currentLevel,tmpVarName,varSymbolType.get(tmpVarType));
+        if(parent instanceof TNode){
+            if(((TNode)parent).token.equals("printf")) {
+                checkPrintf(parent.parent);
             }
-        }
-        else if(parent.name.equals("<ConstDecl>")) {
-            int childrenNum=parent.children.size();
-            int varNum=(childrenNum-2)/2;
-            String tmpVarType=((TNode)(((NNode)parent.children.get(1)).children.get(0))).token;
-            String tmpVarName=((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(0))).token;
-            if(((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-            currentSTTNode.stack.pushStack(currentLevel,tmpVarName,constSymbolType.get(tmpVarType));
-            for(int i=2;i<=varNum;i++){
-                tmpVarName=((TNode)(((NNode)parent.children.get(2*i)).children.get(0).children.get(0))).token;
-                if(((TNode)(((NNode)parent.children.get(2*i)).children.get(0).children.get(1))).token.equals("[")) tmpVarType=tmpVarType+"R";
-                currentSTTNode.stack.pushStack(currentLevel,tmpVarName,constSymbolType.get(tmpVarType));
+            else if(((TNode)parent).token.equals("continue")||((TNode)parent).token.equals("break")) {
+                if(parent.name.equals("errorleaf")){
+                    writeFile(errorFile, ((TNode)parent).lineNumber+" m\n");
+                }
             }
+            else if(((TNode)parent).token.equals("return")) {
+                if(funcDefineFlag==1&&(!getASTNodeContent(parent.parent,new int[] {1}).equals(";"))){
+                    writeFile(errorFile, ((TNode)parent).lineNumber+" f\n");
+                }
+                gErrorFlag=false;
+            }
+            else if(((TNode)parent).token.equals("}")&&parent.parent.name.equals("<Block>")) {
+                if(parent.parent.parent.name.equals("<FuncDef>")) {
+                    if(gErrorFlag){
+                        writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
+                    }
+                }
+                blockNum--;
+                if(blockNum==0)funcDefineFlag=0;
+                forFlag=false;
+                currentSTTNode=currentSTTNode.parent;
+                currentSTTQue=currentSTTNode.que;
+            }
+            else if(((TNode)parent).token.equals("{")&&parent.parent.name.equals("<Block>")) {
+                blockNum++;
+            }
+            
         }
-        else if(parent.name.equals("<FuncDef>")) {
-            STTStack newStack=new STTStack(-1);
-            newStack.pushStack(-1,((TNode)((NNode)parent.children.get(1)).children.get(0)).token,((TNode)((NNode)parent.children.get(0)).children.get(0)).token);
-            currentSTTStack=newStack;
-        }
-        else if(parent.name.equals("<FuncFParam>")) {
-            String tmpName=((TNode)(((NNode)parent.children.get(0)).children.get(0))).token;
-            String tmpType=((TNode)(((NNode)parent.children.get(1)).children.get(0))).token;
-            if((parent.children.size()>2)&&(((TNode)(((NNode)parent.children.get(3)).children.get(1))).token.equals("["))) tmpType=tmpType+"R";
-            currentSTTStack.pushStack(-1,tmpName,funcSymbolType.get(tmpType));
-        }
-        else if(parent.name.equals("<Block>")) {
-            if(currentSTTStack.level!=-1){//若不是函数定义内容，正常新建栈，新建树节点
-                STTStack newStack=new STTStack(currentLevel);
-                currentSTTStack=newStack;
-                STTNode newSTTNode=new STTNode(currentSTTStack);
+        else{
+            if(parent.name.equals("<VarDecl>")) {
+                String ansVarType;
+                String ansVarName;
+                int childrenNum=parent.children.size();
+                int varNum=(childrenNum-1)/2;
+                String tmpVarType=getASTNodeContent(parent, new int[]{0,0});
+                String tmpVarName=getASTNodeContent(parent, new int[]{1,0,0});
+                ansVarName=tmpVarName;
+                ansVarType=tmpVarType;
+                checkNewDefine(ansVarName);
+                checkReDefine(currentSTTQue,ansVarName, ((TNode)getASTNode(parent, new int[]{1,0,0})).lineNumber);
+                
+                if((parent.children.get(1).children.size()>=2)&&(getASTNodeContent(parent, new int[] {1,1}).equals("["))) ansVarType=tmpVarType+"R";
+                currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType));
+                varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType)));
+                for(int i=2;i<=varNum;i++){
+                    ansVarType=tmpVarType;
+                    tmpVarName=getASTNodeContent(parent, new int[] {2*i-1,0,0});
+                    ansVarName=tmpVarName;
+                    checkNewDefine(ansVarName);
+                    checkReDefine(currentSTTQue,ansVarName,((TNode)getASTNode(parent, new int[]{2*i-1,0,0})).lineNumber );
+                    
+                    if((parent.children.get(2*i-1).children.size()>=2)&&getASTNodeContent(parent, new int[] {2*i-1,1}).equals("[")) ansVarType=tmpVarType+"R";
+                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType));
+                    varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType)));
+                }
+            }
+            else if(parent.name.equals("<ConstDecl>")) {
+                String ansVarType;
+                String ansVarName;
+                int childrenNum=parent.children.size();
+                int varNum=(childrenNum-2)/2;
+                //String tmpVarType=((TNode)(((NNode)parent.children.get(1)).children.get(0))).token;
+                String tmpVarType=getASTNodeContent(parent, new int[]{1,0});
+                //String tmpVarName=((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(0))).token;
+                String tmpVarName=getASTNodeContent(parent, new int[]{2,0,0});
+                ansVarName=tmpVarName;
+                ansVarType=tmpVarType;
+                checkNewDefine(ansVarName);
+                checkReDefine(currentSTTQue,tmpVarName, ((TNode)getASTNode(parent, new int[]{2,0,0})).lineNumber);
+                if((parent.children.get(2).children.size()>=2)&&getASTNodeContent(parent, new int[]{2,1}).equals("[")) ansVarType=tmpVarType+"R";
+                currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType));
+                constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType)));
+                for(int i=2;i<=varNum;i++){
+                    ansVarType=tmpVarType;
+                    tmpVarName=getASTNodeContent(parent, new int[]{2*i,0,0});
+                    ansVarName=tmpVarName;
+                    checkNewDefine(ansVarName);
+                    checkReDefine(currentSTTQue,tmpVarName, ((TNode)getASTNode(parent, new int[]{2*i,0,0})).lineNumber);
+                    
+                    if((parent.children.get(2*i).children.size()>=2)&&getASTNodeContent(parent, new int[]{2*i,1}).equals("[")) ansVarType=tmpVarType+"R";
+                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType));
+                    constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType)));
+                }
+            }
+            else if(parent.name.equals("<FuncDef>")) {
+                String tmpFuncName=getASTNodeContent(parent, new int[] {1,0});
+                String tmpFuncType=funcSymbolType.get(getASTNodeContent(parent, new int[] {0,0}));
+                if(tmpFuncType.equals("VoidFunc")){
+                    funcDefineFlag=1;
+                }
+                else{
+                    funcDefineFlag=2;
+                    gErrorFlag=true;
+                }
+                checkReDefine(STTRoot.que, tmpFuncName, ((TNode)getASTNode(parent, new int[] {1,0})).lineNumber);
+                STTRoot.que.pushQue(1,tmpFuncName,tmpFuncType);
+                STTQue newQue=new STTQue(currentLevel+1);
+                newQue.pushQue(0,tmpFuncName,"numofparams");
+                funcSymbolTable.add(newQue);
+            }
+            else if(parent.name.equals("<FuncFParam>")) {
+                String tmpName=getASTNodeContent(parent, new int[]{1,0});
+                String tmpType=getASTNodeContent(parent, new int[]{0,0});
+                if((parent.children.size()>2)&&getASTNodeContent(parent, new int[]{2}).equals("[")) tmpType=tmpType+"R";
+                STTQue newQue=funcSymbolTable.get(funcSymbolTable.size()-1);
+                newQue.peekQue(0).level++;
+                checkReDefine(newQue,tmpName, ((TNode)getASTNode(parent, new int[]{1,0})).lineNumber);
+                newQue.pushQue(currentLevel+1,tmpName,varSymbolType.get(tmpType));
+                //funcSymbolTable.add(newQue);
+            }
+            else if(parent.name.equals("<Block>")) {
+                currentLevel++;
+                STTQue newQue=(funcDefineFlag!=0&&blockNum==0)?funcSymbolTable.get(funcSymbolTable.size()-1):new STTQue(currentLevel);
+                currentSTTQue=newQue;
+                STTNode newSTTNode=new STTNode(currentSTTQue);
                 currentSTTNode.addChild(newSTTNode);
                 currentSTTNode=newSTTNode;
-                currentLevel++;
+                currentSTTNode.que=currentSTTQue;
+                // if(getASTNodeContent(parent, new int[] {1}).equals("}")) {
+                //     currentLevel--;
+                // }
+                // if(funcDefineFlag!=0){
+                //     funcSymbolTable.add(currentSTTQue);
+                // }
+                //funcDefineFlag=0;
             }
-            else{//若是函数定义内容，将当前STTStack压入funcSymbolTable
-                funcSymbolTable.add(currentSTTStack);
-            }
-        }
-        //函数调用
-        else if(isFuncCall(parent)!=null) {
-            String funcName=isFuncCall(parent);
-            int len=funcSymbolTable.size();
-            STTStack newStack=null;
-            for(int i=0;i<len;i++){
-                if(funcSymbolTable.get(i).peekStack(0).name.equals(funcName)){
-                    newStack=funcSymbolTable.get(i);
-                    break;
+            //函数调用
+            else if(isFuncCall(parent)!=null) {
+            //     String funcName=isFuncCall(parent);
+            //     int len=funcSymbolTable.size();
+            //     STTQue newQue=null;
+            //     //在funcSymbolTable中查找符合函数名的栈
+            //     for(int i=0;i<len;i++){
+            //         if(funcSymbolTable.get(i).peekQue(0).name.equals(funcName)){
+            //             newQue=funcSymbolTable.get(i);
+            //             break;
+            //         }
+                    
+            //     }
+            //     //添加标识用于跳转
+            //     // currentSTTQue.pushQue(currentLevel, "jumpChild", currentToken);
+            //     //设置子树节点中添加返回指针
+            //     STTQue.Element retElement=currentSTTQue.peekQue(currentSTTQue.front);
+            //     newQue.setRet(retElement);
+    
+            //     //在当前栈中加入存有函数调用的栈元素
+            //     currentSTTQue.pushQue(currentLevel, funcName, newQue.peekQue(0).type);
+            //     //去掉存函数名的栈元素，并更新栈中所有元素的level
+            //     newQue.que.remove(0);
+            //     newQue.level=currentLevel+1;
+            //     for(int i=0;i<newQue.que.size();i++){
+            //         newQue.que.get(i).level=currentLevel+1;
+            //     }
+            //     //加入新的树节点
+            //     STTNode newSTTNode=new STTNode(newQue);
+            //     currentSTTNode.addChild(newSTTNode);
+            //     currentSTTNode=newSTTNode;
+            //     currentLevel++;
+                int paraNum=0;
+                if(getASTNodeContent(parent, new int[] {0,0,0,2}).equals(")")) paraNum=0;
+                else{
+                    paraNum=getASTNode(parent, new int[] {0,0,0,2}).children.size()/2+1;
                 }
-                
+                String[] paraNames=(paraNum==0)?null:new String[paraNum];
+                for(int i=0;i<paraNum;i++){
+                    String paraKind=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0});
+                    System.out.println(paraKind);
+                    if(paraKind.equals("<Number>")||paraKind.equals("<Character>")){
+                        paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0});
+                    }
+                    else paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0,0});
+                }
+                String[] paraTypes=(paraNum==0)?null:new String[paraNum];
+                for(int i=0;i<paraNum;i++){
+                    STTNode tmpNode=currentSTTNode;
+                    while(tmpNode!=null){
+                        if(isCharConst(paraNames[i])){
+                            paraTypes[i]="Char";
+                            continue;
+                        } 
+                        else if(isIntConst(paraNames[i])){
+                            paraTypes[i]="Int";
+                        }
+                        for(Element element:tmpNode.que.que){
+                            if(element.name.equals(paraNames[i])){
+                                paraTypes[i]=element.type;
+                                break;
+                            }
+                        }
+                        tmpNode=tmpNode.parent;
+                    }
+                }
+                checkFuncCall(parent, getASTNodeContent(parent, new int[] {0,0,0,0,0}), paraNum, paraTypes);
             }
-            //在当前栈中加入存有函数调用的栈元素
-            currentSTTStack.pushStack(currentLevel, funcName, newStack.peekStack(0).type);
-            //去掉存函数名的栈元素，并更新栈中所有元素的level
-            newStack.stack.remove(0);
-            newStack.level=currentLevel+1;
-            for(int i=0;i<newStack.stack.size();i++){
-                newStack.stack.get(i).level=currentLevel+1;
+            
+            else if(parent.name.equals("<Stmt>")) {
+                if(getASTNodeContent(parent, new int[] {0}).equals("<LVal>")) checkChangeConst(getASTNode(parent, new int[] {0}));
             }
-            STTNode newSTTNode=new STTNode(newStack);
-            currentSTTNode.addChild(newSTTNode);
-            currentSTTNode=newSTTNode;
-            currentLevel++;
+            else if(parent.name.equals("<LVal>")) {
+                checkNoDefine(parent);
+            }
+            else if(parent.name.equals("<ForStmt>")) {
+                checkChangeConst(getASTNode(parent,new int[] {0} ));
+            }
+            else if(parent.name.equals("<UnaryExp>")&&getASTNodeContent(parent, new int[] {0}).equals("<Ident>")) {
+                checkNoDefine(parent);
+            }
+
         }
-        else if(parent.name.equals("}")) {
-            if(currentSTTStack.level!=-1) currentLevel=0; //若是函数定义的结束，currentLevel回归0
+        
+        
+    }
+    
+    private static void STTPreorder(STTNode parent){
+        
+        for(Element element:parent.que.que){
+            if(!element.type.equals("numofparams")) writeFile(symbolFile,element.level+" "+element.name+" "+element.type+"\n");
+        }
+        for(STTNode child:parent.children){
+            STTPreorder(child);
         }
     }
     private static String isFuncCall(ASTNode parent){
-        if(parent.name.equals("<Stmt>")){
-            if(((NNode)parent.children.get(0)).name.equals("<LVal>")&&((TNode)parent.children.get(1)).token.equals("=")){
-                if(((TNode)parent.children.get(2)).token.equals("getint")) return "getint";
-                else if(((TNode)parent.children.get(2)).token.equals("getchar")) return "getchar";
-                else if(((NNode)parent.children.get(2).children.get(0).children.get(0).children.get(0).children.get(0)).name.equals("<Ident>")){
-                    return ((TNode)(((NNode)parent.children.get(2)).children.get(0).children.get(0).children.get(0).children.get(0).children.get(0))).token;
-                }
+        if(parent.name.equals("<Exp>")){
+            if(getASTNodeContent(parent, new int[] {0}).equals("<AddExp>")&&getASTNodeContent(parent, new int[] {0,0}).equals("<MulExp>")&&getASTNodeContent(parent,new int[] {0,0,0}).equals("<UnaryExp>")&&getASTNodeContent(parent,new int[] {0,0,0,0}).equals("<Ident>")){
+                return getASTNodeContent(parent,new int[] {0,0,0,0,0});
             }
         }
         return null;
     }
+    public static ASTNode getASTNode(ASTNode node,int[] indexs){
+        ASTNode ansNode=node;
+        for(int index:indexs){
+            ansNode=ansNode.children.get(index);
+        }
+        return ansNode;
+    }
+    private static String getASTNodeContent(ASTNode node,int[] indexs){ 
+        int len=indexs.length;
+        if(node instanceof ENode) return "error";
+        else {
+            ASTNode tmpNode=node;
+            for(int i=0;i<len;i++){
+                tmpNode=tmpNode.children.get(indexs[i]);
+            }
+            if(tmpNode instanceof TNode) return ((TNode)tmpNode).token;
+            else return tmpNode.name;
+            //return ((tmpNode.children.get(indexs[len-1]))).token;
+        }
+    }
+    private static void checkReDefine(STTQue que,String name,int lineNumber){
+        if(que==null||que.isEmpty()) return;
+        for(Element element:que.que){
+            if(element.name.equals(name)){
+                writeFile(errorFile,lineNumber+" "+"b\n");
+                return;
+            }
+        }
+        
+    }
+    private static void checkNewDefine(String name){
+        STTNode tmpNode=currentSTTNode.parent;
+        while(tmpNode!=null){
+            for(Element element:tmpNode.que.que){
+                System.out.println(element.name);
+                if(element.name.equals(name)){
+                    tmpNode.que.removeQue(element);
+                    return;
+                }
+            }
+            tmpNode=tmpNode.parent;
+        }
+    }
+    private static void checkChangeConst(ASTNode parent){//传入LVal
+        String lvalName=getASTNodeContent(parent,new int[] {0,0});
+        for(Element element:constSymbolTable){
+            if(element.name.equals(lvalName)){
+                writeFile(errorFile, ((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+"h\n");
+            }
+        }
+    }
+    private static void checkPrintf(ASTNode parent){
+        String stringConst=getASTNodeContent(parent, new int[] {2,0});
+        int expNum=(parent.children.size()-5)/2;
+        int formatNum=0;
+        for(char ch:stringConst.toCharArray()){
+            if(ch=='%') formatNum++;
+        }
+        if(expNum!=formatNum){
+            writeFile(errorFile, ((TNode)getASTNode(parent, new int[] {2,0})).lineNumber+" "+"l\n");
+        }
+    }
+    private static void checkNoDefine(ASTNode parent){
+        String lvalName=getASTNodeContent(parent,new int[] {0,0});
+        STTNode tmp=currentSTTNode;
+        while(tmp!=null){
+            STTQue que=tmp.que;
+            for(Element element:que.que){
+                if(element.name.equals(lvalName)){
+                    return;
+                }
+            }
+            tmp=tmp.parent;
+        }
+        // for(Element element:varSymbolTable){
+        //     if(element.name.equals(lvalName)){
+        //         return;
+        //     }
+        // }
+        // for(Element element:constSymbolTable){
+        //     if(element.name.equals(lvalName)){
+        //         return;
+        //     }
+        // }
+        writeFile(errorFile, ((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+"c\n");
+    }
+    private static void checkFuncCall(ASTNode parent,String funcName,int paraNum,String[] paraTypes){
+        for(STTQue que:funcSymbolTable){
+            if(que.peekQue(0).name.equals(funcName)){
+                if(que.peekQue(0).level!=paraNum){
+                    writeFile(errorFile,((TNode)getASTNode(parent,new int[] {0,0,0,0,0})).lineNumber+" "+"d\n");
+                    return;
+                } 
+                if(paraTypes==null) return;
+                int tmpIndex=1;
+                for(String type:paraTypes){
+                    if(!type.equals(que.peekQue(tmpIndex).type)){
+                        writeFile(errorFile,((TNode)getASTNode(parent,new int[] {0,0,0,0,0})).lineNumber+" "+"e\n");
+                        return;
+                    } 
+                    tmpIndex++;
+                }
+            }
+        }
+    }
+    
 }
 
