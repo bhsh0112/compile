@@ -1,25 +1,36 @@
-int checkYear(int year){ 
-    const int i = 0;
-    if(year % 4 == 0{ // 错误1 j
-        if(year % 100 == 0){
-            if(year % 400 == 0 return 0; // 错误2 j
-            return 1;
-        }
-        return 1;
-    } else{
-        return 0;
-    }
-} // 错误3 g
+const int a1 = 1, a2 = +3, a3 = 8;
+int b1 = 0 + 2, b2 = -5, b3 = +6;
 
 int main() {
-    int year;
-    year = getint(; // 错误4 j
-
-    if(checkYear(year)){
-        printf("leap year\n"; // 错误5 j
-    } else{
-        printf("common year\n");
-    }
-    
-    return 0;
+	printf("\n");
+	int n = 10;
+	for (;n;) {
+		n = n - 1;
+		if (n < b3) {
+			continue;
+			printf("Continue is error!\n");
+		}
+		if (n < a1) {
+			break;
+			printf("Break is error!And < is error!\n");
+		}
+		if (n == a2) {
+			printf("+ is correct!\n");
+		} else {
+			printf("+ is error!\n");
+		}
+		if (n == b1) {
+			break;
+		}
+	}
+	if (n != b1) {
+		if (n == 0) {
+			printf("Break is error!\n");
+		} else {
+			printf("Continue is error!\n");
+		}
+	}
+	printf("a1+b1 is %d\n", a1 + b1);
+	printf("a2+b2 is %d\n", a2 + b2);
+	return 0;
 }

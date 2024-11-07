@@ -1176,7 +1176,7 @@ public class Compiler {
                 currentSTTNode.que.pushQue(currentSTTNode.que.level,"return","return","return");
             }
             else if(((TNode)parent).token.equals("}")&&parent.parent.name.equals("<Block>")) {
-                if(parent.parent.parent.name.equals("<FuncDef>")) {
+                if((parent.parent.parent.name.equals("<FuncDef>")&&funcDefineFlag==OTHERFUNC)||parent.parent.parent.name.equals("<MainFuncDef>")) {
                     boolean flag=false;
                     for(Element element:currentSTTNode.que.que){
                         if(element.name.equals("return")){
@@ -1398,7 +1398,7 @@ public class Compiler {
     private static void STTPreorder(STTNode parent){
         
         for(Element element:parent.que.que){
-            if(!element.type.equals("numofparams")) writeFile(symbolFile,element.level+" "+element.name+" "+element.type+"\n");
+            if((!element.type.equals("numofparams"))&&(!element.type.equals("return"))) writeFile(symbolFile,element.level+" "+element.name+" "+element.type+"\n");
         }
         for(STTNode child:parent.children){
             STTPreorder(child);
@@ -1469,7 +1469,7 @@ public class Compiler {
         STTNode tmp=currentSTTNode;
         while(tmp!=STTRoot){
             for(Element element:tmp.que.que){
-                if(element.name.equals(lvalName)){
+                if(element.name.equals(lvalName)&&(!element.kind.equals("Const"))){
                     return;
                 }
             }

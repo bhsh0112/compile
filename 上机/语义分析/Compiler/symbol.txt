@@ -1,9 +1,7 @@
-1 checkYear IntFunc
-2 year Int
-2 i ConstInt
-3 return return
-4 return return
-4 return return
-5 return return
-6 year Int
-6 return return
+1 a1 ConstInt
+1 a2 ConstInt
+1 a3 ConstInt
+1 b1 Int
+1 b2 Int
+1 b3 Int
+2 n Int
