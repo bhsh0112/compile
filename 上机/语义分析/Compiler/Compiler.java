@@ -1170,7 +1170,7 @@ public class Compiler {
                 }
             }
             else if(((TNode)parent).token.equals("return")) {
-                if(funcDefineFlag==1&&(!getASTNodeContent(parent.parent,new int[] {1}).equals(";"))){
+                if(funcDefineFlag==VOIDFUNC&&(!getASTNodeContent(parent.parent,new int[] {1}).equals(";"))){
                     writeFile(errorFile, ((TNode)parent).lineNumber+" f\n");
                 }
                 currentSTTNode.que.pushQue(currentSTTNode.que.level,"return","return","return");
@@ -1186,7 +1186,7 @@ public class Compiler {
                     if(!flag) writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
                 }
                 blockNum--;
-                if(blockNum==0)funcDefineFlag=0;
+                if(blockNum==0)funcDefineFlag=ISNOTFUNC;
                 forFlag=false;
                 currentSTTNode=currentSTTNode.parent;
                 currentSTTQue=currentSTTNode.que;
@@ -1211,9 +1211,9 @@ public class Compiler {
                     if((parent.children.get(1).children.size()>=2)&&(getASTNodeContent(parent, new int[] {1,1}).equals("["))) ansVarType=tmpVarType+"R";
                     currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType),"Var");
                     varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType),"Var"));
-                    System.out.println(ansVarType+" "+ansVarName+" "+((TNode)getASTNode(parent, new int[]{1,0,0})).lineNumber);
+                    // System.out.println(ansVarType+" "+ansVarName);
                 }
-            
+                
                 for(int i=2;i<=varNum;i++){
                     ansVarType=tmpVarType;
                     tmpVarName=getASTNodeContent(parent, new int[] {2*i-1,0,0});
@@ -1262,10 +1262,10 @@ public class Compiler {
                 String tmpFuncName=getASTNodeContent(parent, new int[] {1,0});
                 String tmpFuncType=funcSymbolType.get(getASTNodeContent(parent, new int[] {0,0}));
                 if(tmpFuncType.equals("VoidFunc")){
-                    funcDefineFlag=1;
+                    funcDefineFlag=VOIDFUNC;
                 }
                 else{
-                    funcDefineFlag=2;
+                    funcDefineFlag=OTHERFUNC;
                 }
                 if(checkReDefine(STTRoot.que, tmpFuncName, ((TNode)getASTNode(parent, new int[] {1,0})).lineNumber)){
                     rightFuncDefine=true;
@@ -1280,7 +1280,7 @@ public class Compiler {
             }
             else if(parent.name.equals("<MainFuncDef>")) {
                 rightFuncDefine=true;
-                funcDefineFlag=0;
+                funcDefineFlag=ISNOTFUNC;
             }
             else if(parent.name.equals("<FuncFParam>")) {
                 String tmpName=getASTNodeContent(parent, new int[]{1,0});
@@ -1294,7 +1294,7 @@ public class Compiler {
             }
             else if(parent.name.equals("<Block>")) {
                 currentLevel++;
-                STTQue newQue=(funcDefineFlag!=0&&blockNum==0)?funcSymbolTable.get(funcSymbolTable.size()-1):new STTQue(currentLevel);
+                STTQue newQue=(funcDefineFlag!=ISNOTFUNC&&blockNum==0)?funcSymbolTable.get(funcSymbolTable.size()-1):new STTQue(currentLevel);
                 currentSTTQue=newQue;
                 STTNode newSTTNode=new STTNode(currentSTTQue);
                 currentSTTNode.addChild(newSTTNode);
@@ -1352,26 +1352,39 @@ public class Compiler {
                     if(paraKind.equals("<Number>")||paraKind.equals("<Character>")){
                         paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0});
                     }
-                    else paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0,0});
+                    else if(paraKind.equals("<LVal>")){
+                        paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0,0});
+                    } 
+                    else return;
                 }
                 String[] paraTypes=(paraNum==0)?null:new String[paraNum];
+                
+                //确定稿参数类型
                 for(int i=0;i<paraNum;i++){
                     STTNode tmpNode=currentSTTNode;
-                    while(tmpNode!=null){
-                        if(isCharConst(paraNames[i])){
-                            paraTypes[i]="Char";
-                            continue;
-                        } 
-                        else if(isIntConst(paraNames[i])){
-                            paraTypes[i]="Int";
-                        }
-                        for(Element element:tmpNode.que.que){
-                            if(element.name.equals(paraNames[i])){
-                                paraTypes[i]=element.type;
-                                break;
+                    //如果是字符常量
+                    if(isCharConst(paraNames[i])){
+                        paraTypes[i]="Char";
+                        continue;
+                    } 
+                    //如果是数字常量
+                    else if(isIntConst(paraNames[i])){
+                        paraTypes[i]="Int";
+                    }
+                    //如果是已有变量
+                    else{
+                        boolean flag=false;
+                        while(tmpNode!=null){
+                            for(Element element:tmpNode.que.que){
+                                if(element.name.equals(paraNames[i])){
+                                    paraTypes[i]=element.type;
+                                    flag=true;
+                                    break;
+                                }
                             }
+                            tmpNode=tmpNode.parent;
                         }
-                        tmpNode=tmpNode.parent;
+                        if(!flag) paraTypes[i]="errPara";
                     }
                 }
                 checkFuncCall(parent, getASTNodeContent(parent, new int[] {0,0,0,0,0}), paraNum, paraTypes);
@@ -1434,6 +1447,10 @@ public class Compiler {
     private static boolean checkReDefine(STTQue que,String name,int lineNumber){
         if(que==null||que.isEmpty()) return true;
         for(Element element:que.que){
+            if((element.type.equals("numofparams")&&element.kind.equals("Func"))||element.type.equals("return")){
+                continue;
+            }
+            System.out.println(element.name+" "+name);
             if(element.name.equals(name)){
                 writeFile(errorFile,lineNumber+" "+"b\n");
                 return false;
@@ -1498,7 +1515,6 @@ public class Compiler {
         while(tmp!=null){
             STTQue que=tmp.que;
             for(Element element:que.que){
-                // System.out.println(((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+element.name+" "+lvalName);
                 if(element.name.equals(lvalName)){
                     return;
                 }
