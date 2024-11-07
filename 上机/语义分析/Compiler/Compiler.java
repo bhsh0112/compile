@@ -47,7 +47,6 @@ public class Compiler {
     public static int VOIDFUNC=1;
     public static int OTHERFUNC=2;
 
-    public static boolean gErrorFlag=false;
     public static boolean forFlag=false;
     public static boolean inMainFlag=false;
     public static boolean rightFuncDefine=true;
@@ -1145,28 +1144,10 @@ public class Compiler {
     private static void ASTPreorder(ASTNode parent){
         
         if(parent instanceof ENode){
-            if(!(((ENode)parent).errorType.equals("noType"))) writeError(((ENode)parent).errorType,((ENode)parent).lineNumber);
+            if(!(((ENode)parent).errorType.equals("noType"))){
+                writeError(((ENode)parent).errorType,((ENode)parent).lineNumber);
+            } 
         } 
-        // else if(parent instanceof TNode){
-        //     String tmp_token=((TNode)parent).token;
-        //     if (isWords(tmp_token)) {
-        //         writeFile(parserFile, words.get(tmp_token) + " " + tmp_token + "\n");
-        //     } else if (isIntConst(tmp_token)) {
-        //         writeFile(parserFile, "INTCON"+ " " + tmp_token + "\n");
-        //     } else if (isStringConst(tmp_token)) {
-        //         writeFile(parserFile, "STRCON"+" " + tmp_token + "\n");
-        //     } else if (isCharConst(tmp_token)) {
-        //         writeFile(parserFile, "CHRCON " + tmp_token + "\n");
-        //     }  else if (isIdentifier(tmp_token)) {
-        //         writeFile(parserFile, "IDENFR " + tmp_token + "\n");
-        //     } 
-        // }
-        // else{
-        //     if(parent.name.equals("<StringConst>")||parent.name.equals("<Ident>")||parent.name.equals("<BType>")||parent.name.equals("<Decl>")||parent.name.equals("<BlockItem>")){
-
-        //     }
-        //     else writeFile(parserFile, parent.name + "\n");
-        // }
         else{
             symbol(parent);
         }
@@ -1192,13 +1173,17 @@ public class Compiler {
                 if(funcDefineFlag==1&&(!getASTNodeContent(parent.parent,new int[] {1}).equals(";"))){
                     writeFile(errorFile, ((TNode)parent).lineNumber+" f\n");
                 }
-                gErrorFlag=false;
+                currentSTTNode.que.pushQue(currentSTTNode.que.level,"return","return","return");
             }
             else if(((TNode)parent).token.equals("}")&&parent.parent.name.equals("<Block>")) {
                 if(parent.parent.parent.name.equals("<FuncDef>")) {
-                    if(gErrorFlag){
-                        writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
+                    boolean flag=false;
+                    for(Element element:currentSTTNode.que.que){
+                        if(element.name.equals("return")){
+                            flag=true;
+                        }
                     }
+                    if(!flag) writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
                 }
                 blockNum--;
                 if(blockNum==0)funcDefineFlag=0;
@@ -1281,7 +1266,6 @@ public class Compiler {
                 }
                 else{
                     funcDefineFlag=2;
-                    gErrorFlag=true;
                 }
                 if(checkReDefine(STTRoot.que, tmpFuncName, ((TNode)getASTNode(parent, new int[] {1,0})).lineNumber)){
                     rightFuncDefine=true;
@@ -1357,6 +1341,7 @@ public class Compiler {
             //     currentSTTNode=newSTTNode;
             //     currentLevel++;
                 int paraNum=0;
+                if(getASTNode(parent, new int[] {0,0,0,getASTNode(parent,new int[] {0,0,0}).children.size()-1}).name.equals("error")) return;
                 if(getASTNodeContent(parent, new int[] {0,0,0,2}).equals(")")) paraNum=0;
                 else{
                     paraNum=getASTNode(parent, new int[] {0,0,0,2}).children.size()/2+1;
