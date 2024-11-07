@@ -12,11 +12,13 @@ public class STTQue {
         public int level;
         public String name;
         public String type;
+        public String kind;
 
-        public Element(int level, String name, String type) {
+        public Element(int level, String name, String type,String kind) {
             this.level = level;
             this.name = name;
             this.type = type;
+            this.kind=kind;
         }
     }
     public STTQue(int level) {
@@ -27,8 +29,8 @@ public class STTQue {
         this.ret = null;
     }
 
-    public void pushQue(int level, String name, String type) {
-        Element element = new Element(level, name, type);
+    public void pushQue(int level, String name, String type,String kind) {
+        Element element = new Element(level, name, type,kind);
         que.add(element);
         front++;
     }

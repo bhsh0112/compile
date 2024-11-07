@@ -50,6 +50,7 @@ public class Compiler {
     public static boolean gErrorFlag=false;
     public static boolean forFlag=false;
     public static boolean inMainFlag=false;
+    public static boolean rightFuncDefine=true;
     public static int blockNum=0;
 
     //build the directory "words"
@@ -143,7 +144,9 @@ public class Compiler {
         get3Token();
         parserComunit(); 
         STTRoot = new STTNode(new STTQue(1));
+        STTRoot.parent=null;
         currentSTTNode = STTRoot;
+        currentSTTQue=currentSTTNode.que;
         ASTPreorder(ASTRoot);  
         STTPreorder(STTRoot);     
 
@@ -1140,6 +1143,7 @@ public class Compiler {
     }
     
     private static void ASTPreorder(ASTNode parent){
+        
         if(parent instanceof ENode){
             if(!(((ENode)parent).errorType.equals("noType"))) writeError(((ENode)parent).errorType,((ENode)parent).lineNumber);
         } 
@@ -1165,11 +1169,13 @@ public class Compiler {
         // }
         else{
             symbol(parent);
-            
         }
-        for(ASTNode child:parent.children){
-            ASTPreorder(child);
-        }  
+        if(rightFuncDefine){
+            for(ASTNode child:parent.children){
+                ASTPreorder(child);
+            }  
+        }
+        else rightFuncDefine=true;
         
     }
     private static void symbol(ASTNode parent){
@@ -1215,22 +1221,25 @@ public class Compiler {
                 String tmpVarName=getASTNodeContent(parent, new int[]{1,0,0});
                 ansVarName=tmpVarName;
                 ansVarType=tmpVarType;
-                checkNewDefine(ansVarName);
-                checkReDefine(currentSTTQue,ansVarName, ((TNode)getASTNode(parent, new int[]{1,0,0})).lineNumber);
-                
-                if((parent.children.get(1).children.size()>=2)&&(getASTNodeContent(parent, new int[] {1,1}).equals("["))) ansVarType=tmpVarType+"R";
-                currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType));
-                varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType)));
+                if(checkReDefine(currentSTTQue,ansVarName, ((TNode)getASTNode(parent, new int[]{1,0,0})).lineNumber)){
+                    checkNewDefine(ansVarName,false);
+                    if((parent.children.get(1).children.size()>=2)&&(getASTNodeContent(parent, new int[] {1,1}).equals("["))) ansVarType=tmpVarType+"R";
+                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType),"Var");
+                    varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType),"Var"));
+                    System.out.println(ansVarType+" "+ansVarName+" "+((TNode)getASTNode(parent, new int[]{1,0,0})).lineNumber);
+                }
+            
                 for(int i=2;i<=varNum;i++){
                     ansVarType=tmpVarType;
                     tmpVarName=getASTNodeContent(parent, new int[] {2*i-1,0,0});
                     ansVarName=tmpVarName;
-                    checkNewDefine(ansVarName);
-                    checkReDefine(currentSTTQue,ansVarName,((TNode)getASTNode(parent, new int[]{2*i-1,0,0})).lineNumber );
+                    if(checkReDefine(currentSTTQue,ansVarName,((TNode)getASTNode(parent, new int[]{2*i-1,0,0})).lineNumber )){
+                        checkNewDefine(ansVarName,false);
+                        if((parent.children.get(2*i-1).children.size()>=2)&&getASTNodeContent(parent, new int[] {2*i-1,1}).equals("[")) ansVarType=tmpVarType+"R";
+                        currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType),"Var");
+                        varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType),"Var"));
+                    }
                     
-                    if((parent.children.get(2*i-1).children.size()>=2)&&getASTNodeContent(parent, new int[] {2*i-1,1}).equals("[")) ansVarType=tmpVarType+"R";
-                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType));
-                    varSymbolTable.add(new Element(currentLevel,ansVarName,varSymbolType.get(ansVarType)));
                 }
             }
             else if(parent.name.equals("<ConstDecl>")) {
@@ -1244,21 +1253,24 @@ public class Compiler {
                 String tmpVarName=getASTNodeContent(parent, new int[]{2,0,0});
                 ansVarName=tmpVarName;
                 ansVarType=tmpVarType;
-                checkNewDefine(ansVarName);
-                checkReDefine(currentSTTQue,tmpVarName, ((TNode)getASTNode(parent, new int[]{2,0,0})).lineNumber);
-                if((parent.children.get(2).children.size()>=2)&&getASTNodeContent(parent, new int[]{2,1}).equals("[")) ansVarType=tmpVarType+"R";
-                currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType));
-                constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType)));
+                if(checkReDefine(currentSTTQue,ansVarName, ((TNode)getASTNode(parent, new int[]{2,0,0})).lineNumber)){
+                    checkNewDefine(ansVarName,true);
+                    if((parent.children.get(2).children.size()>=2)&&getASTNodeContent(parent, new int[]{2,1}).equals("[")) ansVarType=tmpVarType+"R";
+                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType),"Const");
+                    constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType),"Const"));
+                }
+                
                 for(int i=2;i<=varNum;i++){
                     ansVarType=tmpVarType;
                     tmpVarName=getASTNodeContent(parent, new int[]{2*i,0,0});
                     ansVarName=tmpVarName;
-                    checkNewDefine(ansVarName);
-                    checkReDefine(currentSTTQue,tmpVarName, ((TNode)getASTNode(parent, new int[]{2*i,0,0})).lineNumber);
+                    if(checkReDefine(currentSTTQue,ansVarName, ((TNode)getASTNode(parent, new int[]{2*i,0,0})).lineNumber)){
+                        checkNewDefine(ansVarName,true);
+                        if((parent.children.get(2*i).children.size()>=2)&&getASTNodeContent(parent, new int[]{2*i,1}).equals("[")) ansVarType=tmpVarType+"R";
+                        currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType),"Const");
+                        constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType),"Const"));
+                    }
                     
-                    if((parent.children.get(2*i).children.size()>=2)&&getASTNodeContent(parent, new int[]{2*i,1}).equals("[")) ansVarType=tmpVarType+"R";
-                    currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,constSymbolType.get(ansVarType));
-                    constSymbolTable.add(new Element(currentLevel,ansVarName,constSymbolType.get(ansVarType)));
                 }
             }
             else if(parent.name.equals("<FuncDef>")) {
@@ -1271,11 +1283,20 @@ public class Compiler {
                     funcDefineFlag=2;
                     gErrorFlag=true;
                 }
-                checkReDefine(STTRoot.que, tmpFuncName, ((TNode)getASTNode(parent, new int[] {1,0})).lineNumber);
-                STTRoot.que.pushQue(1,tmpFuncName,tmpFuncType);
-                STTQue newQue=new STTQue(currentLevel+1);
-                newQue.pushQue(0,tmpFuncName,"numofparams");
-                funcSymbolTable.add(newQue);
+                if(checkReDefine(STTRoot.que, tmpFuncName, ((TNode)getASTNode(parent, new int[] {1,0})).lineNumber)){
+                    rightFuncDefine=true;
+                    STTRoot.que.pushQue(1,tmpFuncName,tmpFuncType,"Func");
+                    STTQue newQue=new STTQue(currentLevel+1);
+                    newQue.pushQue(0,tmpFuncName,"numofparams","Func");
+                    funcSymbolTable.add(newQue);
+                }
+                else{
+                    rightFuncDefine=false;
+                } 
+            }
+            else if(parent.name.equals("<MainFuncDef>")) {
+                rightFuncDefine=true;
+                funcDefineFlag=0;
             }
             else if(parent.name.equals("<FuncFParam>")) {
                 String tmpName=getASTNodeContent(parent, new int[]{1,0});
@@ -1284,7 +1305,7 @@ public class Compiler {
                 STTQue newQue=funcSymbolTable.get(funcSymbolTable.size()-1);
                 newQue.peekQue(0).level++;
                 checkReDefine(newQue,tmpName, ((TNode)getASTNode(parent, new int[]{1,0})).lineNumber);
-                newQue.pushQue(currentLevel+1,tmpName,varSymbolType.get(tmpType));
+                newQue.pushQue(currentLevel+1,tmpName,varSymbolType.get(tmpType),"Para");
                 //funcSymbolTable.add(newQue);
             }
             else if(parent.name.equals("<Block>")) {
@@ -1343,7 +1364,6 @@ public class Compiler {
                 String[] paraNames=(paraNum==0)?null:new String[paraNum];
                 for(int i=0;i<paraNum;i++){
                     String paraKind=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0});
-                    System.out.println(paraKind);
                     if(paraKind.equals("<Number>")||paraKind.equals("<Character>")){
                         paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0});
                     }
@@ -1424,34 +1444,52 @@ public class Compiler {
             }
             if(tmpNode instanceof TNode) return ((TNode)tmpNode).token;
             else return tmpNode.name;
-            //return ((tmpNode.children.get(indexs[len-1]))).token;
         }
     }
-    private static void checkReDefine(STTQue que,String name,int lineNumber){
-        if(que==null||que.isEmpty()) return;
+    private static boolean checkReDefine(STTQue que,String name,int lineNumber){
+        if(que==null||que.isEmpty()) return true;
         for(Element element:que.que){
             if(element.name.equals(name)){
                 writeFile(errorFile,lineNumber+" "+"b\n");
-                return;
+                return false;
             }
         }
-        
+        return true;
     }
-    private static void checkNewDefine(String name){
-        STTNode tmpNode=currentSTTNode.parent;
-        while(tmpNode!=null){
-            for(Element element:tmpNode.que.que){
-                System.out.println(element.name);
-                if(element.name.equals(name)){
-                    tmpNode.que.removeQue(element);
-                    return;
-                }
-            }
-            tmpNode=tmpNode.parent;
-        }
+    private static void checkNewDefine(String name,boolean isConst){
+        // STTNode tmpNode=currentSTTNode.parent;
+        // while(tmpNode!=null){
+        //     for(Element element:tmpNode.que.que){
+        //         if(element.name.equals(name)&&element.kind!="Para"){
+        //             // //element.name="removed";
+        //             // //如果新定义的量不是常量，且原量（上层）是常量，则删除常量表中的对应内容
+        //             // if(element.kind.equals("Const")&&!isConst){
+        //             //     for(Element constElement:constSymbolTable){
+        //             //         if(constElement.name.equals(name)){
+        //             //             constElement.name="removed";
+        //             //         } 
+        //             //     }
+                        
+        //             // }
+        //             // tmpNode.que.removeQue(element);
+        //             return;
+        //         }
+        //     }
+        //     tmpNode=tmpNode.parent;
+        // }
+        return;
     }
     private static void checkChangeConst(ASTNode parent){//传入LVal
         String lvalName=getASTNodeContent(parent,new int[] {0,0});
+        STTNode tmp=currentSTTNode;
+        while(tmp!=STTRoot){
+            for(Element element:tmp.que.que){
+                if(element.name.equals(lvalName)){
+                    return;
+                }
+            }
+            tmp=tmp.parent;
+        }
         for(Element element:constSymbolTable){
             if(element.name.equals(lvalName)){
                 writeFile(errorFile, ((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+"h\n");
@@ -1475,22 +1513,13 @@ public class Compiler {
         while(tmp!=null){
             STTQue que=tmp.que;
             for(Element element:que.que){
+                // System.out.println(((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+element.name+" "+lvalName);
                 if(element.name.equals(lvalName)){
                     return;
                 }
             }
             tmp=tmp.parent;
         }
-        // for(Element element:varSymbolTable){
-        //     if(element.name.equals(lvalName)){
-        //         return;
-        //     }
-        // }
-        // for(Element element:constSymbolTable){
-        //     if(element.name.equals(lvalName)){
-        //         return;
-        //     }
-        // }
         writeFile(errorFile, ((TNode)getASTNode(parent,new int[] {0,0})).lineNumber+" "+"c\n");
     }
     private static void checkFuncCall(ASTNode parent,String funcName,int paraNum,String[] paraTypes){
@@ -1503,7 +1532,7 @@ public class Compiler {
                 if(paraTypes==null) return;
                 int tmpIndex=1;
                 for(String type:paraTypes){
-                    if(!type.equals(que.peekQue(tmpIndex).type)){
+                    if((!type.equals(que.peekQue(tmpIndex).type)&&(!type.equals("Const"+que.peekQue(tmpIndex).type)))){
                         writeFile(errorFile,((TNode)getASTNode(parent,new int[] {0,0,0,0,0})).lineNumber+" "+"e\n");
                         return;
                     } 
