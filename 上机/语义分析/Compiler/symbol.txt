@@ -1,4 +1,4 @@
-1 f1 IntFunc
-1 f2 VoidFunc
-1 f3 CharFunc
-1 f4 IntFunc
+1 arr IntArray
+1 i ConstInt
+1 func IntFunc
+2 a Int

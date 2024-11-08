@@ -663,17 +663,25 @@ public class Compiler {
             parserStmt(curNode);
             forFlag=false;
         }
-        else if(currentToken.equals("break")&&nextToken.equals(";")){
+        else if(currentToken.equals("break")){
             if(forFlag) addNode(curNode, new TNode("break","leaf",lineNumber));
             else addNode(curNode, new TNode("break","errorleaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode(";","leaf",lineNumber));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
+            else{
+                backToken();
+                addNode(curNode, new ENode("i",lineNumber,"error"));
+            }
         }
-        else if(currentToken.equals("continue")&&nextToken.equals(";")){
+        else if(currentToken.equals("continue")){
             if(forFlag) addNode(curNode, new TNode("continue","leaf",lineNumber));
             else addNode(curNode, new TNode("continue","errorleaf",lineNumber));
             get3Token();
-            addNode(curNode, new TNode(";","leaf",lineNumber));
+            if(currentToken.equals(";"))addNode(curNode, new TNode(";","leaf",lineNumber));
+            else{
+                backToken();
+                addNode(curNode, new ENode("i",lineNumber,"error"));
+            }
         }
         else if(currentToken.equals("return")){
             addNode(curNode, new TNode("return","leaf",lineNumber));
@@ -1181,7 +1189,6 @@ public class Compiler {
                         break;
                     }
                 }
-                System.out.println(tmpFuncType);
                 if(tmpFuncType!=null&&(!inMainFlag)&&tmpFuncType.equals("VoidFunc")&&(!getASTNodeContent(parent.parent,new int[] {1}).equals(";"))) {
                     
                     writeFile(errorFile, ((TNode)parent).lineNumber+" f\n");
@@ -1199,11 +1206,9 @@ public class Compiler {
                 //     }
                 //     if(!flag) writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
                 // }
-                // System.out.println(parent.parent.parent.name+" "+gErrorFlag);
                 if(parent.parent.parent.name.equals("<FuncDef>")||parent.parent.parent.name.equals("<MainFuncDef>")) {
-                    // System.out.println(getASTNodeContent(parent.parent, new int[] {parent.parent.children.size()-2,0,0}));
+                    
                     if(gErrorFlag){
-                        System.out.println(parent.parent.children.size());
                         if(parent.parent.children.size()<3){
                             writeFile(errorFile, ((TNode)parent).lineNumber+" g\n");
                         }
@@ -1243,7 +1248,7 @@ public class Compiler {
                     checkNewDefine(ansVarName,false);
                     if((parent.children.get(1).children.size()>=2)&&(getASTNodeContent(parent, new int[] {1,1}).equals("["))) ansVarType=tmpVarType+"R";
                     currentSTTNode.que.pushQue(currentSTTNode.que.level,ansVarName,varSymbolType.get(ansVarType),"Var");
-                    // System.out.println(ansVarType+" "+ansVarName);
+                    
                 }
                 
                 for(int i=2;i<=varNum;i++){
@@ -1336,46 +1341,10 @@ public class Compiler {
                 currentSTTNode.addChild(newSTTNode);
                 currentSTTNode=newSTTNode;
                 currentSTTNode.que=currentSTTQue;
-                // if(getASTNodeContent(parent, new int[] {1}).equals("}")) {
-                //     currentLevel--;
-                // }
-                // if(funcDefineFlag!=0){
-                //     funcSymbolTable.add(currentSTTQue);
-                // }
                 //funcDefineFlag=0;
             }
             //函数调用
             else if(isFuncCall(parent)!=null) {
-            //     String funcName=isFuncCall(parent);
-            //     int len=funcSymbolTable.size();
-            //     STTQue newQue=null;
-            //     //在funcSymbolTable中查找符合函数名的栈
-            //     for(int i=0;i<len;i++){
-            //         if(funcSymbolTable.get(i).peekQue(0).name.equals(funcName)){
-            //             newQue=funcSymbolTable.get(i);
-            //             break;
-            //         }
-                    
-            //     }
-            //     //添加标识用于跳转
-            //     // currentSTTQue.pushQue(currentLevel, "jumpChild", currentToken);
-            //     //设置子树节点中添加返回指针
-            //     STTQue.Element retElement=currentSTTQue.peekQue(currentSTTQue.front);
-            //     newQue.setRet(retElement);
-    
-            //     //在当前栈中加入存有函数调用的栈元素
-            //     currentSTTQue.pushQue(currentLevel, funcName, newQue.peekQue(0).type);
-            //     //去掉存函数名的栈元素，并更新栈中所有元素的level
-            //     newQue.que.remove(0);
-            //     newQue.level=currentLevel+1;
-            //     for(int i=0;i<newQue.que.size();i++){
-            //         newQue.que.get(i).level=currentLevel+1;
-            //     }
-            //     //加入新的树节点
-            //     STTNode newSTTNode=new STTNode(newQue);
-            //     currentSTTNode.addChild(newSTTNode);
-            //     currentSTTNode=newSTTNode;
-            //     currentLevel++;
                 int paraNum=0;
                 if(getASTNode(parent, new int[] {0,0,0,getASTNode(parent,new int[] {0,0,0}).children.size()-1}).name.equals("error")) return;
                 if(getASTNodeContent(parent, new int[] {0,0,0,2}).equals(")")) paraNum=0;
@@ -1383,33 +1352,48 @@ public class Compiler {
                     paraNum=getASTNode(parent, new int[] {0,0,0,2}).children.size()/2+1;
                 }
                 String[] paraNames=(paraNum==0)?null:new String[paraNum];
+
+                //获取变量名，一坨狗屎
                 for(int i=0;i<paraNum;i++){
                     String paraKind=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0});
                     if(paraKind.equals("<Number>")||paraKind.equals("<Character>")){
                         paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0});
                     }
-                    else if(paraKind.equals("<LVal>")){
+                    else if(paraKind.equals("<LVal>")){//变量
                         paraNames[i]=getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,0,0});
+                        if(getASTNode(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0}).children.size()>1&&getASTNodeContent(parent, new int[] {0,0,0,2,2*i,0,0,0,0,0,1}).equals("[")){
+                            paraNames[i]=paraNames[i]+"\'s element";
+                        }
                     } 
-                    else return;
+                    else{//不是变量的前提下，不会是数组，因为in、char可互传，这里统一制成数字1就可以
+                        paraNames[i]="1";
+                    }
+                    
                 }
                 String[] paraTypes=(paraNum==0)?null:new String[paraNum];
                 
                 //确定参数类型
                 for(int i=0;i<paraNum;i++){
-                    STTNode tmpNode=currentSTTNode;
+                    
+    
                     //如果是字符常量
                     if(isCharConst(paraNames[i])){
                         paraTypes[i]="Char";
-                        continue;
                     } 
                     //如果是数字常量
                     else if(isIntConst(paraNames[i])){
                         paraTypes[i]="Int";
                     }
+                    else if(paraNames[i].endsWith(" func")&&paraNames[i].startsWith("a ")){
+                        String returnType=paraNames[i].substring(2, paraNames[i].length()-5);
+                        if(returnType.equals("VoidFunc")) paraTypes[i]="void";
+                        else if(returnType.equals("IntFunc")) paraTypes[i]="int";
+                        else if(returnType.equals("CharFunc")) paraTypes[i]="char";
+                    }
                     //如果是已有变量
                     else{
                         boolean flag=false;
+                        STTNode tmpNode=currentSTTNode;
                         while(tmpNode!=null){
                             for(Element element:tmpNode.que.que){
                                 if(element.name.equals(paraNames[i])){
@@ -1417,12 +1401,23 @@ public class Compiler {
                                     flag=true;
                                     break;
                                 }
+                                else if((element.name+"\'s element").equals(paraNames[i])){
+                                    if(element.type.equals("IntArray")||element.type.equals("ConstIntArray")){
+                                        paraTypes[i]="Int";
+                                    }
+                                    else if(element.type.equals("CharArray")||element.type.equals("ConstCharArray")){
+                                        paraTypes[i]="Char";
+                                    }
+                                    flag=true;
+                                    break;
+                                }
                             }
                             tmpNode=tmpNode.parent;
                         }
-                        if(!flag) paraTypes[i]="errorPara";
+                        if(!flag) return;
                     }
                 }
+                
                 checkFuncCall(parent, getASTNodeContent(parent, new int[] {0,0,0,0,0}), paraNum, paraTypes);
             }
             
@@ -1436,6 +1431,7 @@ public class Compiler {
                 checkChangeConst(getASTNode(parent,new int[] {0} ));
             }
             else if(parent.name.equals("<UnaryExp>")&&getASTNodeContent(parent, new int[] {0}).equals("<Ident>")) {
+                System.out.println("2222222222222");
                 checkNoDefine(parent);
             }
 
@@ -1535,23 +1531,21 @@ public class Compiler {
     }
     private static void checkPrintf(ASTNode parent){
         String stringConst=getASTNodeContent(parent, new int[] {2,0});
-        System.out.println(parent.children.size());
         int expNum=(parent.children.size()-5)/2;
         int formatNum=0;
         for(int i=0;i<stringConst.length()-1;i++){
-            System.out.println(stringConst.charAt(i)+" "+stringConst.charAt(i+1));
             if(stringConst.charAt(i)=='%'){
                 if(stringConst.charAt(i+1)=='c'||stringConst.charAt(i+1)=='d') formatNum++;
                 else if(stringConst.charAt(i+1)=='%') i++;
             } 
         }
-        System.out.println(expNum+" "+formatNum);
         if(expNum!=formatNum){
             writeFile(errorFile, ((TNode)getASTNode(parent, new int[] {2,0})).lineNumber+" "+"l\n");
         }
     }
     private static void checkNoDefine(ASTNode parent){
         String lvalName=getASTNodeContent(parent,new int[] {0,0});
+        System.out.println(lvalName);
         STTNode tmp=currentSTTNode;
         while(tmp!=null){
             STTQue que=tmp.que;
@@ -1581,8 +1575,6 @@ public class Compiler {
                     //     writeFile(errorFile,((TNode)getASTNode(parent,new int[] {0,0,0,0,0})).lineNumber+" "+"e\n");
                     //     return;
                     // } 
-                    System.out.println(funcName);
-                    System.out.println(type+" "+que.peekQue(tmpIndex).type);
                     if(type.endsWith("Array")&&(!que.peekQue(tmpIndex).type.endsWith("Array"))){
                         writeFile(errorFile,((TNode)getASTNode(parent,new int[] {0,0,0,0,0})).lineNumber+" "+"e\n");
                         return;

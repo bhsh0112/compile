@@ -1,11 +1,9 @@
-int f1()
-{}
-
-void f2() {}
-
-char f3() {}
-int f4() {}
-
-int main() {
-
+int func1(){
+    return 2;
+}
+int func2(){
+    return 1;
+}
+int main(){
+    int a=func1(func2(1));
 }
