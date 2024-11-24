@@ -157,22 +157,6 @@ public class Compiler {
     }
     public static String getErrorType(String token){
         if(token.equals("&")||token.equals("|")) return "a";
-        // else if(){
-            
-        //     return "b";
-        // }
-        // else if(){
-
-        //     return "c";
-        // }
-        // else if(){
-
-        //     return "d";
-        // }
-        // else if(){
-
-        //     return "e";
-        // }
         else return "invalid error";
     }
     

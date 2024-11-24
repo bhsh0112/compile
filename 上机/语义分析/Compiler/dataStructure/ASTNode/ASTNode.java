@@ -20,4 +20,7 @@ public class ASTNode {
     public void removeChild(Object child) {
         children.remove(child);
     }
+    public void getIR(String outputFile){
+
+    }
 }
