@@ -1,0 +1,10 @@
+int a=1;
+int b=1+a;
+int main() {
+    int a;
+    char b;
+    a = getint();
+    b = getchar();
+    printf("Hello: %d, %c", a, b);
+    return 0;
+}

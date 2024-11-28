@@ -1,5 +1,0 @@
-@a = dso_local global i32 3
-define dso_local i32 @test(i32 %0, i32 %1) {
-}
-define dso_local i32 @main() {
-}

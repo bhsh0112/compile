@@ -1,0 +1,20 @@
+package llvm.ir.value.inst;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+import llvm.ir.value.Value;
+
+public class MulInst extends Instruction{
+    public MulInst(Value... operands) {
+		super(operands);
+	}
+
+	public void output(BufferedWriter writer) throws IOException {
+		// super.parentBasicBlock.getName();
+		String lval=getName();
+		String left = operands.get(0).getName();
+		String right = operands.get(1).getName();
+		writer.write("\t" + lval + " = mul nsw i32 " + left + ", " + right+"\n");
+	}
+}

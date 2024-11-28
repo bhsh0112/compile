@@ -1,7 +1,0 @@
-const int a=1+2;
-int test(int b,int c){
-    
-}
-int main() {
-    
-}
