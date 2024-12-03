@@ -178,7 +178,7 @@ static {
 
 ### 5 中间代码生成一（LLVMIR）
 
-#### 文件结构
+#### 5.1 文件结构
 
 本次任务的代码主体在llvm文件夹下，**代码顶层接口为`llvm.ir.Module.main`**
 
@@ -219,7 +219,7 @@ llvm文件结构如下：
 
 
 
-#### 体系结构
+#### 5.2 体系结构
 
 - Module
 
@@ -235,15 +235,206 @@ llvm文件结构如下：
 
 ​		因此，全局量和函数定义在顶层类Moudle中处理，函数定义中只处理BasicBlock，各类指令在BasicBlock中处理。
 
-#### 全局变量
+#### 5.3 具体实现
 
-#### 函数定义
+​		由上可知，顶层module模块中只需要实现对全局变量和函数定义的处理即可。因此在module中设置两个ArrayList属性，分别记录全局变量和函数定义
 
-#### 局部变量
+```java
+public static ArrayList<GlobalValue> globalValues = new ArrayList<>();
+public static ArrayList<Function> functions = new ArrayList<>();
+```
+
+##### 5.3.1 全局变量
+
+​		根据sysy语法，为module添加正确的GlobalValue实例即可
+
+##### 5.3.2 函数定义
+
+​		与上面类似的，根据sysy语法，为module添加正确的Function实例即可，这里不同前面，需要对参数进行分析，主要过程如下：
+
+```java
+ReturnType retType=new ReturnType(symbol.getASTNodeContent(parent, new int[] {0,0}));
+String funcName=symbol.getASTNodeContent(parent, new int[] {1,0});
+int paraNum=(parent.children.size()==5)?0:symbol.getASTNode(parent, new int[] {3}).children.size()/2+1;
+ArrayList<VarType> paraTypes=new ArrayList<VarType>();
+if (paraNum==0) paraTypes=null;
+String[] paraNames=new String[paraNum];
+for(int i=0;i<paraNum;i++){
+  VarType paraType=new VarType(symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0}));
+  paraNames[i]=symbol.getASTNodeContent(parent, new int[] {3,2*i,1,0});
+  paraTypes.add(paraType);
+// symbolStack.pushStack(1,symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0})+"Para",paraName,paraType);
+}
+Function newFunction=createFunction(retType,funcName, paraTypes);
+symbolStack.pushStack(0,retType+"Func",funcName,newFunction);
+```
+
+​		同时，我们需要继续处理函数定义的Block内部的代码：
+
+​		这里在参数处理方面，第一版采用了较蠢的处理方法，即在block的一开始，先对所有参数进行Alloca和Store，这实际上是一个很轻松就可以优化的点。
+
+​		另外，之所以在这里才将参数推进栈式符号表，是为了保证在符号表中先推入函数再推入对应参数。
+
+```java
+BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(parent.children.size()-1),1,null);
+//TODO：可优化，这样时间消耗比较大
+for(int i=0;i<paraNum;i++){ 
+  Value ptr=newbasicblock.createAllocaInst(paraTypes.get(i));
+  newbasicblock.createStoreInst(newFunction.params.get(i), ptr, paraTypes.get(i));
+  symbolStack.pushStack(1,paraTypes.get(i).type,paraNames[i],ptr);
+}
+newbasicblock.orderAST(parent.children.get(parent.children.size()-1));
+symbolStack.rmCurLevel(1);
+```
+
+##### 5.3.3 局部变量定义
 
 ```
 Module->basicBlock->AddExp->xxInst
 ```
 
+​	**需要添加的指令：`alloca+处理AddExp+store`**
 
+##### 5.3.4 赋值语句(不包含函数调用)
+
+​	**需要添加的指令：`load+处理AddExp+store`**
+
+##### 5.3.5 函数调用
+
+###### 库函数
+
+​	**需要添加的指令：`getint/getchar:左值相关指令+call`**
+
+​									**`printf:全局formatstring+处理AddExp{+putint}{+putch`}**
+
+###### 自定义函数
+
+​	**需要添加的指令：`[左值相关指令+][处理AddExp+]call`**
+
+##### 5.3.6 返回
+
+​	**需要添加的指令：`处理AddExp+return`**
+
+#### 5.4 对AddExp的处理
+
+​	由于代码中涉及广泛的对AddExp处理的需求，所以我建立了一个AddExp类，专门用于处理AddExp
+
+​	处理思路如下：
+
+- 把语法树转为特定结构AddTree，结点定义如下：
+
+  ```java
+  public class AddTreeNode {
+      public String value; // 节点存储的字符串
+      public List<AddTreeNode> children; // 子节点列表
+      public Value exp;
+      public String type;
+  
+      public AddTreeNode(String value) {
+          this.value = value;
+          this.children = new ArrayList<>();
+      }
+  
+      // 添加子节点的方法
+      public void addChild(AddTreeNode child) {
+          children.add(child);
+      }
+  }
+  ```
+
+​		在处理过程中，会面临四种情况：立即数、变量、函数调用前三者的运算式
+
+​		立即数直接求值（对立即数间的运算，直接算出结果），变量遍历符号表，函数调用遍历函数表
+
+​		最终得到一个三叉树，每个父节点保证有三个子节点，其中中间的为操作符，两侧的为操作数，操作数可能为以上四种的任意一种，具体解释如下：
+
+​		1.立即数：value为立即数的值，exp为对应value
+
+​		2.变量：value为变量名，exp为Load指令对应value
+
+​		3.函数调用：value为func，exp为call指令对应的value
+
+​		4.运算式：value初始为tmpp，在遍历AddTree的过程中，根据子节点情况生成
+
+​		同时，所有结点的数据会被分为：int、char、intimm、charimm用于
+
+- 遍历AddTree
+
+  后序遍历，根据操作符、操作数进行指定输出即可
+
+  每次遍历通过`flashType()`函数刷新AddExp的type属性：
+
+  ```java
+  public void flashType(AddTreeNode parent){
+  		type=parent.type;
+  }
+  ```
+
+​		需要注意的是，一旦涉及字符运算，就可以将字符立即数转为整形，如果是字符变量，进行类型转换
+
+​		这里处理的逻辑，只要进入运算，先把所有字符常量（charImm）转为整形常量（intImm），如果左右两个节点类型都为intImm，
+
+则直接计算得到父结点value，否则父结点一定为运算式，进行类型判断、计算指令添加即可：
+
+```java
+AddTreeNode left,right;
+left=parent.children.get(0);
+right=parent.children.get(2);
+if(left.type.equals("charImm")){
+  left.value=String.valueOf((int)(left.value.charAt(1)));
+  left.exp=new Value(left.value);
+  left.type="intImm";
+}
+if(right.type.equals("charImm")){
+  right.value=String.valueOf((int)(right.value.charAt(1)));
+  right.exp=new Value(right.value);
+  right.type="intImm";
+}
+System.out.println(left.value+" "+right.value);
+if(left.type.equals("intImm")&&right.type.equals("intImm")){
+  switch(parent.children.get(1).value){
+    case "+":
+      value=new Value(String.valueOf(Integer.valueOf(left.value)+Integer.valueOf(right.value)));
+      parent.exp=value;
+      parent.value=value.name;
+      parent.type="intImm";
+      break;
+    //...
+  }
+}
+else{
+  switch(parent.children.get(1).value){
+    case "+":
+      value=basicBlock.createAddInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+      parent.exp=value;
+      parent.type="int";
+      break;
+    //...
+  }
+}
+```
+
+
+
+#### 5.5 类型转换问题
+
+##### 5.5.1 转换逻辑
+
+​	变量类型存在：int、char、intImm、charImm四种可能
+
+​	以下为例：
+
+```java
+if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
+else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
+else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
+	from.name=String.valueOf((int)(from.name.charAt(1)));
+}
+```
+
+​	只存在以上三种类型转换可能，其中字符立即数和整形立即数间可以相互转换，不必进行立即数
+
+##### 5.5.2 可能出现的场景
+
+​	变量声明、AddExp处理、赋值语句、Printf、Return
 
