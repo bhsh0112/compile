@@ -41,16 +41,6 @@ public class Function extends Value {
 		}
 		
 	}
-	// public Function(ReturnType retType, String name,ArrayList<VarType> argTypes) {
-	// 	super(name);
-	// 	this.retType = retType;
-	// 	if(argTypes!=null){
-	// 		for (var argType : argTypes) {
-	// 			params.add(new FunctionParam(argType));
-	// 		}
-	// 	}
-		
-	// }
 
 	public BasicBlock getFirstBasicBlock() {
 		if (basicBlocks.isEmpty()) {

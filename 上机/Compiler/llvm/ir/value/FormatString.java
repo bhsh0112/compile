@@ -34,7 +34,6 @@ public class FormatString extends GlobalValue{
 
     public void output(BufferedWriter writer) throws IOException{
         int length=getLength(content);
-        // System.out.println(newContent);
         writer.write(getName()+" = private unnamed_addr constant ["+(length+1)+" x i8] c\""+content+"\\00\", align 1");
     }
 }

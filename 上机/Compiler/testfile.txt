@@ -1,7 +1,7 @@
 int a=1;
-int b=1+a;
+int b=1;
 int main() {
-    int a;
+    int a=1+getint();
     char b;
     a = getint();
     b = getchar();

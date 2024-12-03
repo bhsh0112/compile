@@ -1,0 +1,8 @@
+int main() {
+    int a;
+    char b;
+    a = getint();
+    b = getchar();
+    printf("Hello: %d, %c", a, b);
+    return 0;
+}

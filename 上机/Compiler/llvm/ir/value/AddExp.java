@@ -101,6 +101,7 @@ public class AddExp extends InitVal{
             else ATparent.value=symbol.getASTNodeContent(ASTparent,new int[] {0,0,0});
         }
         else if(symbol.getASTNodeContent(ASTparent,new int[] {0}).equals("<Ident>")){//函数调用
+            ATparent.value="Func";
             String funcName=symbol.getASTNodeContent(ASTparent,new int[] {0,0});
             int paraNum=0;
             if(ASTparent.children.size()==3) paraNum=0;
@@ -149,8 +150,6 @@ public class AddExp extends InitVal{
     }
     public void flashType(AddTreeNode parent){
         type=parent.type;
-        // if(inputType.equals("int")) this.type="int";
-        // else if(inputType.equals("char")&&this.type==null) this.type="char";
     }
     public void orderAT(AddTreeNode parent,BufferedWriter writer) throws IOException{
         if(parent==null) return;
@@ -185,7 +184,7 @@ public class AddExp extends InitVal{
                     writer.write(parent.children.get(0).value+", "+parent.children.get(2).value+"\n");
                 }
                 else{
-                    //数字加字符情况未解决
+                    //TODO：数字加字符情况未解决
                     int num1=Integer.parseInt(parent.children.get(0).value);
                     int num2=Integer.parseInt(parent.children.get(2).value);
                     switch(parent.children.get(1).value){
@@ -223,6 +222,9 @@ public class AddExp extends InitVal{
                     parent.type="charImm";
                     value=new ImmediateValue(parent.value);
                     parent.exp=value;
+                }
+                else if(parent.value.equals("Func")){
+                    
                 }
                 else{
                     Value tmpValue=null,tmpType=null;
@@ -267,26 +269,6 @@ public class AddExp extends InitVal{
                 AddTreeNode left,right;
                 left=parent.children.get(0);
                 right=parent.children.get(2);
-                // AddTreeNode newleft,newright;
-                // if(left.type.equals("intImm")&&right.type.equals("intImm")){
-                //     parent.type="intImm";
-                //     newleft=left;
-                //     newright=right;
-                // }
-                // else if((left.type.equals("intImm")&&right.type.equals("int"))||(left.type.equals("int")&&right.type.equals("intImm"))){
-                //     parent.type="int";
-                //     newleft=left;
-                //     newright=right;
-                // }
-                // else if((left.type.equals("intImm")&&right.type.equals("charImm"))){
-                //     parent.type="intImm";
-                //     right.value=String.valueOf((int)(right.value.charAt(1)));
-
-                // }
-                // else if((left.type.equals("charImm")&&right.type.equals("intImm"))){
-                //     parent.type="intImm";
-
-                // }
                 if(left.type.equals("charImm")){
                     left.value=String.valueOf((int)(left.value.charAt(1)));
                     left.exp=new Value(left.value);

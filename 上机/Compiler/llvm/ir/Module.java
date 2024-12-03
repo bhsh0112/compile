@@ -182,6 +182,7 @@ public class Module {
                 Function newFunction=createFunction(retType,funcName, paraTypes);
                 symbolStack.pushStack(0,retType+"Func",funcName,newFunction);
                 BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(parent.children.size()-1),1,null);
+                //TODO：可优化，这样时间消耗比较大
                 for(int i=0;i<paraNum;i++){ 
                     Value ptr=newbasicblock.createAllocaInst(paraTypes.get(i));
                     newbasicblock.createStoreInst(newFunction.params.get(i), ptr, paraTypes.get(i));

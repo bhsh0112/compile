@@ -27,17 +27,7 @@ public class Compiler {
         totleTokens=lexer.main(inputFile,outputFile,errorFile);
         ASTRoot=parser.main(totleTokens,errorFile);
         STTRoot=symbol.main(ASTRoot,errorFile);
-        // llvm.main(ASTRoot,STTRoot,outputFile);
         llvm.ir.Module.main(outputFile,ASTRoot);
-        // STTPreorder(STTRoot);
     }
-    // private static void STTPreorder(STTNode parent){
-        
-    //     for(Element element:parent.que.que){
-    //         if((!element.type.equals("numofparams"))&&(!element.type.equals("return"))) symbol.writeFile(outputFile,element.level+" "+element.name+" "+element.type+"\n");
-    //     }
-    //     for(STTNode child:parent.children){
-    //         STTPreorder(child);
-    //     }
-    // }
+    
 }
