@@ -10,6 +10,7 @@ public class InitVal extends Value {
     VarType type;
     AddExp val;
     ASTNode valRoot;
+    String ans;
 
     public InitVal(){}
     public InitVal(AddExp val){
@@ -25,10 +26,18 @@ public class InitVal extends Value {
         this.valRoot=valRoot;
         val=new AddExp(valRoot);
     }
+    public InitVal(VarType type,String ans) {
+        this.type=type;
+        this.ans=ans;
+    }
 
 
     public String output(BufferedWriter writer) throws IOException{
-        String str=val.output(writer);
+        String str=null;
+        if (ans != null) {
+            str=ans;
+        }
+        else str=val.output(writer);
         String value;
         if(type.Type2String().equals("i32")&&str.startsWith("\'")){
             value=String.valueOf((int)(str.charAt(1)));

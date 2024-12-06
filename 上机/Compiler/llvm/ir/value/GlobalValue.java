@@ -17,6 +17,7 @@ import llvm.ir.value.inst.StoreInst;
 import llvm.ir.value.inst.SubInst;
 import llvm.ir.value.inst.TruncInst;
 import llvm.ir.value.inst.ZextInst;
+import symbol.symbol;
 
 public class GlobalValue extends Value{
     public VarType dataType;
@@ -52,10 +53,37 @@ public class GlobalValue extends Value{
         formatString=new FormatString(str);
         return formatString;
     }
-    public ArrayList<InitVal> createInitVal(VarType type,ASTNode AddExp){
-        InitVal newInitval=new InitVal(type, AddExp);
+    public ArrayList<InitVal> createInitVal(VarType type,ASTNode InitVal){
         initvals=new ArrayList<InitVal>();
-        initvals.add(newInitval);
+        int initSize=InitVal.children.size();
+        System.out.println(initSize);
+        int initNum=0;
+        if(initSize==1){
+            initNum=1;
+            if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
+                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
+                initvals.add(newInitval);
+            } 
+            else{
+                String str=symbol.getASTNodeContent(InitVal,new int[] {0,0});
+                for(int i=1;i<str.length()-1;i++){
+                    InitVal newInitval=new InitVal(new VarType("char"),new AddExp("\'"+str.charAt(i)+"\'"));
+                    initvals.add(newInitval);
+                }
+            }
+        }
+        else if(initSize==2){
+            initNum=0;
+        }
+        else{
+            initNum=(initSize-2)/2+1;
+            for(int i=0;i<initNum;i++){
+                InitVal newInitval=new InitVal(new VarType(type.type.substring(0, type.type.length()-1)), symbol.getASTNode(InitVal, new int[] {2*i+1,0}));
+                initvals.add(newInitval);
+            }
+        }
+        
+        
         return initvals;
     }
 
@@ -116,20 +144,26 @@ public class GlobalValue extends Value{
             System.out.println("success");
             instruction.output(writer);
         }
-        if(var!=null){
-            writer.write(getName()+" = dso_local global ");
-            var.output(writer);
-        } 
-        else if(array!=null){
-            writer.write(getName()+" = dso_local global ");
-            String arraySize=null;
-            arraySize=size.output(writer);
-            writer.write("["+arraySize+" x "+dataType.Type2String()+"]");
-            array.output(writer);
-            
-        } 
+        if(formatString!=null) formatString.output(writer);
         else{
-            formatString.output(writer);
+            writer.write(getName()+" = dso_local global "+dataType.Type2String()+" ");
+            if(initvals==null) writer.write("zeroinitializer");
+            else if(initvals.size()==1) initvals.get(0).output(writer);
+            else{
+                writer.write("[");
+                boolean firstFlag=true;
+                for(InitVal initVal:initvals){
+                    if(firstFlag){
+                        firstFlag=false;
+                    }
+                    else{
+                        writer.write(",");
+                    }
+                    initVal.output(writer);
+                }
+                writer.write("]");
+            }
+
         }
         writer.write("\n");
     }

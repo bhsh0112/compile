@@ -22,11 +22,15 @@ public class Type extends Value{
             case "char":
                 return "i8";
             case "intR":
-                return "[i32 x"+size+ "]";
+                return "["+size+" x i32"+ "]";
             case "charR":
-                return "[i8 x"+size+ "]";
+                return "["+size+" x i8"+ "]";
             case "void":
                 return "void";
+            case "intPtr":
+                return "i32*";
+            case "charPtr":
+                return "i8*";
         }
         return null;
     }

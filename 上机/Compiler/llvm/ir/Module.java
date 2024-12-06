@@ -32,9 +32,9 @@ public class Module {
         return functions;
     }
 
-    public static GlobalValue createGlobalValue(VarType type,String name,ASTNode AddExp) {
+    public static GlobalValue createGlobalValue(VarType type,String name,ASTNode InitVal) {
             var newGlobalValue = new GlobalValue(type,name);
-            if(AddExp!=null) newGlobalValue.createInitVal(type,AddExp);
+            if(InitVal!=null) newGlobalValue.createInitVal(type,InitVal);
             globalValues.add(newGlobalValue);
             return newGlobalValue;
         }
@@ -77,7 +77,7 @@ public class Module {
                 Function newFunction=createFunction(new ReturnType("int"),"main", null);
                 BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(4),1,null);
                 newbasicblock.orderAST(parent.children.get(4));
-                symbolStack.pushStack(0, "MainFunc", "main", newbasicblock);
+                symbolStack.pushStack(0, "MainFunc","Func", "main", newbasicblock,0);
                 symbolStack.rmCurLevel(1);
                 return;
             }
@@ -85,25 +85,23 @@ public class Module {
             }
             else if(parent.name.equals("<ConstDecl>")){
                 String originType=symbol.getASTNodeContent(parent,new int[] {1,0});
-                VarType type=new VarType(originType);
                 int num=(parent.children.size()-2)/2;
                 if(globalFlag){
                     for(int i=0;i<num;i++){
                         String declName=symbol.getASTNodeContent(parent,new int[]{2*i+2,0,0});
                         if(symbol.getASTNode(parent,new int[] {2*i+2}).children.size()==3){//变量
-                            GlobalValue newGlobalValue=createGlobalValue(type,declName,symbol.getASTNode(parent,new int[] {2*i+2,2,0,0}));
-                            globalValues.get(globalValues.size()-1).createGlobalVar();
-                            // globalValues.get(globalValues.size()-1).createInitVal(type,symbol.getASTNode(parent,new int[] {2*i+2,2,0,0}));
-                            Module.symbolStack.pushStack(0,originType,declName,newGlobalValue);
+                            VarType type=new VarType(originType);
+                            String name=symbol.getASTNodeContent(parent,new int[] {2*i+2,0,0});
+                            GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+2,2}));
+                            symbolStack.pushStack(0,originType,"Var",declName,newGlobalValue,0);
                         }
                         else{//数组
-                            //有用！！！！！！
-                            // String name=symbol.getASTNodeContent(parent,new int[] {2*i+2,0,0});
-                            // createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+2,2,0,0}));
-                            // GlobalValue newGlobalValue=globalValues.get(globalValues.size()-1).createGlobalArray();
-                            // globalValues.get(globalValues.size()-1).size=globalValues.get(globalValues.size()-1).array.createSize(symbol.getASTNode(parent,new int[] {2*i+2,2,0}));
-                            // globalValues.get(globalValues.size()-1).array.createInitVal(symbol.getASTNode(parent,new int[] {2*i+2,5}));
-                            // Module.symbolStack.pushStack(0,originType+"Array",declName,newGlobalValue);
+                            AddExp newAddExp=new AddExp("tmpAddExp");
+                            int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+2,2,0}), null));
+                            VarType type=new VarType(originType+"R",size);
+                            String name=symbol.getASTNodeContent(parent,new int[] {2*i+2,0,0});
+                            GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+2,5}));
+                            symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size);
                         }
                         
                     }
@@ -116,7 +114,7 @@ public class Module {
             else if(parent.name.equals("<VarDecl>")){
                 
                 String originType=symbol.getASTNodeContent(parent,new int[] {0,0});
-                VarType type=new VarType(originType);
+                
                 int num=(parent.children.size()-1)/2;
                 if(globalFlag){
                     for(int i=0;i<num;i++){
@@ -124,37 +122,35 @@ public class Module {
                         if(symbol.getASTNodeContent(parent,new int[] {2*i+1,symbol.getASTNode(parent,new int[] {2*i+1}).children.size()-1}).equals("<InitVal>")){//有初值
                             if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==6){//数组
                                 //有用！！！！！！
-                                // String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
-                                // GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+1,2,0,0}));
-                                // globalValues.get(globalValues.size()-1).createGlobalArray();
-                                // globalValues.get(globalValues.size()-1).size=globalValues.get(globalValues.size()-1).array.createSize(symbol.getASTNode(parent,new int[] {2*i+1,2,0}));
-                                // globalValues.get(globalValues.size()-1).array.createInitVal(symbol.getASTNode(parent,new int[] {2*i+1,5}));
-                                // symbolStack.pushStack(0,originType+"Array",declName,newGlobalValue);
+                                AddExp newAddExp=new AddExp("tmpAddExp");
+                                int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
+                                VarType type=new VarType(originType+"R",size);
+                                String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
+                                GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+1,5}));
+                                symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size);
                             }
                             else{//变量
+                                VarType type=new VarType(originType);
                                 String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
-                                GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+1,2,0,0}));
-                                // AddExp newAddExp=new AddExp(newGlobalValue);
-                                // newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0,0}), null);
-                                globalValues.get(globalValues.size()-1).createGlobalVar();
-                                globalValues.get(globalValues.size()-1).createInitVal(type,symbol.getASTNode(parent,new int[] {2*i+1,2,0,0}));
-                                symbolStack.pushStack(0,originType,declName,newGlobalValue);
+                                GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+1,2}));
+                                symbolStack.pushStack(0,originType,"Var",declName,newGlobalValue,0);
                             }
                         }
                         else{//无初值
                             if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==4){//数组
                                 //有用！！！！！！
-                                // String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
-                                // GlobalValue newGlobalValue=createGlobalValue(type,name,null);
-                                // globalValues.get(globalValues.size()-1).createGlobalArray();
-                                // globalValues.get(globalValues.size()-1).size=globalValues.get(globalValues.size()-1).array.createSize(symbol.getASTNode(parent,new int[] {2*i+1,2,0}));
-                                // symbolStack.pushStack(0,originType+"Array",declName,newGlobalValue);
-                            }
-                            else{//变量
+                                AddExp newAddExp=new AddExp("tmpAddExp");
+                                int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
+                                VarType type=new VarType(originType+"R",size);
                                 String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
                                 GlobalValue newGlobalValue=createGlobalValue(type,name,null);
-                                globalValues.get(globalValues.size()-1).createGlobalVar();
-                                symbolStack.pushStack(0,originType,declName,newGlobalValue);
+                                symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size);
+                            }
+                            else{//变量
+                                VarType type=new VarType(originType);
+                                String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
+                                GlobalValue newGlobalValue=createGlobalValue(type,name,null);
+                                symbolStack.pushStack(0,originType,"Var",declName,newGlobalValue,0);
                             }
                             
                         }
@@ -174,19 +170,25 @@ public class Module {
                 if (paraNum==0) paraTypes=null;
                 String[] paraNames=new String[paraNum];
                 for(int i=0;i<paraNum;i++){
-                    VarType paraType=new VarType(symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0}));
+                    VarType paraType=null;
+                    if(symbol.getASTNode(parent, new int[] {3,2*i}).children.size()==2){
+                        paraType=new VarType(symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0}));
+                    } 
+                    else{
+                        paraType=new VarType(symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0})+"Ptr");
+                    }
                     paraNames[i]=symbol.getASTNodeContent(parent, new int[] {3,2*i,1,0});
                     paraTypes.add(paraType);
                     // symbolStack.pushStack(1,symbol.getASTNodeContent(parent, new int[] {3,2*i,0,0})+"Para",paraName,paraType);
                 }
                 Function newFunction=createFunction(retType,funcName, paraTypes);
-                symbolStack.pushStack(0,retType+"Func",funcName,newFunction);
+                symbolStack.pushStack(0,retType.type,"Func",funcName,newFunction,0);
                 BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(parent.children.size()-1),1,null);
                 //TODO：可优化，这样时间消耗比较大
                 for(int i=0;i<paraNum;i++){ 
                     Value ptr=newbasicblock.createAllocaInst(paraTypes.get(i));
                     newbasicblock.createStoreInst(newFunction.params.get(i), ptr, paraTypes.get(i));
-                    symbolStack.pushStack(1,paraTypes.get(i).type,paraNames[i],ptr);
+                    symbolStack.pushStack(1,paraTypes.get(i).type,"Para",paraNames[i],ptr,0);
                 }
                 newbasicblock.orderAST(parent.children.get(parent.children.size()-1));
                 symbolStack.rmCurLevel(1);

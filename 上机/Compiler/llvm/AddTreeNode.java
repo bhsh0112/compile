@@ -9,6 +9,7 @@ public class AddTreeNode {
     public List<AddTreeNode> children; // 子节点列表
     public Value exp;
     public String type;
+    public String kind;
 
     public AddTreeNode(String value) {
         this.value = value;

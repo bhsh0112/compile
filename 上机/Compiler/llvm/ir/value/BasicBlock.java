@@ -132,6 +132,11 @@ public class BasicBlock extends Value{
 		instructions.add(newTruncInst);
 		return newTruncInst;
 	}
+	public Value createGetElementPtrInst(VarType type,Value ptr,int[] indexs){
+		GetelementptrInst newGetelementptrInst=new GetelementptrInst(type, ptr, indexs);
+		instructions.add(newGetelementptrInst);
+		return newGetelementptrInst;
+	}
 
 	public void orderAST(ASTNode parent) throws IOException{
 		if(parent.name.equals("<ConstDecl>")){
@@ -150,10 +155,36 @@ public class BasicBlock extends Value{
 						from.name=String.valueOf((int)(from.name.charAt(1)));
 					}
 					createStoreInst(from,ptr,new VarType(declType));
-					Module.symbolStack.pushStack(this.level,declType,declName,ptr);
+					Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
 				}
 				else{//数组
-
+					AddExp newAddExp=new AddExp("tmpAddExp");
+                    int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+2,2,0}), null));
+					Value ptr=createAllocaInst(new VarType(declType+"R",size));
+					Value originPtr=ptr;
+					int initNum=(symbol.getASTNode(parent, new int[]{2*i+2,5}).children.size()-2)/2+1;
+					if(initNum>=1){
+						for(int j=0;j<initNum;j++){
+							if(j==0){
+								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new int[]{0,j});
+							}
+							else{
+								ptr=createGetElementPtrInst(new VarType(declType),ptr,new int[]{1});
+							}
+							ASTNode AddExp=symbol.getASTNode(parent, new int[]{2*i+2,5,2*j+1,0});
+							AddExp tmpAddExp=new AddExp(this);
+							tmpAddExp.llvmAddExp(AddExp, null);
+							Value from=tmpAddExp.value;
+							System.out.println(from+" "+ptr);
+							createStoreInst(from,ptr,new VarType(declType));
+						}
+					}
+					else{
+						//TODO:是否存在？
+					}
+					//TODO:如何推入符号栈？
+					Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size);
+					//TODO:类型转换？
 				}
 			}
 
@@ -166,7 +197,33 @@ public class BasicBlock extends Value{
 				String declName=symbol.getASTNodeContent(parent,new int[]{2*i+1,0,0});
 				if(symbol.getASTNodeContent(parent,new int[] {2*i+1,symbol.getASTNode(parent,new int[] {2*i+1}).children.size()-1}).equals("<InitVal>")){//有初值
 					if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==6){//数组
-						
+						AddExp newAddExp=new AddExp("tmpAddExp");
+						int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
+						Value ptr=createAllocaInst(new VarType(declType+"R",size));
+						Value originPtr=ptr;
+						int initNum=(symbol.getASTNode(parent, new int[]{2*i+1,5}).children.size()-2)/2+1;
+						if(initNum>=1){
+							for(int j=0;j<initNum;j++){
+								if(j==0){
+									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new int[]{0,j});
+								}
+								else{
+									ptr=createGetElementPtrInst(new VarType(declType),ptr,new int[]{1});
+								}
+								ASTNode AddExp=symbol.getASTNode(parent, new int[]{2*i+1,5,2*j+1,0});
+								AddExp tmpAddExp=new AddExp(this);
+								tmpAddExp.llvmAddExp(AddExp, null);
+								Value from=tmpAddExp.value;
+								System.out.println(from+" "+ptr);
+								createStoreInst(from,ptr,new VarType(declType));
+							}
+						}
+						else{
+							//TODO:是否存在？
+						}
+						//TODO:如何推入符号栈？
+						Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size);
+						//TODO:类型转换？
 					}
 					else{//变量
 						Value ptr=createAllocaInst(new VarType(declType));
@@ -179,16 +236,20 @@ public class BasicBlock extends Value{
 							from.name=String.valueOf((int)(from.name.charAt(1)));
 						}
 						createStoreInst(from,ptr,new VarType(declType));
-						Module.symbolStack.pushStack(this.level,declType,declName,ptr);
+						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
 					}
 				}
 				else{//无初值
 					if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==4){//数组
-						
+						AddExp newAddExp=new AddExp("tmpAddExp");
+						int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
+						Value ptr=createAllocaInst(new VarType(declType+"R",size));
+						//TODO:如何推入符号栈？
+						Module.symbolStack.pushStack(this.level,declType,"Array",declName,ptr,size);
 					}
 					else{//变量
 						Value ptr=createAllocaInst(new VarType(declType));
-						Module.symbolStack.pushStack(this.level,declType,declName,ptr);
+						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
 					}
 					
 				}
@@ -252,6 +313,11 @@ public class BasicBlock extends Value{
 			ASTNode father=parent.parent;//Stmt 或 ForStmt
 			//处理LVal
 			String ident=symbol.getASTNodeContent(parent, new int[] {0,0});
+			int index=0;
+			if(parent.children.size()==3){
+				AddExp newAddExp=new AddExp("tmpAddExp");
+				index=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2,0}), null));
+			}
 			Value tmpValue=null,tmpType=null;
 			if(parent.children.size()==1){//变量
 				boolean tmpFlag=false;
@@ -264,6 +330,9 @@ public class BasicBlock extends Value{
 							tmpValue=element.value;
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
+							if(element.kind.equals("Array")){
+								createGetElementPtrInst(ttType, element.value, new int[] {index});
+							}
 							break;
 						} 
 					}
@@ -273,6 +342,9 @@ public class BasicBlock extends Value{
 							tmpValue=element.value;
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
+							if(element.kind.equals("Array")){
+								createGetElementPtrInst(ttType, element.value, new int[] {index});
+							}
 							break;
 						} 
 					}

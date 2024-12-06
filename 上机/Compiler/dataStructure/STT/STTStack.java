@@ -16,12 +16,16 @@ public class STTStack {
         public String name;
         public String type;
         public Value value;
+        public String kind;
+        public int size;
 
-        public Element(int level, String type,String name,Value value) {
+        public Element(int level, String type,String kind,String name,Value value,int size) {
             this.level = level;
             this.type = type;
             this.value=value;
             this.name=name;
+            this.kind=kind;
+            this.size=size;
         }
     }
 
@@ -31,8 +35,8 @@ public class STTStack {
         this.level=level;
     }
 
-    public Element pushStack(int level, String type,String name,Value value) {
-        Element element = new Element(level, type,name,value);
+    public Element pushStack(int level, String type,String kind,String name,Value value,int size) {
+        Element element = new Element(level, type,kind,name,value,size);
         stack.add(element);
         top++;
         return element;
