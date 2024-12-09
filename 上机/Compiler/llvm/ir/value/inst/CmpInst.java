@@ -36,7 +36,8 @@ public class CmpInst extends Instruction {
             writer.write("\t"+getName()+" = icmp "+type+" "+tmpType+" "+value1.getName()+", 0\n");
         }
         else{
-            writer.write("\t"+getName()+" = icmp "+type+" "+value1.getName()+", "+value2.getName()+"\n");
+            String tmpType=(varType.equals("char")||varType.equals("charImm"))?"i8":"i32";
+            writer.write("\t"+getName()+" = icmp "+type+" "+tmpType+" "+value1.getName()+", "+value2.getName()+"\n");
         }
         
     }

@@ -34,44 +34,38 @@ define dso_local i32 @main() {
 8:
 	%9 = call i32 @func2()
 	%10 = icmp ne i32 %9, 0
-	br i1 %10, label %11, label %16
+	br i1 %10, label %11, label %13
 11:
 	%12 = load i32, i32* @a
 	call void @putint(i32 %12)
 	call void @putstr(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str, i64 0, i64 0))
-	br label %16
-16:
-17:
-	br label %21
+	br label %13
+14:
+	br label %18
+15:
+	%16 = call i32 @func3()
+	%17 = icmp ne i32 %16, 0
+	br i1 %17, label %18, label %20
 18:
-	%19 = call i32 @func3()
-	%20 = icmp ne i32 %19, 0
-	br i1 %20, label %21, label %26
-21:
-	%22 = load i32, i32* @a
-	call void @putint(i32 %22)
+	%19 = load i32, i32* @a
+	call void @putint(i32 %19)
 	call void @putstr(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.1, i64 0, i64 0))
-	br label %26
-26:
-27:
-	br label %28
-28:
-	%29 = call i32 @func3()
-	%30 = icmp ne i32 %29, 0
-	br i1 %30, label %37, label %31
-31:
-	%32 = call i32 @func()
-	%33 = icmp ne i32 %32, 0
-	br i1 %33, label %34, label %42
-34:
-	%35 = call i32 @func2()
-	%36 = icmp ne i32 %35, 0
-	br i1 %36, label %37, label %42
-37:
-	%38 = load i32, i32* @a
-	call void @putint(i32 %38)
+	br label %20
+21:
+	br label %22
+22:
+	%23 = call i32 @func3()
+	%24 = icmp ne i32 %23, 0
+	br i1 %24, label %29, label %25
+25:
+	%26 = call i32 @func()
+	%27 = call i32 @func2()
+	%28 = icmp slt i32 %26, %27
+	br i1 %28, label %29, label %31
+29:
+	%30 = load i32, i32* @a
+	call void @putint(i32 %30)
 	call void @putstr(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @str.2, i64 0, i64 0))
-	br label %42
-42:
+	br label %31
 	ret i32 0
 }

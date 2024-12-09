@@ -299,25 +299,19 @@ public class BasicBlock extends Value{
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
 					BasicBlock ifBasicBlock=null,elseBasicBlock=null;
-					this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
+					// this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
-						if(children.size()>=1&&children.get(children.size()-1).nextBasicBlock!=null){
-							ifBasicBlock=children.get(children.size()-1).nextBasicBlock;
-						}
-						else ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4,0}));
-						ifBasicBlock.createBrInst(this.nextBasicBlock);
+						// ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
 					else{//TODO：单一语句
-						if(children.size()>=1&&children.get(children.size()-1).nextBasicBlock!=null){
-							ifBasicBlock=children.get(children.size()-1).nextBasicBlock;
-						}
-						else ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4}));
-						ifBasicBlock.createBrInst(this.nextBasicBlock);
+						// ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
@@ -337,7 +331,10 @@ public class BasicBlock extends Value{
 						}
 					}
 					if(elseBasicBlock!=null){//有else
+						System.out.println("before: "+this.nextBasicBlock);
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
+						System.out.println("after: "+this.nextBasicBlock);
+						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
@@ -345,22 +342,23 @@ public class BasicBlock extends Value{
 
 						jumpIndexs.add(instructions.size());
 						jumpIndexs.add(instructions.size());
-						jumpIndexs.add(instructions.size());
+						//jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
 						children.add(elseBasicBlock);
-						children.add(this.nextBasicBlock);
+						//children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
 						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
+						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
 
 						jumpIndexs.add(instructions.size());
-						jumpIndexs.add(instructions.size());
+						//jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
-						children.add(this.nextBasicBlock);
+						//children.add(this.nextBasicBlock);
 					}
 					
 					return;
