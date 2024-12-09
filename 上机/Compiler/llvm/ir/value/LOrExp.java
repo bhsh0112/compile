@@ -33,9 +33,9 @@ public class LOrExp extends Value {
         }
         else{
             //TODO
-            CTparent.type="or";
-            CTparent.addLeftChild(new CondTreeNode(CTparent));
-            buildTreeLAndExp(CTparent.leftChildren,ASTparent.children.get(0));
+            // CTparent.type="or";
+            // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            buildTreeLAndExp(CTparent,ASTparent.children.get(0));
         }
     }
     public void buildTreeLAndExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
@@ -48,46 +48,140 @@ public class LOrExp extends Value {
         }
         else{
             //TODO
-            CTparent.type="and";
-            CTparent.addLeftChild(new CondTreeNode(CTparent));
-            buildTreeEqExp(CTparent.leftChildren,ASTparent.children.get(0));
+            // CTparent.type="and";
+            // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            buildTreeEqExp(CTparent,ASTparent.children.get(0));
         }
     }
     public void buildTreeEqExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
+        BasicBlock basicBlock=CTparent.createBasicBlock();
+        basicBlock.label=new Label(basicBlock);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
+            CTparent.leftChildren.nowBasicBlock=basicBlock;
             buildTreeEqExp(CTparent.leftChildren,ASTparent.children.get(0));
             //TODO
-            CTparent.type="and";
+            CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
             CTparent.addRightChild(new CondTreeNode(CTparent));
+            CTparent.rightChildren.nowBasicBlock=basicBlock;
             buildTreeRelExp(CTparent.rightChildren,ASTparent.children.get(2));
         }
         else{
             //TODO
-            CTparent.type="and";
-            CTparent.addLeftChild(new CondTreeNode(CTparent));
-            buildTreeRelExp(CTparent.leftChildren,ASTparent.children.get(0));
+            // CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
+            // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            buildTreeRelExp(CTparent,ASTparent.children.get(0));
         }
     }
     public void buildTreeRelExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
+            CTparent.leftChildren.nowBasicBlock=CTparent.nowBasicBlock;
             buildTreeRelExp(CTparent.leftChildren,ASTparent.children.get(0));
             //TODO
-            CTparent.type="and";
+            CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
             CTparent.addRightChild(new CondTreeNode(CTparent));
+            CTparent.rightChildren.nowBasicBlock=CTparent.nowBasicBlock;
             buildTreeAddExp(CTparent.rightChildren,ASTparent.children.get(2));
         }
         else{
             //TODO
-            CTparent.type="and";
-            CTparent.addLeftChild(new CondTreeNode(CTparent));
-            buildTreeAddExp(CTparent.leftChildren,ASTparent.children.get(0));
+            // CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
+            // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            buildTreeAddExp(CTparent,ASTparent.children.get(0));
         }
     }
     public void buildTreeAddExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{  
-        BasicBlock basicBlock=CTparent.createBasicBlock(ASTparent);
-        basicBlock.label=new Label(basicBlock);
+        // BasicBlock basicBlock=CTparent.createBasicBlock(ASTparent);
+        // basicBlock.label=new Label(basicBlock);
+        CTparent.type="addExp";
+        CTparent.ASTNode=ASTparent;
+    }
+
+    public void buildFinalTree(CondTreeNode CTparent) throws IOException{
+        if(CTparent==null) return;
+        buildFinalTree(CTparent.leftChildren);
+        buildFinalTree(CTparent.rightChildren);
+
+        if(CTparent.type.equals("addExp")){
+            AddExp newAddExp=new AddExp(CTparent.nowBasicBlock);
+            newAddExp.llvmAddExp(CTparent.ASTNode, null);
+            CTparent.value=newAddExp.value;
+            CTparent.varType=newAddExp.type;
+            if(CTparent.parent==null){
+                if(newAddExp.value!=null){
+                    if(newAddExp.value.name!=null) {
+                        if(newAddExp.value.name.equals("0")) CTparent.ans="false";
+                        else CTparent.ans="true";
+                    }
+                    else CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
+                }
+            }
+            else if(CTparent.parent.type.equals("and")||CTparent.parent.type.equals("or")){
+                if(newAddExp.value!=null){
+                    if(newAddExp.value.name!=null) {
+                        if(newAddExp.value.name.equals("0")) CTparent.ans="false";
+                        else CTparent.ans="true";
+                    }
+                    else CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
+                }
+            }
+        }
+        //TODO:类型转换
+        else if(CTparent.type.equals("<")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("slt",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
+        else if(CTparent.type.equals(">")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sgt",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
+        else if(CTparent.type.equals("<=")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sle",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
+        else if(CTparent.type.equals(">=")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sge",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
+        else if(CTparent.type.equals("==")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("eq",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
+        else if(CTparent.type.equals("!=")){
+            Value[] operands=new Value[2];
+            operands[0]=CTparent.leftChildren.value;
+            operands[1]=CTparent.rightChildren.value;
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("ne",CTparent.leftChildren.varType, operands);
+            CTparent.varType="int";
+            CTparent.cmpInst=CTparent.value;
+            CTparent.removeChildren();
+        }
     }
 
     public void preJudgeBasicBlocks(CondTreeNode CTparent){
@@ -133,6 +227,7 @@ public class LOrExp extends Value {
 
     public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock) throws IOException{
         CTRoot=this.buildTree();
+        buildFinalTree(CTRoot);
         CTRoot.trueBasicBlock=ifBasicBlock;
         CTRoot.falseBasicBlock=elseBasicBlock;
         this.judgeBasicBlocks(CTRoot);

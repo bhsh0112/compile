@@ -9,6 +9,7 @@ import llvm.ir.value.AddExp;
 import llvm.ir.value.BasicBlock;
 import llvm.ir.value.Label;
 import llvm.ir.value.Value;
+import llvm.ir.value.Type.VarType;
 
 public class CondTreeNode {
     public String childType;
@@ -21,6 +22,11 @@ public class CondTreeNode {
     public BasicBlock newBasicBlock;
     public CondTreeNode leftChildren;
     public CondTreeNode rightChildren;
+
+    public ASTNode ASTNode;
+    public Value value;
+    public String varType;
+
     public String ans=null;
 
     public CondTreeNode(CondTreeNode parent) {
@@ -39,19 +45,27 @@ public class CondTreeNode {
         child.childType = "right";
         rightChildren = child;
     }
+    public void removeChildren(){
+        leftChildren=null;
+        rightChildren=null;
+    }
 
-    public BasicBlock createBasicBlock(ASTNode addExp) throws IOException{
-        //TODO：当前不可解决判等等问题
+    // public BasicBlock createBasicBlock(ASTNode addExp) throws IOException{
+    //     //TODO：当前不可解决判等等问题
+    //     this.nowBasicBlock=new BasicBlock();
+    //     AddExp newAddExp=new AddExp(this.nowBasicBlock);
+    //     newAddExp.llvmAddExp(addExp, null);
+    //     if(newAddExp.value!=null){
+    //         if(newAddExp.value.name!=null) {
+    //             if(newAddExp.value.name.equals("0")) this.ans="false";
+    //             else this.ans="true";
+    //         }
+    //         else this.cmpInst=this.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
+    //     } 
+    //     return this.nowBasicBlock;
+    // }
+    public BasicBlock createBasicBlock(){
         this.nowBasicBlock=new BasicBlock();
-        AddExp newAddExp=new AddExp(this.nowBasicBlock);
-        newAddExp.llvmAddExp(addExp, null);
-        if(newAddExp.value!=null){
-            if(newAddExp.value.name!=null) {
-                if(newAddExp.value.name.equals("0")) this.ans="false";
-                else this.ans="true";
-            }
-            else this.cmpInst=this.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
-        } 
         return this.nowBasicBlock;
     }
 
