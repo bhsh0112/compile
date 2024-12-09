@@ -56,7 +56,6 @@ public class GlobalValue extends Value{
     public ArrayList<InitVal> createInitVal(VarType type,ASTNode InitVal){
         initvals=new ArrayList<InitVal>();
         int initSize=InitVal.children.size();
-        System.out.println(initSize);
         int initNum=0;
         if(initSize==1){
             initNum=1;
@@ -141,12 +140,11 @@ public class GlobalValue extends Value{
 
     public void output(BufferedWriter writer) throws IOException {
         for(Instruction instruction:instructions){
-            System.out.println("success");
             instruction.output(writer);
         }
         if(formatString!=null) formatString.output(writer);
         else{
-            writer.write(getName()+" = dso_local global "+dataType.Type2String()+" ");
+            writer.write(getName()+" = dso_local global ");
             if(initvals==null) writer.write("zeroinitializer");
             else if(initvals.size()==1) initvals.get(0).output(writer);
             else{

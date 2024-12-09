@@ -91,7 +91,8 @@ public class Function extends Value {
         writer.write(") {\n");
 
         for (var block : basicBlocks) {
-			new Value().getName();
+			System.out.println("iiiii "+block.jumpIndexs.size()+" "+block.children.size());
+			block.getName();
             block.output(writer);
         }
 

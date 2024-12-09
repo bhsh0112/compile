@@ -173,7 +173,6 @@ public class AddExp extends InitVal{
             }
             else{
                 for(Function function:Module.functions){
-                    System.out.println(function.name+" "+funcName);
                     if(function.name.equals(funcName)){
                         operands[0]=function;
                         break;
@@ -360,7 +359,6 @@ public class AddExp extends InitVal{
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }
-                System.out.println(left.value+" "+right.value);
                 if(left.type.equals("intImm")&&right.type.equals("intImm")){
                     switch(parent.children.get(1).value){
                         case "+":

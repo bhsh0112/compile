@@ -77,6 +77,7 @@ public class Module {
                 Function newFunction=createFunction(new ReturnType("int"),"main", null);
                 BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(4),1,null);
                 newbasicblock.orderAST(parent.children.get(4));
+                // System.out.println(newbasicblock.jumpIndexs.size()+" "+newbasicblock.children.size());
                 symbolStack.pushStack(0, "MainFunc","Func", "main", newbasicblock,0);
                 symbolStack.rmCurLevel(1);
                 return;

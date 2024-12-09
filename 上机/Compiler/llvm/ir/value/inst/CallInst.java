@@ -37,7 +37,6 @@ public class CallInst extends Instruction {
             writer.write("\tcall void @putch(i32 "+para.getName()+")\n");
         }
         else{
-            // System.out.println(func.name+func.retType);
             if(lval==null){
                 writer.write("\tcall void "+func.getName()+"(");
                 for(int i=1;i<operands.size();i++){

@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.nio.Buffer;
 
 public class Label extends Value{
-    
-    public Label(){
-
+    BasicBlock basicBlock;
+    public Label(BasicBlock basicBlock){
+        this.basicBlock=basicBlock;
     }
     public String getName(){
-        return super.getName().substring(1);
+        return name.substring(1);
     }
     public void output(BufferedWriter writer) throws IOException{
-        writer.write(getName()+":\n");
+        writer.write(basicBlock.getName().substring(1)+":\n");
     }
 }

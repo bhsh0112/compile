@@ -18,6 +18,7 @@ import llvm.ir.Module;
 import symbol.symbol;
 
 public class BasicBlock extends Value{
+	public Label label;
     public ArrayList<Instruction> instructions=new ArrayList<>(); // 该基本块中的指令
     public Function parentFunction; // 该基本块所属的函数
 	public int level;
@@ -26,9 +27,11 @@ public class BasicBlock extends Value{
 	public ArrayList<BasicBlock> children=new ArrayList<>();
 	public BasicBlock parent;
     
+	public BasicBlock(){
+
+	}
     public BasicBlock(String name){
         super(name);
-	
     }
     public BasicBlock(Function parentFunction,ASTNode BlockRoot,int level,BasicBlock parent){
         this.instructions=new ArrayList<>();
@@ -114,11 +117,11 @@ public class BasicBlock extends Value{
 		instructions.add(newBrInst);
 		return newBrInst;
 	}
-	// public Value createCmpInst(Value... operands){
-	// 	CmpInst newCmpInst=new CmpInst(operands);
-	// 	instructions.add(newCmpInst);
-	// 	return newCmpInst;
-	// }
+	public Value createCmpInst(String type,String varType,Value... operands){
+		CmpInst newCmpInst=new CmpInst(type,varType,operands);
+		instructions.add(newCmpInst);
+		return newCmpInst;
+	}
 	public Value createZextInst(Value... operands){
 		// if(operands[0].name.matches("\\d+")||operands[0].name.matches("\\'.\\'")){
 
@@ -175,7 +178,6 @@ public class BasicBlock extends Value{
 							AddExp tmpAddExp=new AddExp(this);
 							tmpAddExp.llvmAddExp(AddExp, null);
 							Value from=tmpAddExp.value;
-							System.out.println(from+" "+ptr);
 							createStoreInst(from,ptr,new VarType(declType));
 						}
 					}
@@ -214,7 +216,6 @@ public class BasicBlock extends Value{
 								AddExp tmpAddExp=new AddExp(this);
 								tmpAddExp.llvmAddExp(AddExp, null);
 								Value from=tmpAddExp.value;
-								System.out.println(from+" "+ptr);
 								createStoreInst(from,ptr,new VarType(declType));
 							}
 						}
@@ -294,12 +295,67 @@ public class BasicBlock extends Value{
 					createPrintfInst(operands);
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
-					// CondInst cond=new CondInst(symbol.getASTNode(parent,new int[]{2}),new BasicBlock("condBasicBlock"));
-					// Label labelIf=new Label();
-					// Label labelElse=new Label();
-					// BasicBlock stmtIf=new BasicBlock(null,symbol.getASTNode(parent, new int[] {4}),this.level+1,this);
-					// BasicBlock stmtElse=(parent.children.size()==5)?null:new BasicBlock(null,symbol.getASTNode(parent, new int[] {6}),this.level+1,this);
-					// createBrInst(cond,labelIf,labelElse,stmtIf,stmtElse);
+					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
+					BasicBlock ifBasicBlock=null,elseBasicBlock=null,nextBasicBlock=new BasicBlock(parentFunction,null,this.level+1,this);
+					nextBasicBlock.label=new Label(nextBasicBlock);
+					//ifBasicBlock
+					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
+						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4,0}));
+						ifBasicBlock.createBrInst(nextBasicBlock);
+						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
+						ifBasicBlock.label=new Label(ifBasicBlock);
+					}
+					else{//TODO：单一语句
+						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4}),this.level+1,this);
+						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4}));
+						ifBasicBlock.createBrInst(nextBasicBlock);
+						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
+						ifBasicBlock.label=new Label(ifBasicBlock);
+					}
+					//elseBasicBlock
+					if(parent.children.size()>5){
+						if(symbol.getASTNodeContent(parent, new int[]{6,0}).equals("<Block>")){
+							elseBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{6,0}),this.level+1,this);
+							elseBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{6,0}));
+							Module.symbolStack.rmCurLevel(elseBasicBlock.level);
+							elseBasicBlock.label=new Label(elseBasicBlock);
+						}
+						else{//TODO：单一语句
+							elseBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{6}),this.level+1,this);
+							elseBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{6}));
+							Module.symbolStack.rmCurLevel(elseBasicBlock.level);
+							elseBasicBlock.label=new Label(elseBasicBlock);
+						}
+					}
+					if(elseBasicBlock!=null){//有else
+						newLOrExp.main(ifBasicBlock,elseBasicBlock);
+						// System.out.println(instructions.size());
+						for(int i=0;i<newLOrExp.numBasicBlock;i++){
+							jumpIndexs.add(instructions.size());
+						}
+
+						jumpIndexs.add(instructions.size());
+						jumpIndexs.add(instructions.size());
+						jumpIndexs.add(instructions.size());
+						children.add(ifBasicBlock);
+						children.add(elseBasicBlock);
+						children.add(nextBasicBlock);
+					}
+					else{//TODO:无else
+						newLOrExp.main(ifBasicBlock,nextBasicBlock);
+						// System.out.println(instructions.size());
+						for(int i=0;i<newLOrExp.numBasicBlock;i++){
+							jumpIndexs.add(instructions.size());
+						}
+
+						jumpIndexs.add(instructions.size());
+						jumpIndexs.add(instructions.size());
+						children.add(ifBasicBlock);
+						children.add(nextBasicBlock);
+					}
+					
+					return;
 				}
 			}
 			else{
@@ -366,9 +422,7 @@ public class BasicBlock extends Value{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
-				System.out.println(((VarType)tmpType).type+" "+tmpAddExp.type);
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
-				// System.out.println(tmpValue+" "+tmpType+" "+tmpAddExp);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
 					from.name=String.valueOf((int)(from.name.charAt(1)));
@@ -395,6 +449,11 @@ public class BasicBlock extends Value{
 			}
 			
 		}
+		// else if(parent.name.equals("<Block>")){
+		// 	BasicBlock newbasicblock=parentFunction.createBasicBlock(parentFunction, parent, level+1, null);
+		// 	newbasicblock.orderAST(parent);
+		// 	Module.symbolStack.rmCurLevel(newbasicblock.level);
+		// }
 		
 		
 		for(ASTNode child:parent.children){
@@ -411,16 +470,22 @@ public class BasicBlock extends Value{
 	}
 
     public void output(BufferedWriter writer) throws IOException {
-		if (!useList.isEmpty()) {
-			writer.write(name + ":\n");
+		System.out.println(jumpIndexs.size()); 
+		if (label!=null) {
+			label.output(writer);
 		}
 		int jumpindex=0;
 		int cnt=0;
+		while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
+			children.get(jumpindex).output(writer);
+			jumpindex++;
+		} 
 		for (Instruction ins : instructions) {
 			if(jumpindex<=(jumpIndexs.size()-1)){
-				if(cnt==jumpIndexs.get(jumpindex)){//先输出子block
+				System.out.println(cnt+" "+jumpIndexs.get(jumpindex));
+				while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
 					children.get(jumpindex).output(writer);
-					if(jumpindex<jumpIndexs.size()-1) jumpindex++;
+					jumpindex++;
 				} 
 			}
 			ins.output(writer);
