@@ -299,7 +299,7 @@ public class BasicBlock extends Value{
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
 					BasicBlock ifBasicBlock=null,elseBasicBlock=null;
-					this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
+					// this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
 						if(children.size()>=1&&children.get(children.size()-1).nextBasicBlock!=null){
