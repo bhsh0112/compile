@@ -15,7 +15,8 @@ public class GetelementptrInst extends Instruction {
         this.type=type;
         this.ptr=ptr;
         this.indexs=indexs;
-
+        // ptr.getName();
+        // super.getName();
     }
     
     public void output(BufferedWriter writer) throws IOException {

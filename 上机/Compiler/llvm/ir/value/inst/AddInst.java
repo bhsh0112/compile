@@ -8,6 +8,10 @@ import llvm.ir.value.Value;
 public class AddInst extends Instruction{
 	public AddInst(Value... operands){
 		super(operands);
+		// for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
 	}
 
     // public AddInst(String name, Value... operands) {

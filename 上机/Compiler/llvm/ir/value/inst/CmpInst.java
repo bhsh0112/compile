@@ -21,6 +21,10 @@ public class CmpInst extends Instruction {
         this.varType=varType;
         this.value1=operands[0];
         if(operands.length>1)value2=operands[1];
+        // for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
         // labelSameLevel=(Label)operands[2];
         // labelParentLevl=(Label)operands[3];
     }

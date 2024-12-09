@@ -11,11 +11,14 @@ public class StoreInst extends Instruction {
     Value ptr;
     VarType type;
 
-    public StoreInst(Value... operands) {
+    public StoreInst(VarType type,Value... operands) {
         super(operands);
         this.value = operands[0];
         this.ptr = operands[1];
-        this.type=(VarType)operands[2];
+        this.type=type;
+        // for(Value v:operands){
+		// 	v.getName();
+		// }
     }
 
     public Value getValue() {

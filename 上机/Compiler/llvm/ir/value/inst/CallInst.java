@@ -7,17 +7,20 @@ import llvm.ir.value.*;
 
 public class CallInst extends Instruction {
     Function func;
-    Value lval;
+    public Value lval;
 
     public CallInst(Value... operands){
         super(operands);
         this.func=(Function)operands[0];
+        
+        
     }
     public CallInst(Value lval,Value... operands){
         super(operands);
-        
-        this.func=(Function)operands[0];
         this.lval=lval;
+        this.func=(Function)operands[0];
+        // lval.getName();
+        // func.getName();
     }
 
     public void output(BufferedWriter writer) throws IOException{

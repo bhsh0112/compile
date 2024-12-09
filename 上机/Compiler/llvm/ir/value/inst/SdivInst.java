@@ -8,6 +8,10 @@ import llvm.ir.value.Value;
 public class SdivInst extends Instruction{
     public SdivInst(Value... operands) {
 		super(operands);
+		// for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
 	}
 
 	public void output(BufferedWriter writer) throws IOException {

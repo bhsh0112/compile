@@ -188,7 +188,7 @@ public class Module {
                 //TODO：可优化，这样时间消耗比较大
                 for(int i=0;i<paraNum;i++){ 
                     Value ptr=newbasicblock.createAllocaInst(paraTypes.get(i));
-                    newbasicblock.createStoreInst(newFunction.params.get(i), ptr, paraTypes.get(i));
+                    newbasicblock.createStoreInst(paraTypes.get(i),newFunction.params.get(i), ptr);
                     symbolStack.pushStack(1,paraTypes.get(i).type,"Para",paraNames[i],ptr,0);
                 }
                 newbasicblock.orderAST(parent.children.get(parent.children.size()-1));

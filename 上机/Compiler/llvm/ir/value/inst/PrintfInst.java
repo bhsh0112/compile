@@ -32,6 +32,10 @@ public class PrintfInst extends Instruction{
             this.addExps.add((AddExp)operands[i]);
         }
         splitString();
+        // for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
     }
     public void splitString(){
         int start=1;
@@ -41,38 +45,6 @@ public class PrintfInst extends Instruction{
                     this.format.content=this.format.content.substring(0,i)+"\\0A"+this.format.content.substring(i+2,this.format.content.length());
                     i=i+2;
                 }
-                // else if(this.format.content.charAt(i+1)=='a'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\07"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='b'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\08"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='t'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\09"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='v'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\0B"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='f'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\0C"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='\"'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\22"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='\''){
-                //     this.format.content=this.format.content.substring(0,i)+"\\27"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
-                // else if(this.format.content.charAt(i+1)=='\\'){
-                //     this.format.content=this.format.content.substring(0,i)+"\\5C"+this.format.content.substring(i+2,this.format.content.length());
-                //     i=i+2;
-                // }
             }
             
             

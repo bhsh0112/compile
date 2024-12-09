@@ -8,6 +8,10 @@ import llvm.ir.value.Value;
 public class SubInst extends Instruction{
     public SubInst(Value... operands) {
 		super(operands);
+		// for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
 	}
 
 	public void output(BufferedWriter writer) throws IOException {

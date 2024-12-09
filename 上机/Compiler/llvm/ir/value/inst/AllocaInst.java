@@ -10,8 +10,9 @@ public class AllocaInst extends Instruction {
     Type dataType;
 
     public AllocaInst(Value... operands) {
-        super(operands);
+        // super(operands);
         this.dataType=(Type)operands[operands.length-1];
+        // super.getName();
     }
 
     public Value getDataType() {

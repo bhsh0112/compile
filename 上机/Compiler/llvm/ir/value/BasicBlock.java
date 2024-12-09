@@ -26,6 +26,7 @@ public class BasicBlock extends Value{
 	public ArrayList<Integer> jumpIndexs=new ArrayList<>();
 	public ArrayList<BasicBlock> children=new ArrayList<>();
 	public BasicBlock parent;
+	public BasicBlock nextBasicBlock;//仅控制语句使用
     
 	public BasicBlock(){
 
@@ -38,6 +39,7 @@ public class BasicBlock extends Value{
         this.parentFunction=parentFunction;
 		this.BlockRoot=BlockRoot;
 		this.level=level;
+		
     }
 
     public void addInstruction(Instruction value) {
@@ -85,13 +87,13 @@ public class BasicBlock extends Value{
 		return newAddInst;
 
 	}
-	public Value createStoreInst(Value value,Value ptr,VarType type){
-		StoreInst newStoreInst=new StoreInst(value, ptr,type);
+	public Value createStoreInst(VarType type,Value value,Value ptr){
+		StoreInst newStoreInst=new StoreInst(type,value, ptr);
 		instructions.add(newStoreInst);
 		return newStoreInst;
 	}
-	public Value createLoadInst(Value value,Value type){
-		LoadInst newLoadInst=new LoadInst(value,type);
+	public Value createLoadInst(VarType dataType,Value value){
+		LoadInst newLoadInst=new LoadInst(dataType,value);
 		instructions.add(newLoadInst);
 		return newLoadInst;
 	}
@@ -157,7 +159,7 @@ public class BasicBlock extends Value{
 					else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 						from.name=String.valueOf((int)(from.name.charAt(1)));
 					}
-					createStoreInst(from,ptr,new VarType(declType));
+					createStoreInst(new VarType(declType),from,ptr);
 					Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
 				}
 				else{//数组
@@ -178,7 +180,7 @@ public class BasicBlock extends Value{
 							AddExp tmpAddExp=new AddExp(this);
 							tmpAddExp.llvmAddExp(AddExp, null);
 							Value from=tmpAddExp.value;
-							createStoreInst(from,ptr,new VarType(declType));
+							createStoreInst(new VarType(declType),from,ptr);
 						}
 					}
 					else{
@@ -216,7 +218,7 @@ public class BasicBlock extends Value{
 								AddExp tmpAddExp=new AddExp(this);
 								tmpAddExp.llvmAddExp(AddExp, null);
 								Value from=tmpAddExp.value;
-								createStoreInst(from,ptr,new VarType(declType));
+								createStoreInst(new VarType(declType),from,ptr);
 							}
 						}
 						else{
@@ -236,7 +238,7 @@ public class BasicBlock extends Value{
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 							from.name=String.valueOf((int)(from.name.charAt(1)));
 						}
-						createStoreInst(from,ptr,new VarType(declType));
+						createStoreInst(new VarType(declType),from,ptr);
 						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
 					}
 				}
@@ -296,20 +298,26 @@ public class BasicBlock extends Value{
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
-					BasicBlock ifBasicBlock=null,elseBasicBlock=null,nextBasicBlock=new BasicBlock(parentFunction,null,this.level+1,this);
-					nextBasicBlock.label=new Label(nextBasicBlock);
+					BasicBlock ifBasicBlock=null,elseBasicBlock=null;
+					this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
-						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						if(children.size()>=1&&children.get(children.size()-1).nextBasicBlock!=null){
+							ifBasicBlock=children.get(children.size()-1).nextBasicBlock;
+						}
+						else ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4,0}));
-						ifBasicBlock.createBrInst(nextBasicBlock);
+						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
 					else{//TODO：单一语句
-						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4}),this.level+1,this);
+						if(children.size()>=1&&children.get(children.size()-1).nextBasicBlock!=null){
+							ifBasicBlock=children.get(children.size()-1).nextBasicBlock;
+						}
+						else ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4}));
-						ifBasicBlock.createBrInst(nextBasicBlock);
+						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
@@ -340,10 +348,10 @@ public class BasicBlock extends Value{
 						jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
 						children.add(elseBasicBlock);
-						children.add(nextBasicBlock);
+						children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
-						newLOrExp.main(ifBasicBlock,nextBasicBlock);
+						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
@@ -352,7 +360,7 @@ public class BasicBlock extends Value{
 						jumpIndexs.add(instructions.size());
 						jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
-						children.add(nextBasicBlock);
+						children.add(this.nextBasicBlock);
 					}
 					
 					return;
@@ -427,25 +435,25 @@ public class BasicBlock extends Value{
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
 					from.name=String.valueOf((int)(from.name.charAt(1)));
 				}
-				createStoreInst(from,tmpValue,(VarType)tmpType);
+				createStoreInst((VarType)tmpType,from,tmpValue);
 			}
 			else if(((TNode)(father.children.get(2))).token.equals("getint")){
 				Value newValue=new Value();
 				Value newCallInst=createCallInst(newValue,new Function(new ReturnType("int"), "getint", null));
 				if(((VarType)tmpType).type.equals("char")){
 					Value newTruncInst=createTruncInst(newValue);
-					createStoreInst(newTruncInst,tmpValue,(VarType)tmpType);
+					createStoreInst((VarType)tmpType,newTruncInst,tmpValue);
 				} 
-				else createStoreInst(newValue,tmpValue,(VarType)tmpType);
+				else createStoreInst((VarType)tmpType,newValue,tmpValue);
 			}
 			else if(((TNode)(father.children.get(2))).token.equals("getchar")){
 				Value newValue=new Value();
 				Value newCallInst=createCallInst(newValue,new Function(new ReturnType("int"), "getchar", null));
 				if(((VarType)tmpType).type.equals("char")){
 					Value newTruncInst=createTruncInst(newValue);
-					createStoreInst(newTruncInst,tmpValue,(VarType)tmpType);
+					createStoreInst((VarType)tmpType,newTruncInst,tmpValue);
 				} 
-				else createStoreInst(newValue,tmpValue,(VarType)tmpType);
+				else createStoreInst((VarType)tmpType,newValue,tmpValue);
 			}
 			
 		}
@@ -469,8 +477,52 @@ public class BasicBlock extends Value{
 		}
 	}
 
+	public void flash(){
+		
+		int jumpindex=0;
+		int cnt=0;
+		while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
+			children.get(jumpindex).getName();
+			children.get(jumpindex).flash();
+			jumpindex++;
+		} 
+		for (Instruction ins : instructions) {
+			if(jumpindex<=(jumpIndexs.size()-1)){
+				System.out.println(cnt+" "+jumpIndexs.get(jumpindex));
+				while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
+					children.get(jumpindex).getName();
+					children.get(jumpindex).flash();
+					// if(jumpIndexs.get(jumpindex)==jumpIndexs.get(jumpindex+1)) children.get(jumpindex).nextBasicBlock=children.get(jumpindex+1);
+					// else{
+					// 	children.get(jumpindex).nextBasicBlock=parentFunction.createBasicBlock(parentFunction, null, level+1, this);
+					// 	children.get(jumpindex).nextBasicBlock.label=new Label(children.get(jumpindex).nextBasicBlock);
+					// } 
+					jumpindex++;
+				} 
+			}
+			if(!(ins instanceof BrInst)){
+				if(!(ins instanceof ReturnInst||ins instanceof CallInst||ins instanceof StoreInst||ins instanceof PrintfInst)){
+					ins.getName();
+				}
+				if(ins instanceof CallInst && ((CallInst)ins).lval!=null){
+					((CallInst)ins).lval.getName();
+				}
+				for(Value value:ins.operands){
+					// if(ins instanceof CallInst){
+					// 	System.out.print(value.getName()+" ");
+					// } 
+					if(!(ins instanceof PrintfInst)) value.getName();
+				}
+				// System.out.println();
+				
+			}
+			
+			cnt++;
+		}
+	}
+
     public void output(BufferedWriter writer) throws IOException {
-		System.out.println(jumpIndexs.size()); 
+		
 		if (label!=null) {
 			label.output(writer);
 		}

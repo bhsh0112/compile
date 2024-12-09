@@ -12,6 +12,10 @@ public class TruncInst extends Instruction {
     public TruncInst(Value... operands){
         super(operands);
         value=operands[0];
+        // for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
     }
     
 

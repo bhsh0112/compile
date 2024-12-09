@@ -21,6 +21,11 @@ public abstract class User extends Value {
 		addOperand(operands);
 	}
 
+	public void addValue(int index,Value value) {
+		value.addUse(new Use(value, this));
+		operands.add(index, value);
+	}
+
 	public void addOperand(Value...values) {
 		for (Value value : values) {
 			value.addUse(new Use(value, this));

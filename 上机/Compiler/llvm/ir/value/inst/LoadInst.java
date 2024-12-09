@@ -10,10 +10,10 @@ public class LoadInst extends Instruction {
     Value value;
     VarType dataType;
 
-    public LoadInst(Value... operands){
+    public LoadInst(VarType dataType,Value... operands){
         super(operands);
         this.value=operands[0];
-        dataType=(VarType)operands[1];
+        this.dataType=dataType;
     }
 
     public void output(BufferedWriter writer) throws IOException{

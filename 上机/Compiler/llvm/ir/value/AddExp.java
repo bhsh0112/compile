@@ -109,7 +109,7 @@ public class AddExp extends InitVal{
                                 // Value newLoadInst=basicBlock.createLoadInst(element.value, newVarType);
                                 // VarType LoadType=new VarType(element.type.substring(0,element.type.length()-3));
                                 Value newGetElementPtrInst=basicBlock.createGetElementPtrInst(new VarType(element.type+"R",element.size), element.value, new int[] {0,index});
-                                ATparent.exp=basicBlock.createLoadInst(newGetElementPtrInst, new VarType(element.type));
+                                ATparent.exp=basicBlock.createLoadInst(new VarType(element.type),newGetElementPtrInst);
                                 ATparent.type=element.type;
                                 break;
                             } 
@@ -121,7 +121,7 @@ public class AddExp extends InitVal{
                                 Value newGetElementPtrInst=null;
                                 if(element.type.endsWith("Ptr")){
                                     VarType newVarType=new VarType(element.type);
-                                    ptrValue=basicBlock.createLoadInst(element.value, newVarType);
+                                    ptrValue=basicBlock.createLoadInst(newVarType,element.value);
                                     ptrType=new VarType(element.type.substring(0,element.type.length()-3));
                                     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new int[] {index});
                                 }
@@ -132,7 +132,7 @@ public class AddExp extends InitVal{
                                     ptrType=new VarType(element.type);
                                 }
                                 
-                                ATparent.exp=basicBlock.createLoadInst(newGetElementPtrInst, ptrType);
+                                ATparent.exp=basicBlock.createLoadInst(ptrType,newGetElementPtrInst);
                                 ATparent.type=element.type;
                                 break;
                             } 
@@ -185,7 +185,7 @@ public class AddExp extends InitVal{
                     operands[i+1]=tmpAddExp.value;
                 }
                 if(((Function)operands[0]).retType.Type2String().equals("void")){
-                    ATparent.exp=basicBlock.createCallInst(null, operands);
+                    ATparent.exp=basicBlock.createCallInst(null,operands);
                 }
                 else{
                     // Value tmpValue=new Value(((Type)((Function)operands[0]).retType).type);
@@ -306,7 +306,7 @@ public class AddExp extends InitVal{
                                     parent.kind="ArrayElement";
                                 }
                                 else{
-                                    parent.exp=basicBlock.createLoadInst(tmpValue,tmpType);
+                                    parent.exp=basicBlock.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
                                 } 
                                 parent.type=((VarType)tmpType).type;
@@ -325,7 +325,7 @@ public class AddExp extends InitVal{
                                     parent.kind="ArrayElement";
                                 }
                                 else{
-                                    parent.exp=basicBlock.createLoadInst(tmpValue,tmpType);
+                                    parent.exp=basicBlock.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
                                 } 
                                 parent.type=((VarType)tmpType).type;

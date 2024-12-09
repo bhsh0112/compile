@@ -14,6 +14,10 @@ public class ZextInst extends Instruction{
     public ZextInst(Value... operands){
         super(operands);
         value=operands[0];
+        // for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
     }
     
 

@@ -8,6 +8,10 @@ import llvm.ir.value.Value;
 public class MulInst extends Instruction{
     public MulInst(Value... operands) {
 		super(operands);
+		// for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
 	}
 
 	public void output(BufferedWriter writer) throws IOException {

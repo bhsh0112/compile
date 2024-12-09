@@ -117,8 +117,8 @@ public class GlobalValue extends Value{
 		return newAddInst;
 
 	}
-	public Value createLoadInst(Value value,Value type){
-		LoadInst newLoadInst=new LoadInst(value,type);
+	public Value createLoadInst(VarType dataType,Value value){
+		LoadInst newLoadInst=new LoadInst(dataType,value);
 		instructions.add(newLoadInst);
 		return newLoadInst;
 	}

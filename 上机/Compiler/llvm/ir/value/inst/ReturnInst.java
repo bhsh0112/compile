@@ -13,6 +13,10 @@ public class ReturnInst extends Instruction{
 		super(operands);
 		if(operands.length!=0) value=operands[0];
 		retType=returnType;
+		// for(Value v:operands){
+		// 	v.getName();
+		// }
+		// super.getName();
 	}
 	public void output(BufferedWriter writer) throws IOException {
 		// super.parentBasicBlock.getName();

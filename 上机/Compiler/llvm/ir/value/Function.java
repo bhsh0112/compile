@@ -18,18 +18,7 @@ public class Function extends Value {
 	public ReturnType retType;
 	public ArrayList<FunctionParam> params = new ArrayList<>();
 	public ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
-
-	// public static Function BUILD_IN_GETINT = new Function(ReturnType.getInt(), List.of());
-	// public static Function BUILD_IN_PUTINT = new Function(IRType.getVoid(), List.of(IRType.getInt()));
-	// public static Function BUILD_IN_PUTCH = new Function(IRType.getVoid(), List.of(IRType.getInt()));
-	// public static Function BUILD_IN_PUTSTR = new Function(IRType.getVoid(), List.of(IRType.getChar().ptr(1)));
-
-	// static {
-	//     BUILD_IN_GETINT.setName("getint");
-	//     BUILD_IN_PUTINT.setName("putint");
-	//     BUILD_IN_PUTCH.setName("putch");
-	//     BUILD_IN_PUTSTR.setName("putstr");
-	// }
+	public ArrayList<Value> values = new ArrayList<>();
 
 	public Function(ReturnType retType, String name,ArrayList<VarType> argTypes) {
 		super(name);
@@ -66,6 +55,7 @@ public class Function extends Value {
 		// getName();
 		var newBlock = new BasicBlock(parentFunction,BlockRoot,level,parentBasicBlock);
 		basicBlocks.add(newBlock);
+		values.add(newBlock);
 		return newBlock;
 	}
 
@@ -75,6 +65,8 @@ public class Function extends Value {
 	}
 
 	public void output(BufferedWriter writer) throws IOException {
+
+		
 		
         writer.write("define dso_local "+ retType.Type2String()+" " + getName()+"(");
 
@@ -91,8 +83,8 @@ public class Function extends Value {
         writer.write(") {\n");
 
         for (var block : basicBlocks) {
-			System.out.println("iiiii "+block.jumpIndexs.size()+" "+block.children.size());
 			block.getName();
+			block.flash();
             block.output(writer);
         }
 
