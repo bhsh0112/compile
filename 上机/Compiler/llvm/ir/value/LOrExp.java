@@ -62,11 +62,16 @@ public class LOrExp extends Value {
             basicBlock=parentBasicBlock.nextBasicBlock;
             CTparent.nowBasicBlock=basicBlock;
             parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
+            parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
             first=false;
+            parentBasicBlock.jumpIndexs.remove(parentBasicBlock.jumpIndexs.size()-1);
+            parentBasicBlock.children.remove(parentBasicBlock.children.size()-1);
+            
         }
         else{
             basicBlock=CTparent.createBasicBlock();
             parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
+            parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
         } 
         System.out.println(basicBlock+" "+parentBasicBlock.nextBasicBlock);
         basicBlock.label=new Label(basicBlock);

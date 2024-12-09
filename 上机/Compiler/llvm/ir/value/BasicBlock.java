@@ -342,10 +342,10 @@ public class BasicBlock extends Value{
 
 						jumpIndexs.add(instructions.size());
 						jumpIndexs.add(instructions.size());
-						//jumpIndexs.add(instructions.size());
+						jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
 						children.add(elseBasicBlock);
-						//children.add(this.nextBasicBlock);
+						children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
 						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
@@ -356,9 +356,9 @@ public class BasicBlock extends Value{
 						}
 
 						jumpIndexs.add(instructions.size());
-						//jumpIndexs.add(instructions.size());
+						jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
-						//children.add(this.nextBasicBlock);
+						children.add(this.nextBasicBlock);
 					}
 					
 					return;

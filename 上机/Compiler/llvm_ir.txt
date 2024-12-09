@@ -38,5 +38,6 @@ define dso_local i32 @main() {
 	br label %12
 11:
 	call void @putstr(i8* getelementptr inbounds ([9 x i8], [9 x i8]* @str.3, i64 0, i64 0))
+12:
 	ret i32 0
 }
