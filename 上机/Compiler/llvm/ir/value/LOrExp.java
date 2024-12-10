@@ -56,9 +56,11 @@ public class LOrExp extends Value {
         }
     }
     public void buildTreeEqExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
-        BasicBlock basicBlock=null;
-        basicBlock=CTparent.createBasicBlock();
-        CTparent.nowBasicBlock.label=new Label(basicBlock);
+        if(ASTparent.parent.name.equals("<LAndExp>")){
+            CTparent.nowBasicBlock=new BasicBlock();
+            CTparent.nowBasicBlock.label=new Label(CTparent.nowBasicBlock);
+        } 
+        
         if(first){
             System.out.println("success");
             CTparent.nowBasicBlock.label=null;
@@ -68,11 +70,11 @@ public class LOrExp extends Value {
         System.out.println("in: "+CTparent.nowBasicBlock.label);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
-            CTparent.leftChildren.nowBasicBlock=basicBlock;
+            CTparent.leftChildren.nowBasicBlock=CTparent.nowBasicBlock;
             buildTreeEqExp(CTparent.leftChildren,ASTparent.children.get(0));
             CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
             CTparent.addRightChild(new CondTreeNode(CTparent));
-            CTparent.rightChildren.nowBasicBlock=basicBlock;
+            CTparent.rightChildren.nowBasicBlock=CTparent.nowBasicBlock;
             buildTreeRelExp(CTparent.rightChildren,ASTparent.children.get(2));
         }
         else{
