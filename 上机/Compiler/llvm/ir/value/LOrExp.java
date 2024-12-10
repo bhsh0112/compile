@@ -59,24 +59,36 @@ public class LOrExp extends Value {
     }
     public void buildTreeEqExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
         BasicBlock basicBlock=null;
-        if(first&&parentBasicBlock.nextBasicBlock!=null){
-            System.out.println("success");
-            basicBlock=parentBasicBlock.nextBasicBlock;
-            CTparent.nowBasicBlock=basicBlock;
-            parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
-            parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
-            first=false;
-            if(parentBasicBlock.jumpIndexs.size()>0){
-                parentBasicBlock.jumpIndexs.remove(parentBasicBlock.jumpIndexs.size()-1);
-                parentBasicBlock.children.remove(parentBasicBlock.children.size()-1);
-            }
-        }
-        else{
-            basicBlock=CTparent.createBasicBlock();
-            parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
-            parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
-        }
+        // if(first&&parentBasicBlock.nextBasicBlock!=null){
+        //     System.out.println("success");
+        //     basicBlock=parentBasicBlock.nextBasicBlock;
+        //     CTparent.nowBasicBlock=basicBlock;
+        //     parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
+        //     // parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
+        //     parentBasicBlock.nextBasicBlock.label=null;
+        //     first=false;
+        //     if(parentBasicBlock.jumpIndexs.size()>0){
+        //         parentBasicBlock.jumpIndexs.remove(parentBasicBlock.jumpIndexs.size()-1);
+        //         parentBasicBlock.children.remove(parentBasicBlock.children.size()-1);
+        //     }
+        // }
+        // else{
+        //     basicBlock=CTparent.createBasicBlock();
+        //     parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
+        //     parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
+        // }
+
+        basicBlock=CTparent.createBasicBlock();
         basicBlock.label=new Label(basicBlock);
+        // parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
+        // parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
+        if(first){
+            System.out.println("success");
+            basicBlock.label=null;
+            System.out.println(basicBlock.label);
+            first=false;
+        }
+        // basicBlock.label=new Label(basicBlock);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
             CTparent.leftChildren.nowBasicBlock=basicBlock;
@@ -272,7 +284,7 @@ public class LOrExp extends Value {
         // System.out.println(ifBasicBlock+" "+elseBasicBlock);
         CTRoot=this.buildTree();
         // buildFinalTree(CTRoot);
-        if(noElseFlag) elseBasicBlock=parentBasicBlock.nextBasicBlock;
+        if(noElseFlag) elseBasicBlock=parentBasicBlock.nextBasicBlock;//TODO:什么作用？能否去掉？
         CTRoot.trueBasicBlock=ifBasicBlock;
         CTRoot.falseBasicBlock=elseBasicBlock;
         this.judgeBasicBlocks(CTRoot);

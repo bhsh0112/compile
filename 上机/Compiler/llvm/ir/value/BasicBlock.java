@@ -302,7 +302,8 @@ public class BasicBlock extends Value{
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
 					BasicBlock ifBasicBlock=null,elseBasicBlock=null;
-					// this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
+					this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
+					this.nextBasicBlock.label=new Label(this.nextBasicBlock);
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
 						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
@@ -597,14 +598,14 @@ public class BasicBlock extends Value{
 		int jumpindex=0;
 		int cnt=0;
 		while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
-			children.get(jumpindex).getName();
+			if(children.get(jumpindex).label!=null)children.get(jumpindex).getName();
 			children.get(jumpindex).flash();
 			jumpindex++;
 		} 
 		for (Instruction ins : instructions) {
 			if(jumpindex<=(jumpIndexs.size()-1)){
 				while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
-					children.get(jumpindex).getName();
+					if(children.get(jumpindex).label!=null)children.get(jumpindex).getName();
 					children.get(jumpindex).flash();
 					// if(jumpIndexs.get(jumpindex)==jumpIndexs.get(jumpindex+1)) children.get(jumpindex).nextBasicBlock=children.get(jumpindex+1);
 					// else{
