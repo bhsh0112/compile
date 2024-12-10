@@ -331,7 +331,7 @@ public class BasicBlock extends Value{
 						}
 					}
 					if(elseBasicBlock!=null){//有else
-						newLOrExp.main(ifBasicBlock,elseBasicBlock);
+						newLOrExp.main(ifBasicBlock,elseBasicBlock,false);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
@@ -346,7 +346,7 @@ public class BasicBlock extends Value{
 						children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
-						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
+						newLOrExp.main(ifBasicBlock,this.nextBasicBlock,true);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){

@@ -271,13 +271,13 @@ public class LOrExp extends Value {
         orderCT(CTparent.rightChildren);
     }
 
-    public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock) throws IOException{
+    public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock,boolean noElseFlag) throws IOException{
         // System.out.println(ifBasicBlock+" "+elseBasicBlock);
         CTRoot=this.buildTree();
         buildFinalTree(CTRoot);
+        if(noElseFlag) elseBasicBlock=parentBasicBlock.nextBasicBlock;
         CTRoot.trueBasicBlock=ifBasicBlock;
-        CTRoot.falseBasicBlock=(elseBasicBlock==null)?parentBasicBlock.nextBasicBlock:elseBasicBlock;
-        
+        CTRoot.falseBasicBlock=elseBasicBlock;
         this.judgeBasicBlocks(CTRoot);
         orderCT(CTRoot);
     }

@@ -45,7 +45,7 @@ define dso_local i32 @main() {
 14:
 	%15 = call i32 @func3()
 	%16 = icmp ne i32 %15, 0
-	br i1 %16, label %17, label %13
+	br i1 %16, label %17, label %19
 17:
 	%18 = load i32, i32* @a
 	call void @putint(i32 %18)
@@ -61,7 +61,7 @@ define dso_local i32 @main() {
 	%24 = call i32 @func()
 	%25 = call i32 @func2()
 	%26 = icmp slt i32 %24, %25
-	br i1 %26, label %27, label %19
+	br i1 %26, label %27, label %29
 27:
 	%28 = load i32, i32* @a
 	call void @putint(i32 %28)
