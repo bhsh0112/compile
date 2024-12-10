@@ -37,6 +37,7 @@ public class LOrExp extends Value {
             //TODO
             // CTparent.type="or";
             // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            System.out.println(symbol.getASTNodeContent(ASTparent, new int[]{}));
             buildTreeLAndExp(CTparent,ASTparent.children.get(0));
         }
     }
@@ -52,11 +53,11 @@ public class LOrExp extends Value {
             //TODO
             // CTparent.type="and";
             // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            System.out.println(symbol.getASTNodeContent(ASTparent, new int[]{}));
             buildTreeEqExp(CTparent,ASTparent.children.get(0));
         }
     }
     public void buildTreeEqExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
-        // System.out.println(CTparent.trueBasicBlock+" "+CTparent.falseBasicBlock);
         BasicBlock basicBlock=null;
         if(first&&parentBasicBlock.nextBasicBlock!=null){
             System.out.println("success");
@@ -74,23 +75,19 @@ public class LOrExp extends Value {
             basicBlock=CTparent.createBasicBlock();
             parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
             parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
-            // if(CTRoot.falseBasicBlock==null) CTRoot.falseBasicBlock=parentBasicBlock.nextBasicBlock; 
         }
         basicBlock.label=new Label(basicBlock);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
             CTparent.leftChildren.nowBasicBlock=basicBlock;
             buildTreeEqExp(CTparent.leftChildren,ASTparent.children.get(0));
-            //TODO
             CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
             CTparent.addRightChild(new CondTreeNode(CTparent));
             CTparent.rightChildren.nowBasicBlock=basicBlock;
             buildTreeRelExp(CTparent.rightChildren,ASTparent.children.get(2));
         }
         else{
-            //TODO
-            // CTparent.type=symbol.getASTNodeContent(ASTparent, new int[] {1});
-            // CTparent.addLeftChild(new CondTreeNode(CTparent));
+            System.out.println(symbol.getASTNodeContent(ASTparent, new int[]{}));
             buildTreeRelExp(CTparent,ASTparent.children.get(0));
         }
     }
@@ -274,11 +271,12 @@ public class LOrExp extends Value {
     public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock,boolean noElseFlag) throws IOException{
         // System.out.println(ifBasicBlock+" "+elseBasicBlock);
         CTRoot=this.buildTree();
-        buildFinalTree(CTRoot);
+        // buildFinalTree(CTRoot);
         if(noElseFlag) elseBasicBlock=parentBasicBlock.nextBasicBlock;
         CTRoot.trueBasicBlock=ifBasicBlock;
         CTRoot.falseBasicBlock=elseBasicBlock;
         this.judgeBasicBlocks(CTRoot);
+        buildFinalTree(CTRoot);
         orderCT(CTRoot);
     }
 

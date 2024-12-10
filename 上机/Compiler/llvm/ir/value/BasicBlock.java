@@ -27,6 +27,9 @@ public class BasicBlock extends Value{
 	public ArrayList<BasicBlock> children=new ArrayList<>();
 	public BasicBlock parent;
 	public BasicBlock nextBasicBlock;//仅控制语句使用
+	public BasicBlock afterBasicBlock;//仅for循环用到
+
+	public boolean isStmt=false;
     
 	public BasicBlock(){
 
@@ -39,7 +42,7 @@ public class BasicBlock extends Value{
         this.parentFunction=parentFunction;
 		this.BlockRoot=BlockRoot;
 		this.level=level;
-		
+		this.parent=parent;
     }
 
     public void addInstruction(Instruction value) {
@@ -333,7 +336,6 @@ public class BasicBlock extends Value{
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock,false);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
-						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -348,7 +350,6 @@ public class BasicBlock extends Value{
 					else{//TODO:无else
 						newLOrExp.main(ifBasicBlock,this.nextBasicBlock,true);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
-						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -361,24 +362,123 @@ public class BasicBlock extends Value{
 					return;
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("for")){
-
+					BasicBlock ForStmt1=null,Cond=null,ForStmt2=null,Stmt=new BasicBlock(this.parentFunction,null,this.level,this);
+					Stmt.isStmt=true;
+					BasicBlock entranceBasicBlock=null;
+					this.afterBasicBlock=new BasicBlock();
+					this.afterBasicBlock.label=new Label(this.afterBasicBlock);
+					//判断缺省情况
 					if(parent.children.size()==9){//无缺省
-
+						ForStmt1=new BasicBlock();
+						ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
+						jumpIndexs.add(instructions.size());
+						children.add(ForStmt1);
+						//TODO:处理LOrExp
+						LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
+						newLOrExp.main(Stmt,this.afterBasicBlock,false);//TODO:noElseFlag?
+						for(int i=0;i<newLOrExp.numBasicBlock;i++){
+							jumpIndexs.add(instructions.size());
+						}
+						Cond=children.get(children.size()-newLOrExp.numBasicBlock);
+						Cond.parentFunction=this.parentFunction;
+						Cond.parent=this;
+						
+						ForStmt2=new BasicBlock();
+						ForStmt2.orderAST(parent.children.get(6));
 					}
+					//TODO:只完成了没缺省的情况
 					else if(parent.children.size()==8){//一个缺省
 						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1
-
+							LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{3,0}));
+							newLOrExp.main(Stmt,this.afterBasicBlock,true);//TODO:noElseFlag?
+							for(int i=0;i<newLOrExp.numBasicBlock;i++){
+								jumpIndexs.add(instructions.size());
+							}
+							Cond=children.get(children.size()-newLOrExp.numBasicBlock);
+							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt2.orderAST(parent.children.get(5));
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals(";")){//缺省cond
-
+							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt1.orderAST(parent.children.get(2));
+							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt2.orderAST(parent.children.get(5));
+						}
+						else if(symbol.getASTNodeContent(parent, new int[]{6}).equals(";")){//缺省ForStmt2
+							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt1.orderAST(parent.children.get(2));
+							Cond=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							//TODO:处理LOrExp
 						}
 					}
 					else if(parent.children.size()==7){//两个缺省
-
+						if(symbol.getASTNodeContent(parent, new int[]{2}).equals("<ForStmt>")){//留ForStmt1
+							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt1.orderAST(parent.children.get(2));
+						}
+						else if(symbol.getASTNodeContent(parent, new int[]{3}).equals("<Cond>")){//留Cond
+							Cond=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							//TODO:处理LOrExp
+						}
+						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals("<ForStmt>")){//留ForStmt2 
+							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							ForStmt2.orderAST(parent.children.get(4));
+						}
 					}
 					else if(parent.children.size()==6){//三个缺省
-
+						
 					}
+					
+					Stmt.label=new Label(Stmt);
+					jumpIndexs.add(instructions.size());
+					children.add(Stmt);
+					
+					if(ForStmt2!=null){
+						jumpIndexs.add(instructions.size());
+						children.add(ForStmt2);
+						ForStmt2.label=new Label(ForStmt2);
+					} 
+					jumpIndexs.add(instructions.size());
+					children.add(this.afterBasicBlock);
+					
+					//根据缺省情况调整控制流
+					//TODO:break,continue
+					if(Cond==null){
+						entranceBasicBlock=Stmt;
+					}
+					else{
+						entranceBasicBlock=Cond;
+					}
+					
+					if(ForStmt1!=null) ForStmt1.createBrInst(entranceBasicBlock);
+					
+					if(ForStmt2==null){
+						Stmt.nextBasicBlock=entranceBasicBlock;
+						
+					}
+					else{
+						Stmt.nextBasicBlock=ForStmt2;
+						ForStmt2.nextBasicBlock=entranceBasicBlock;
+						ForStmt2.createBrInst(entranceBasicBlock);
+					}
+					System.out.println("befor: "+Stmt.instructions.size());
+					Stmt.orderAST(parent.children.get(parent.children.size()-1));
+					System.out.println("after: "+Stmt.instructions.size());
+					Stmt.createBrInst(Stmt.nextBasicBlock);
+					return;
+				}
+				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
+					BasicBlock tmp=this;
+					while(tmp.afterBasicBlock==null) tmp=tmp.parent;
+					this.createBrInst(tmp.afterBasicBlock);
+				}
+				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("continue")){
+					BasicBlock tmp=this;
+					
+					while(tmp.isStmt==false){
+						tmp=tmp.parent;
+					} 
+					this.createBrInst(tmp.nextBasicBlock);
 				}
 			}
 			else{

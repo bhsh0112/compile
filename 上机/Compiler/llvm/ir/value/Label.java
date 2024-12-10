@@ -13,6 +13,6 @@ public class Label extends Value{
         return name.substring(1);
     }
     public void output(BufferedWriter writer) throws IOException{
-        writer.write(basicBlock.getName().substring(1)+":\n");
+        writer.write("\n"+basicBlock.getName().substring(1)+":\n");
     }
 }
