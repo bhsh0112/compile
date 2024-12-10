@@ -308,7 +308,6 @@ public class BasicBlock extends Value{
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
 						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4,0}));
-						// ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
@@ -335,7 +334,7 @@ public class BasicBlock extends Value{
 						}
 					}
 					if(elseBasicBlock!=null){//有else
-						newLOrExp.main(ifBasicBlock,elseBasicBlock,false);
+						newLOrExp.main(ifBasicBlock,elseBasicBlock);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
@@ -349,7 +348,10 @@ public class BasicBlock extends Value{
 						children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
-						newLOrExp.main(ifBasicBlock,this.nextBasicBlock,true);
+						System.out.println(newLOrExp.first);
+						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
+						System.out.println(newLOrExp.numBasicBlock);
+						System.out.println(children.get(children.size()-1).label);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
@@ -376,7 +378,8 @@ public class BasicBlock extends Value{
 						children.add(ForStmt1);
 						//TODO:处理LOrExp
 						LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
-						newLOrExp.main(Stmt,this.afterBasicBlock,false);//TODO:noElseFlag?
+						newLOrExp.first=false;//输出第一个标签
+						newLOrExp.main(Stmt,this.afterBasicBlock);//TODO:noElseFlag?
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -391,7 +394,8 @@ public class BasicBlock extends Value{
 					else if(parent.children.size()==8){//一个缺省
 						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1
 							LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{3,0}));
-							newLOrExp.main(Stmt,this.afterBasicBlock,true);//TODO:noElseFlag?
+							
+							newLOrExp.main(Stmt,this.afterBasicBlock);//TODO:noElseFlag?
 							for(int i=0;i<newLOrExp.numBasicBlock;i++){
 								jumpIndexs.add(instructions.size());
 							}
@@ -462,9 +466,7 @@ public class BasicBlock extends Value{
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);
 					}
-					System.out.println("befor: "+Stmt.instructions.size());
 					Stmt.orderAST(parent.children.get(parent.children.size()-1));
-					System.out.println("after: "+Stmt.instructions.size());
 					Stmt.createBrInst(Stmt.nextBasicBlock);
 					return;
 				}
@@ -472,10 +474,14 @@ public class BasicBlock extends Value{
 					BasicBlock tmp=this;
 					while(tmp.afterBasicBlock==null) tmp=tmp.parent;
 					this.createBrInst(tmp.afterBasicBlock);
+					// if(this.instructions.size()>1){
+					// 	this.instructions.remove(instructions.size()-1);
+					// 	this.children.remove(children.size()-1);
+					// }
+					
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("continue")){
 					BasicBlock tmp=this;
-					
 					while(tmp.isStmt==false){
 						tmp=tmp.parent;
 					} 
@@ -623,21 +629,20 @@ public class BasicBlock extends Value{
 					((CallInst)ins).lval.getName();
 				}
 				for(Value value:ins.operands){
-					// if(ins instanceof CallInst){
-					// 	System.out.print(value.getName()+" ");
-					// } 
 					if(!(ins instanceof PrintfInst)) value.getName();
 				}
-				// System.out.println();
-				
 			}
 			
 			cnt++;
 		}
+		while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
+			if(children.get(jumpindex).label!=null)children.get(jumpindex).getName();
+			children.get(jumpindex).flash();
+			jumpindex++;
+		} 
 	}
 
     public void output(BufferedWriter writer) throws IOException {
-		
 		if (label!=null) {
 			label.output(writer);
 		}
@@ -657,5 +662,9 @@ public class BasicBlock extends Value{
 			ins.output(writer);
 			cnt++;
 		}
+		while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
+			children.get(jumpindex).output(writer);
+			jumpindex++;
+		} 
 	}
 }

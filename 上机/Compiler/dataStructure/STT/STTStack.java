@@ -64,7 +64,8 @@ public class STTStack {
     }
 
     public void rmCurLevel(int level){
-        while(stack.get(top).level==level){
+        if(top==-1) return;
+        while(top>-1&&stack.get(top).level==level){
             popStack();
         } 
     }
