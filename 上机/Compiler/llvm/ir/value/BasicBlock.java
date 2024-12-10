@@ -331,9 +331,7 @@ public class BasicBlock extends Value{
 						}
 					}
 					if(elseBasicBlock!=null){//有else
-						System.out.println("before: "+this.nextBasicBlock);
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
-						System.out.println("after: "+this.nextBasicBlock);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						// System.out.println(instructions.size());
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
@@ -360,8 +358,27 @@ public class BasicBlock extends Value{
 						children.add(ifBasicBlock);
 						children.add(this.nextBasicBlock);
 					}
-					
 					return;
+				}
+				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("for")){
+
+					if(parent.children.size()==9){//无缺省
+
+					}
+					else if(parent.children.size()==8){//一个缺省
+						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1
+
+						}
+						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals(";")){//缺省cond
+
+						}
+					}
+					else if(parent.children.size()==7){//两个缺省
+
+					}
+					else if(parent.children.size()==6){//三个缺省
+
+					}
 				}
 			}
 			else{
@@ -486,7 +503,6 @@ public class BasicBlock extends Value{
 		} 
 		for (Instruction ins : instructions) {
 			if(jumpindex<=(jumpIndexs.size()-1)){
-				System.out.println(cnt+" "+jumpIndexs.get(jumpindex));
 				while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
 					children.get(jumpindex).getName();
 					children.get(jumpindex).flash();
@@ -532,7 +548,6 @@ public class BasicBlock extends Value{
 		} 
 		for (Instruction ins : instructions) {
 			if(jumpindex<=(jumpIndexs.size()-1)){
-				System.out.println(cnt+" "+jumpIndexs.get(jumpindex));
 				while(jumpindex<jumpIndexs.size()&&cnt==jumpIndexs.get(jumpindex)){//先输出子block
 					children.get(jumpindex).output(writer);
 					jumpindex++;

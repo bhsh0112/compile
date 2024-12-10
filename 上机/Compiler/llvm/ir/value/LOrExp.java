@@ -56,6 +56,7 @@ public class LOrExp extends Value {
         }
     }
     public void buildTreeEqExp(CondTreeNode CTparent,ASTNode ASTparent) throws IOException{
+        // System.out.println(CTparent.trueBasicBlock+" "+CTparent.falseBasicBlock);
         BasicBlock basicBlock=null;
         if(first&&parentBasicBlock.nextBasicBlock!=null){
             System.out.println("success");
@@ -64,16 +65,17 @@ public class LOrExp extends Value {
             parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
             parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
             first=false;
-            parentBasicBlock.jumpIndexs.remove(parentBasicBlock.jumpIndexs.size()-1);
-            parentBasicBlock.children.remove(parentBasicBlock.children.size()-1);
-            
+            if(parentBasicBlock.jumpIndexs.size()>0){
+                parentBasicBlock.jumpIndexs.remove(parentBasicBlock.jumpIndexs.size()-1);
+                parentBasicBlock.children.remove(parentBasicBlock.children.size()-1);
+            }
         }
         else{
             basicBlock=CTparent.createBasicBlock();
             parentBasicBlock.nextBasicBlock=new BasicBlock(parentBasicBlock.parentFunction, null, parentBasicBlock.level+1, parentBasicBlock);
             parentBasicBlock.nextBasicBlock.label=new Label(parentBasicBlock.nextBasicBlock);
-        } 
-        System.out.println(basicBlock+" "+parentBasicBlock.nextBasicBlock);
+            // if(CTRoot.falseBasicBlock==null) CTRoot.falseBasicBlock=parentBasicBlock.nextBasicBlock; 
+        }
         basicBlock.label=new Label(basicBlock);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
@@ -227,17 +229,17 @@ public class LOrExp extends Value {
         }
     }
 
-    public void preJudgeBasicBlocks(CondTreeNode CTparent){
+    public void preJudgeBasicBlocks(CondTreeNode CTparent){//trueBasicBlock和falseBasicBlock
         if(CTparent==null) return;
         if(CTparent.parent!=null){
             CTparent.judgeTrueBasicBlock();
             CTparent.judgeFalseBasicBlock();
         }
+        // System.out.println(CTparent.trueBasicBlock+" "+CTparent.falseBasicBlock);
         if(CTparent.rightChildren!=null) preJudgeBasicBlocks(CTparent.rightChildren);
         preJudgeBasicBlocks(CTparent.leftChildren);
-        
     }
-    public void ostJudgeBasicBlocks(CondTreeNode CTparent){
+    public void ostJudgeBasicBlocks(CondTreeNode CTparent){//nowBasicBlock
         if(CTparent==null) return;
         ostJudgeBasicBlocks(CTparent.leftChildren);
         if(CTparent.rightChildren!=null) ostJudgeBasicBlocks(CTparent.rightChildren);
@@ -249,6 +251,7 @@ public class LOrExp extends Value {
     }
 
     public void generateBrInst(CondTreeNode CTparent){
+        // System.out.println(CTparent.trueBasicBlock+" "+CTparent.falseBasicBlock);
         if(CTparent.cmpInst!=null) CTparent.nowBasicBlock.createBrInst(CTparent.cmpInst,CTparent.trueBasicBlock,CTparent.falseBasicBlock);
         else if(CTparent.ans!=null){
             if(CTparent.ans.equals("true")) CTparent.nowBasicBlock.createBrInst(CTparent.trueBasicBlock);
@@ -269,10 +272,12 @@ public class LOrExp extends Value {
     }
 
     public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock) throws IOException{
+        // System.out.println(ifBasicBlock+" "+elseBasicBlock);
         CTRoot=this.buildTree();
         buildFinalTree(CTRoot);
         CTRoot.trueBasicBlock=ifBasicBlock;
-        CTRoot.falseBasicBlock=elseBasicBlock;
+        CTRoot.falseBasicBlock=(elseBasicBlock==null)?parentBasicBlock.nextBasicBlock:elseBasicBlock;
+        
         this.judgeBasicBlocks(CTRoot);
         orderCT(CTRoot);
     }
