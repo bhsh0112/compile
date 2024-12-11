@@ -9,9 +9,11 @@ import llvm.ir.value.Type.VarType;
 public class GetelementptrInst extends Instruction {
     VarType type;
     Value ptr;
-    int[] indexs;
+    Value[] indexs;
 
-    public GetelementptrInst(VarType type,Value ptr,int[] indexs) {
+    public GetelementptrInst(VarType type,Value ptr,Value[] indexs) {
+        //TODO:super应加上ptr
+        super(indexs);
         this.type=type;
         this.ptr=ptr;
         this.indexs=indexs;
@@ -22,8 +24,8 @@ public class GetelementptrInst extends Instruction {
     public void output(BufferedWriter writer) throws IOException {
         // super.parentBasicBlock.getName();
         writer.write("\t"+getName()+" = getelementptr inbounds "+type.Type2String()+", "+type.Type2String()+"* "+ptr.getName());
-        for(int index:indexs){
-            writer.write(", i32 "+index);
+        for(Value index:indexs){
+            writer.write(", i32 "+index.getName());
         }
         writer.write("\n");
     }

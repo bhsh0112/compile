@@ -73,6 +73,7 @@ public class Module {
         public static void orderAST(ASTNode parent) throws NumberFormatException, IOException{
             if(parent==null) return;
             if(parent.name.equals("<MainFuncDef>")){
+                // System.out.println("success");
                 globalFlag=false;
                 Function newFunction=createFunction(new ReturnType("int"),"main", null);
                 BasicBlock newbasicblock=functions.get(functions.size()-1).createBasicBlock(newFunction,parent.children.get(4),1,null);

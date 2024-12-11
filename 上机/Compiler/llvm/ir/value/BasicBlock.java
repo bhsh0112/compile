@@ -144,7 +144,7 @@ public class BasicBlock extends Value{
 		instructions.add(newTruncInst);
 		return newTruncInst;
 	}
-	public Value createGetElementPtrInst(VarType type,Value ptr,int[] indexs){
+	public Value createGetElementPtrInst(VarType type,Value ptr,Value[] indexs){
 		GetelementptrInst newGetelementptrInst=new GetelementptrInst(type, ptr, indexs);
 		instructions.add(newGetelementptrInst);
 		return newGetelementptrInst;
@@ -178,10 +178,13 @@ public class BasicBlock extends Value{
 					if(initNum>=1){
 						for(int j=0;j<initNum;j++){
 							if(j==0){
-								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new int[]{0,j});
+								Value tmpValue1=new Value("0");
+								Value tmpValue2=new Value(String.valueOf(j));
+								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
 							}
 							else{
-								ptr=createGetElementPtrInst(new VarType(declType),ptr,new int[]{1});
+								Value tmpValue1=new Value("1");
+								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue1});
 							}
 							ASTNode AddExp=symbol.getASTNode(parent, new int[]{2*i+2,5,2*j+1,0});
 							AddExp tmpAddExp=new AddExp(this);
@@ -216,10 +219,13 @@ public class BasicBlock extends Value{
 						if(initNum>=1){
 							for(int j=0;j<initNum;j++){
 								if(j==0){
-									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new int[]{0,j});
+									Value tmpValue1=new Value("0");
+									Value tmpValue2=new Value(String.valueOf(j));
+									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
 								}
 								else{
-									ptr=createGetElementPtrInst(new VarType(declType),ptr,new int[]{1});
+									Value tmpValue1=new Value("1");
+									ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue1});
 								}
 								ASTNode AddExp=symbol.getASTNode(parent, new int[]{2*i+1,5,2*j+1,0});
 								AddExp tmpAddExp=new AddExp(this);
@@ -551,13 +557,16 @@ public class BasicBlock extends Value{
 			ASTNode father=parent.parent;//Stmt 或 ForStmt
 			//处理LVal
 			String ident=symbol.getASTNodeContent(parent, new int[] {0,0});
-			int index=0;
-			if(parent.children.size()==3){
-				AddExp newAddExp=new AddExp("tmpAddExp");
-				index=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2,0}), null));
+			Value index=null;
+			// System.out.print
+			if(parent.children.size()==4){
+				System.out.println("success");
+				AddExp newAddExp=new AddExp(this);
+				newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2,0}), null);
+				index=newAddExp.value;
 			}
 			Value tmpValue=null,tmpType=null;
-			if(parent.children.size()==1){//变量
+			// if(parent.children.size()==1){//变量
 				boolean tmpFlag=false;
 				int stackSize=Module.symbolStack.stack.size();
 				for(int i=stackSize-1;i>=0;i--){
@@ -569,7 +578,7 @@ public class BasicBlock extends Value{
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
 							if(element.kind.equals("Array")){
-								createGetElementPtrInst(ttType, element.value, new int[] {index});
+								createGetElementPtrInst(ttType, element.value, new Value[] {index});
 							}
 							break;
 						} 
@@ -581,7 +590,7 @@ public class BasicBlock extends Value{
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
 							if(element.kind.equals("Array")){
-								createGetElementPtrInst(ttType, element.value, new int[] {index});
+								createGetElementPtrInst(ttType, element.value, new Value[] {index});
 							}
 							break;
 						} 
@@ -594,16 +603,17 @@ public class BasicBlock extends Value{
 				else{
 					
 				}
-			}
-			else{
+			// }
+			// else{
 
-			}
+			// }
 			// Module.symbolStack.pushStack(this.level, ((VarType)tmpType).Type2String(), tmpValue.name, tmpValue);
 			//处理等号右侧
 			if(father.children.get(2).name.equals("<Exp>"))	{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
+				System.out.println(tmpType+" "+tmpAddExp);
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
