@@ -62,12 +62,10 @@ public class LOrExp extends Value {
         } 
         
         if(first){
-            System.out.println("success");
             CTparent.nowBasicBlock.label=null;
             // basicBlock.getName();
             first=false;
         }
-        System.out.println("in: "+CTparent.nowBasicBlock.label);
         if(ASTparent.children.size()==3){
             CTparent.addLeftChild(new CondTreeNode(CTparent));
             CTparent.leftChildren.nowBasicBlock=CTparent.nowBasicBlock;

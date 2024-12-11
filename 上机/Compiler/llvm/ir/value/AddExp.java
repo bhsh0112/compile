@@ -84,6 +84,13 @@ public class AddExp extends InitVal{
                 ATparent.addChild(new AddTreeNode("tmp"));
                 buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
             }
+            else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("!")){
+                //TODO:是否正确地实现！的功能？
+                ATparent.addChild(new AddTreeNode("1"));
+                ATparent.addChild(new AddTreeNode("-"));
+                ATparent.addChild(new AddTreeNode("tmp"));
+                buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
+            }
             else{
                 System.out.println("error\n");
             }

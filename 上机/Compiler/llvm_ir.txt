@@ -47,74 +47,79 @@ define dso_local i32 @main() {
 	%5 = load i32, i32* @ONE
 	%6 = sub nsw i32 %4, %5
 	%7 = icmp eq i32 %3, %6
-	br i1 %7, label %8, label %24
+	br i1 %7, label %8, label %27
 
 8:
 	%9 = load i32, i32* @ONE
 	%10 = icmp ne i32 %9, 0
-	br i1 %10, label %11, label %24
+	br i1 %10, label %11, label %27
 
 11:
 	%12 = load i32, i32* @ZERO
 	%13 = icmp ne i32 %12, 0
-	br i1 %13, label %21, label %14
+	br i1 %13, label %24, label %14
 
 14:
+	%15 = load i32, i32* @ZERO
+	%16 = sub nsw i32 1, %15
+	%17 = icmp ne i32 %16, 0
+	br i1 %17, label %18, label %25
 
-15:
-	%16 = load i32, i32* @ONE
-	%17 = add nsw i32 %16, 1
-	%18 = load i32, i32* @var2
-	%19 = add nsw i32 %17, %18
-	%20 = icmp slt i32 %19, 0
-	br i1 %20, label %21, label %22
-
-21:
-	call void @putstr(i8* getelementptr inbounds ([8 x i8], [8 x i8]* @str.2, i64 0, i64 0))
-	br label %23
-
-22:
-	call void @putstr(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @str.3, i64 0, i64 0))
-
-23:
-	br label %24
+18:
+	%19 = load i32, i32* @ONE
+	%20 = add nsw i32 %19, 1
+	%21 = load i32, i32* @var2
+	%22 = add nsw i32 %20, %21
+	%23 = icmp slt i32 %22, 0
+	br i1 %23, label %24, label %25
 
 24:
-	%25 = load i32, i32* @var3
-	%26 = icmp ne i32 %25, 3
-	br i1 %26, label %31, label %27
+	call void @putstr(i8* getelementptr inbounds ([8 x i8], [8 x i8]* @str.2, i64 0, i64 0))
+	br label %26
+
+25:
+	call void @putstr(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @str.3, i64 0, i64 0))
+	br label %26
+
+26:
+	br label %27
 
 27:
-	%28 = load i32, i32* @var2
-	%29 = sub nsw i32 %28, 22
-	%30 = icmp eq i32 %29, -20
-	br i1 %30, label %31, label %46
+	%28 = load i32, i32* @var3
+	%29 = icmp ne i32 %28, 3
+	br i1 %29, label %34, label %30
 
-31:
-	%32 = load i32, i32* @ONE
-	%33 = srem i32 %32, 2
-	%34 = add nsw i32 %33, 3
-	%35 = sub nsw i32 %34, 8
-	%36 = load i32, i32* @var3
-	%37 = add nsw i32 %35, %36
-	%38 = load i32, i32* @var2
-	%39 = add nsw i32 %37, %38
-	%40 = icmp sle i32 %39, 100
-	br i1 %40, label %44, label %41
+30:
+	%31 = load i32, i32* @var2
+	%32 = sub nsw i32 %31, 22
+	%33 = icmp eq i32 %32, -20
+	br i1 %33, label %34, label %49
 
-41:
-	%42 = load i32, i32* @ONE
-	%43 = icmp ne i32 %42, 0
-	br i1 %43, label %44, label %45
+34:
+	%35 = load i32, i32* @ONE
+	%36 = srem i32 %35, 2
+	%37 = add nsw i32 %36, 3
+	%38 = sub nsw i32 %37, 8
+	%39 = load i32, i32* @var3
+	%40 = add nsw i32 %38, %39
+	%41 = load i32, i32* @var2
+	%42 = add nsw i32 %40, %41
+	%43 = icmp sle i32 %42, 100
+	br i1 %43, label %47, label %44
 
 44:
+	%45 = load i32, i32* @ONE
+	%46 = icmp ne i32 %45, 0
+	br i1 %46, label %47, label %48
+
+47:
 	call void @putstr(i8* getelementptr inbounds ([10 x i8], [10 x i8]* @str.4, i64 0, i64 0))
-	br label %45
+	br label %48
 
-45:
-	br label %46
+48:
+	br label %49
 
-46:
+49:
 	call void @putstr(i8* getelementptr inbounds ([15 x i8], [15 x i8]* @str.5, i64 0, i64 0))
 	call void @fun()
 	call void @fun()

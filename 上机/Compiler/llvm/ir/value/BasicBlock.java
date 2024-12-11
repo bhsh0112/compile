@@ -336,6 +336,7 @@ public class BasicBlock extends Value{
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
+						elseBasicBlock.createBrInst(this.nextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -348,10 +349,7 @@ public class BasicBlock extends Value{
 						children.add(this.nextBasicBlock);
 					}
 					else{//TODO:无else
-						System.out.println(newLOrExp.first);
 						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
-						System.out.println(newLOrExp.numBasicBlock);
-						System.out.println(children.get(children.size()-1).label);
 						ifBasicBlock.createBrInst(this.nextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());

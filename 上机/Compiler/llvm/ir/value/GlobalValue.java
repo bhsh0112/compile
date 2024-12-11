@@ -60,7 +60,6 @@ public class GlobalValue extends Value{
         if(initSize==1){
             initNum=1;
             if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
-                System.out.println("success");
                 InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
                 initvals.add(newInitval);
             } 
