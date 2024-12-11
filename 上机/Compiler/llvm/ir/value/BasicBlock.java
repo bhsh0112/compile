@@ -30,6 +30,8 @@ public class BasicBlock extends Value{
 	public BasicBlock afterBasicBlock;//仅for循环用到
 
 	public boolean isStmt=false;
+
+	public boolean addBrFlag=true;//进continue，break会用到
     
 	public BasicBlock(){
 
@@ -307,12 +309,15 @@ public class BasicBlock extends Value{
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
 						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						System.out.println("before: "+ifBasicBlock.addBrFlag);
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4,0}));
+						System.out.println("after: "+ifBasicBlock.addBrFlag);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
 						ifBasicBlock.label=new Label(ifBasicBlock);
 					}
 					else{//TODO：单一语句
 						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
+						
 						ifBasicBlock.orderAST(symbol.getASTNode(parent, new int[]{4}));
 						// ifBasicBlock.createBrInst(this.nextBasicBlock);
 						Module.symbolStack.rmCurLevel(ifBasicBlock.level);
@@ -333,9 +338,11 @@ public class BasicBlock extends Value{
 							elseBasicBlock.label=new Label(elseBasicBlock);
 						}
 					}
+					System.out.println("if: "+ifBasicBlock);
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
-						ifBasicBlock.createBrInst(this.nextBasicBlock);
+						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(this.nextBasicBlock);
+						else System.out.println("success");
 						elseBasicBlock.createBrInst(this.nextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
@@ -348,9 +355,10 @@ public class BasicBlock extends Value{
 						children.add(elseBasicBlock);
 						children.add(this.nextBasicBlock);
 					}
-					else{//TODO:无else
+					else{//无else
 						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
-						ifBasicBlock.createBrInst(this.nextBasicBlock);
+						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(this.nextBasicBlock);
+						else System.out.println("success");
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -376,9 +384,6 @@ public class BasicBlock extends Value{
 					if(parent.children.size()==9){//无缺省
 						// ForStmt1=new BasicBlock();
 						ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
-						// jumpIndexs.add(instructions.size());
-						// children.add(ForStmt1);
-
 						//TODO:处理LOrExp
 						LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
 						newLOrExp.first=false;//输出第一个标签
@@ -509,6 +514,8 @@ public class BasicBlock extends Value{
 					BasicBlock tmp=this;
 					while(tmp.afterBasicBlock==null) tmp=tmp.parent;
 					this.createBrInst(tmp.afterBasicBlock);
+					this.addBrFlag=false;
+					System.out.println("if? "+this);
 					// if(this.instructions.size()>1){
 					// 	this.instructions.remove(instructions.size()-1);
 					// 	this.children.remove(children.size()-1);
@@ -521,6 +528,8 @@ public class BasicBlock extends Value{
 						tmp=tmp.parent;
 					} 
 					this.createBrInst(tmp.nextBasicBlock);
+					this.addBrFlag=false;
+					System.out.println("if? "+this);
 				}
 			}
 			else{
