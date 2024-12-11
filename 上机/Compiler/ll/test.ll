@@ -1,3 +1,4 @@
+
 declare i32 @getint()
 declare i32 @getchar()
 declare void @putint(i32)
@@ -40,7 +41,7 @@ define dso_local i32 @main() {
 	br i1 %10, label %11, label %12
 
 11:
-	br label %12
+	br label %2
 
 12:
 	%13 = load i32, i32* %1
@@ -75,7 +76,7 @@ define dso_local i32 @main() {
 	br label %29
 
 28:
-	br label %29
+	br label %2
 
 29:
 	%30 = load i32, i32* %1

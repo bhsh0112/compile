@@ -19,12 +19,12 @@ define dso_local i32 @main() {
 	br i1 %6, label %7, label %8
 
 7:
-	br label %8
+	br label %10
 
 8:
-	br label %10
 	%9 = alloca i32
 	store i32 0, i32* %9
+	br label %2
 
 10:
 	ret i32 0

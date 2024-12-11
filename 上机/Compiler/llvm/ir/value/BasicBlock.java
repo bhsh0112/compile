@@ -202,7 +202,6 @@ public class BasicBlock extends Value{
 			
 		}
 		else if(parent.name.equals("<VarDecl>")){
-			System.out.println("decl: "+this);
 			String declType=symbol.getASTNodeContent(parent,new int[]{0,0});
 			int declNum=(parent.children.size()-1)/2;
 			for(int i=0;i<declNum;i++){
@@ -307,8 +306,8 @@ public class BasicBlock extends Value{
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
 					BasicBlock ifBasicBlock=null,elseBasicBlock=null;
-					this.nextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
-					this.nextBasicBlock.label=new Label(this.nextBasicBlock);
+					BasicBlock newNextBasicBlock=new BasicBlock(parentFunction, null, level+1, this);
+					newNextBasicBlock.label=new Label(newNextBasicBlock);
 					//ifBasicBlock
 					if(symbol.getASTNodeContent(parent, new int[]{4,0}).equals("<Block>")){
 						ifBasicBlock=new BasicBlock(parentFunction,symbol.getASTNode(parent, new int[]{4,0}),this.level+1,this);
@@ -341,8 +340,8 @@ public class BasicBlock extends Value{
 					}
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
-						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(this.nextBasicBlock);
-						elseBasicBlock.createBrInst(this.nextBasicBlock);
+						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(newNextBasicBlock);
+						elseBasicBlock.createBrInst(newNextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -352,22 +351,19 @@ public class BasicBlock extends Value{
 						jumpIndexs.add(instructions.size());
 						children.add(ifBasicBlock);
 						children.add(elseBasicBlock);
-						children.add(this.nextBasicBlock);
+						children.add(newNextBasicBlock);
 					}
 					else{//无else
-						newLOrExp.main(ifBasicBlock,this.nextBasicBlock);
-						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(this.nextBasicBlock);
+						newLOrExp.main(ifBasicBlock,newNextBasicBlock);
+						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(newNextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
 
 						jumpIndexs.add(instructions.size());
 						jumpIndexs.add(instructions.size());
-						System.out.println(this.children.size());
 						children.add(ifBasicBlock);
-						children.add(this.nextBasicBlock);
-						System.out.println(this.children.size());
-						System.out.println("if: "+this+" "+this.parent);
+						children.add(newNextBasicBlock);
 					}
 					return;
 				}
@@ -507,15 +503,15 @@ public class BasicBlock extends Value{
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);
 					}
+					System.out.println("for: "+Stmt+" "+Stmt.nextBasicBlock);
 					if(symbol.getASTNodeContent(parent,new int[]{ parent.children.size()-1,0}).equals("<Block>")) Stmt.orderAST(symbol.getASTNode(parent,new int[]{ parent.children.size()-1,0}));
 					else Stmt.orderAST(parent.children.get(parent.children.size()-1));
-					//TODO:确定正确性
-					System.out.println("for: "+Stmt);
-					System.out.println(Stmt.children.size()+" "+(Stmt.children.get(Stmt.children.size()-1)).instructions.size());
+					//TODO:存在问题
+					// System.out.println(Stmt.children.size()+" "+(Stmt.children.get(Stmt.children.size()-1)).instructions.size());
 					if(Stmt.children.size()>0&&(Stmt.children.get(Stmt.children.size()-1)).instructions.size()==0){//防止冗余标签
-						Stmt.children.get(Stmt.children.size()-1).createBrInst(this.afterBasicBlock);
+						// Stmt.children.get(Stmt.children.size()-1).createBrInst(this.afterBasicBlock);
 					}
-					if(Stmt.addBrFlag)Stmt.createBrInst(Stmt.nextBasicBlock);
+					if(Stmt.addBrFlag) Stmt.createBrInst(Stmt.nextBasicBlock);
 					return;
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
@@ -526,7 +522,7 @@ public class BasicBlock extends Value{
 					while(tmp.isStmt==false){
 						tmp=tmp.parent;
 					} 
-					tmp.addBrFlag=false;
+					// tmp.addBrFlag=false;
 					this.addBrFlag=false;
 					this.stop=true;
 					// return;
@@ -536,8 +532,9 @@ public class BasicBlock extends Value{
 					while(tmp.isStmt==false){
 						tmp=tmp.parent;
 					} 
+					System.out.println("if: "+tmp+" "+tmp.nextBasicBlock);
 					this.createBrInst(tmp.nextBasicBlock);
-					tmp.addBrFlag=false;
+					// tmp.addBrFlag=false;
 					this.addBrFlag=false;
 					this.stop=true;
 					// return;
