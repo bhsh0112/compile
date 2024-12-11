@@ -506,20 +506,23 @@ public class BasicBlock extends Value{
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);
 					}
+					System.out.println("before: "+Stmt.addBrFlag);
+					System.out.println("if: "+Stmt);
 					Stmt.orderAST(parent.children.get(parent.children.size()-1));
-					Stmt.createBrInst(Stmt.nextBasicBlock);
+					System.out.println("after: "+Stmt.addBrFlag);
+					if(Stmt.addBrFlag)Stmt.createBrInst(Stmt.nextBasicBlock);
 					return;
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
 					BasicBlock tmp=this;
 					while(tmp.afterBasicBlock==null) tmp=tmp.parent;
 					this.createBrInst(tmp.afterBasicBlock);
-					this.addBrFlag=false;
+					tmp=this;
+					while(tmp.isStmt==false){
+						tmp=tmp.parent;
+					} 
+					tmp.addBrFlag=false;
 					System.out.println("if? "+this);
-					// if(this.instructions.size()>1){
-					// 	this.instructions.remove(instructions.size()-1);
-					// 	this.children.remove(children.size()-1);
-					// }
 					
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("continue")){
@@ -528,7 +531,7 @@ public class BasicBlock extends Value{
 						tmp=tmp.parent;
 					} 
 					this.createBrInst(tmp.nextBasicBlock);
-					this.addBrFlag=false;
+					tmp.addBrFlag=false;
 					System.out.println("if? "+this);
 				}
 			}
