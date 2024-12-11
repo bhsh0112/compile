@@ -112,6 +112,11 @@ public class LOrExp extends Value {
             newAddExp.llvmAddExp(CTparent.ASTNode, null);
             CTparent.value=newAddExp.value;
             CTparent.varType=newAddExp.type;
+            if(newAddExp.notFlag){//取非，交换trueBasicBlock和falseBasicBlock
+                BasicBlock tmp=CTparent.trueBasicBlock;
+                CTparent.trueBasicBlock=CTparent.falseBasicBlock;
+                CTparent.falseBasicBlock=tmp;
+            }
             if(CTparent.parent==null){
                 if(newAddExp.value!=null){
                     if(newAddExp.value.name!=null) {
@@ -255,7 +260,6 @@ public class LOrExp extends Value {
 
     public void main(BasicBlock ifBasicBlock,BasicBlock elseBasicBlock) throws IOException{
         CTRoot=this.buildTree();
-        
         // buildFinalTree(CTRoot);
         // if(noElseFlag) elseBasicBlock=parentBasicBlock.nextBasicBlock;//TODO:什么作用？能否去掉？
         CTRoot.trueBasicBlock=ifBasicBlock;

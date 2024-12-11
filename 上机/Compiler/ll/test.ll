@@ -122,7 +122,7 @@ define dso_local i32 @main() {
 
 47:
 	%48 = load i32, i32* %6
-	%49 = icmp ne i32 %48, -2
+	%49 = icmp ne i32 %48, 3
 	br i1 %49, label %50, label %53
 
 50:

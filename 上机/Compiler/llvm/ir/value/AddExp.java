@@ -22,6 +22,7 @@ public class AddExp extends InitVal{
     BasicBlock basicBlock=null;
     public Value value;
     public String type;
+    public boolean notFlag=false;
 
     public AddExp(String ans){
         this.ans=ans;
@@ -86,10 +87,9 @@ public class AddExp extends InitVal{
             }
             else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("!")){
                 //TODO:是否正确地实现！的功能？
-                ATparent.addChild(new AddTreeNode("1"));
-                ATparent.addChild(new AddTreeNode("-"));
-                ATparent.addChild(new AddTreeNode("tmp"));
-                buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
+                this.notFlag=true;
+                // ATparent.addChild(new AddTreeNode("tmp"));
+                buildTreeUnaryExp(ATparent,ASTparent.children.get(1));
             }
             else{
                 System.out.println("error\n");
