@@ -60,9 +60,14 @@ public class GlobalValue extends Value{
         if(initSize==1){
             initNum=1;
             if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
+                System.out.println("success");
                 InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
                 initvals.add(newInitval);
             } 
+            else if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<ConstExp>")){
+                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
+                initvals.add(newInitval);
+            }
             else{
                 String str=symbol.getASTNodeContent(InitVal,new int[] {0,0});
                 for(int i=1;i<str.length()-1;i++){

@@ -91,6 +91,7 @@ public class Module {
                     for(int i=0;i<num;i++){
                         String declName=symbol.getASTNodeContent(parent,new int[]{2*i+2,0,0});
                         if(symbol.getASTNode(parent,new int[] {2*i+2}).children.size()==3){//变量
+                            // System.out.println("success");
                             VarType type=new VarType(originType);
                             String name=symbol.getASTNodeContent(parent,new int[] {2*i+2,0,0});
                             GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+2,2}));

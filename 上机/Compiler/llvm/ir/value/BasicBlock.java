@@ -365,17 +365,22 @@ public class BasicBlock extends Value{
 					return;
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("for")){
-					BasicBlock ForStmt1=null,Cond=null,ForStmt2=null,Stmt=new BasicBlock(this.parentFunction,null,this.level,this);
+					BasicBlock ForStmt1=new BasicBlock(),Cond=null,ForStmt2=null,Stmt=new BasicBlock(this.parentFunction,null,this.level,this);
 					Stmt.isStmt=true;
 					BasicBlock entranceBasicBlock=null;
 					this.afterBasicBlock=new BasicBlock();
 					this.afterBasicBlock.label=new Label(this.afterBasicBlock);
+
+					//无论是否缺省ForStmt1，都新建一个子基本块，缺省时用于存Br指令
+					jumpIndexs.add(instructions.size());
+					children.add(ForStmt1);
 					//判断缺省情况
 					if(parent.children.size()==9){//无缺省
-						ForStmt1=new BasicBlock();
+						// ForStmt1=new BasicBlock();
 						ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
-						jumpIndexs.add(instructions.size());
-						children.add(ForStmt1);
+						// jumpIndexs.add(instructions.size());
+						// children.add(ForStmt1);
+
 						//TODO:处理LOrExp
 						LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
 						newLOrExp.first=false;//输出第一个标签
@@ -392,47 +397,76 @@ public class BasicBlock extends Value{
 					}
 					//TODO:只完成了没缺省的情况
 					else if(parent.children.size()==8){//一个缺省
-						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1
+						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1     
+							//TODO:处理LOrExp
 							LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{3,0}));
-							
+							newLOrExp.first=false;//输出第一个标签
 							newLOrExp.main(Stmt,this.afterBasicBlock);//TODO:noElseFlag?
 							for(int i=0;i<newLOrExp.numBasicBlock;i++){
 								jumpIndexs.add(instructions.size());
 							}
 							Cond=children.get(children.size()-newLOrExp.numBasicBlock);
-							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt2.orderAST(parent.children.get(5));
+							Cond.parentFunction=this.parentFunction;
+							Cond.parent=this;
+							
+							ForStmt2=new BasicBlock();
+							ForStmt2.orderAST(parent.children.get(6));
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals(";")){//缺省cond
-							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt1.orderAST(parent.children.get(2));
-							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt2.orderAST(parent.children.get(5));
+							// ForStmt1=new BasicBlock();
+							ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
+							// jumpIndexs.add(instructions.size());
+							// children.add(ForStmt1);
+							
+							ForStmt2=new BasicBlock();
+							ForStmt2.orderAST(parent.children.get(6));
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{6}).equals(";")){//缺省ForStmt2
-							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt1.orderAST(parent.children.get(2));
-							Cond=new BasicBlock(this.parentFunction,null,this.level+1,this);
+							// ForStmt1=new BasicBlock();
+							ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
+							// jumpIndexs.add(instructions.size());
+							// children.add(ForStmt1);
+						
 							//TODO:处理LOrExp
+							LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
+							newLOrExp.first=false;//输出第一个标签
+							newLOrExp.main(Stmt,this.afterBasicBlock);//TODO:noElseFlag?
+							for(int i=0;i<newLOrExp.numBasicBlock;i++){
+								jumpIndexs.add(instructions.size());
+							}
+							Cond=children.get(children.size()-newLOrExp.numBasicBlock);
+							Cond.parentFunction=this.parentFunction;
+							Cond.parent=this;
 						}
 					}
 					else if(parent.children.size()==7){//两个缺省
 						if(symbol.getASTNodeContent(parent, new int[]{2}).equals("<ForStmt>")){//留ForStmt1
-							ForStmt1=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt1.orderAST(parent.children.get(2));
+							// ForStmt1=new BasicBlock();
+							ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
+							// jumpIndexs.add(instructions.size());
+							// children.add(ForStmt1);
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{3}).equals("<Cond>")){//留Cond
-							Cond=new BasicBlock(this.parentFunction,null,this.level+1,this);
 							//TODO:处理LOrExp
+							LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{3,0}));
+							newLOrExp.first=false;//输出第一个标签
+							newLOrExp.main(Stmt,this.afterBasicBlock);//TODO:noElseFlag?
+							for(int i=0;i<newLOrExp.numBasicBlock;i++){
+								jumpIndexs.add(instructions.size());
+							}
+							Cond=children.get(children.size()-newLOrExp.numBasicBlock);
+							Cond.parentFunction=this.parentFunction;
+							Cond.parent=this;
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals("<ForStmt>")){//留ForStmt2 
-							ForStmt2=new BasicBlock(this.parentFunction,null,this.level+1,this);
-							ForStmt2.orderAST(parent.children.get(4));
+							ForStmt2=new BasicBlock();
+							ForStmt2.orderAST(parent.children.get(6));
 						}
 					}
 					else if(parent.children.size()==6){//三个缺省
 						
 					}
+					
 					
 					Stmt.label=new Label(Stmt);
 					jumpIndexs.add(instructions.size());
@@ -443,6 +477,7 @@ public class BasicBlock extends Value{
 						children.add(ForStmt2);
 						ForStmt2.label=new Label(ForStmt2);
 					} 
+					//加入afterBasicBlock
 					jumpIndexs.add(instructions.size());
 					children.add(this.afterBasicBlock);
 					
@@ -455,7 +490,9 @@ public class BasicBlock extends Value{
 						entranceBasicBlock=Cond;
 					}
 					
-					if(ForStmt1!=null) ForStmt1.createBrInst(entranceBasicBlock);
+					// if(ForStmt1!=null) ForStmt1.createBrInst(entranceBasicBlock);
+					// else this.createBrInst(entranceBasicBlock);
+					ForStmt1.createBrInst(entranceBasicBlock);
 					
 					if(ForStmt2==null){
 						Stmt.nextBasicBlock=entranceBasicBlock;
