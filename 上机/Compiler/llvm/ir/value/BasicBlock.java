@@ -628,7 +628,7 @@ public class BasicBlock extends Value{
 								VarType ttType=new VarType(element.type);
 								tmpValue=element.value;
 								if(element.kind.equals("Array")){
-									tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[] {index});
+									tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)), tmpValue, new Value[] {index});
 									ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
 								}
 								tmpType=ttType;
