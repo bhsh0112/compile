@@ -135,29 +135,29 @@ define dso_local i32 @main() {
   store i32 5, ptr %10, align 4
   %11 = alloca [10 x i32], align 4
   %12 = alloca [12 x i8], align 1
-  %13 = getelementptr inbounds [12 x i8], ptr %12, i32 0, i32 1
+  %13 = getelementptr inbounds [12 x i8], ptr %12, i32 0, i32 0
   store i8 113, ptr %13, align 1
-  %14 = getelementptr inbounds [12 x i8], ptr %13, i32 0, i32 2
+  %14 = getelementptr inbounds [12 x i8], ptr %13, i32 0, i32 1
   store i8 119, ptr %14, align 1
-  %15 = getelementptr inbounds [12 x i8], ptr %14, i32 0, i32 3
+  %15 = getelementptr inbounds [12 x i8], ptr %14, i32 0, i32 2
   store i8 101, ptr %15, align 1
-  %16 = getelementptr inbounds [12 x i8], ptr %15, i32 0, i32 4
+  %16 = getelementptr inbounds [12 x i8], ptr %15, i32 0, i32 3
   store i8 114, ptr %16, align 1
-  %17 = getelementptr inbounds [12 x i8], ptr %16, i32 0, i32 5
+  %17 = getelementptr inbounds [12 x i8], ptr %16, i32 0, i32 4
   store i8 116, ptr %17, align 1
-  %18 = getelementptr inbounds [12 x i8], ptr %17, i32 0, i32 6
+  %18 = getelementptr inbounds [12 x i8], ptr %17, i32 0, i32 5
   store i8 121, ptr %18, align 1
-  %19 = getelementptr inbounds [12 x i8], ptr %18, i32 0, i32 7
+  %19 = getelementptr inbounds [12 x i8], ptr %18, i32 0, i32 6
   store i8 117, ptr %19, align 1
-  %20 = getelementptr inbounds [12 x i8], ptr %19, i32 0, i32 8
+  %20 = getelementptr inbounds [12 x i8], ptr %19, i32 0, i32 7
   store i8 105, ptr %20, align 1
-  %21 = getelementptr inbounds [12 x i8], ptr %20, i32 0, i32 9
+  %21 = getelementptr inbounds [12 x i8], ptr %20, i32 0, i32 8
   store i8 111, ptr %21, align 1
-  %22 = getelementptr inbounds [12 x i8], ptr %21, i32 0, i32 10
+  %22 = getelementptr inbounds [12 x i8], ptr %21, i32 0, i32 9
   store i8 112, ptr %22, align 1
-  %23 = getelementptr inbounds [12 x i8], ptr %22, i32 0, i32 11
+  %23 = getelementptr inbounds [12 x i8], ptr %22, i32 0, i32 10
   store i8 92, ptr %23, align 1
-  %24 = getelementptr inbounds [12 x i8], ptr %23, i32 0, i32 12
+  %24 = getelementptr inbounds [12 x i8], ptr %23, i32 0, i32 11
   store i8 110, ptr %24, align 1
   %25 = alloca [10 x i8], align 1
   %26 = getelementptr inbounds [10 x i8], ptr %25, i32 0, i32 1
@@ -179,7 +179,7 @@ define dso_local i32 @main() {
   %34 = load i32, ptr %1, align 4
   %35 = getelementptr inbounds i32, ptr %11, i32 %34
   %36 = load i32, ptr %1, align 4
-  store i32 %36, ptr %11, align 4
+  store i32 %36, ptr %35, align 4
   %37 = load i32, ptr %1, align 4
   %38 = icmp eq i32 %37, 4
   br i1 %38, label %39, label %44

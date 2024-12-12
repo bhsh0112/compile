@@ -139,6 +139,7 @@ public class AddExp extends InitVal{
                                     ptrValue=basicBlock.createLoadInst(newVarType,element.value);
                                     ptrType=new VarType(element.type.substring(0,element.type.length()-3));
                                     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new Value[] {index});
+                                    
                                 }
                                 else{
                                     ptrType=new VarType(element.type+"R",element.size);
@@ -147,9 +148,11 @@ public class AddExp extends InitVal{
                                     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new Value[] {tmpValue,index});
                                     ptrType=new VarType(element.type);
                                 }
-                                
+                                System.out.println("success:"+ptrType.Type2String());
                                 ATparent.exp=basicBlock.createLoadInst(ptrType,newGetElementPtrInst);
-                                ATparent.type=element.type;
+                                //TODO:不确定更改正确性
+                                // ATparent.type=element.type;
+                                ATparent.type=ptrType.type;
                                 break;
                             } 
                         }
@@ -298,11 +301,15 @@ public class AddExp extends InitVal{
                                     Value tmptmpValue=new Value("0");
                                     parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                     parent.kind="ArrayElement";
+                                    //TODO:不确定正确性
+                                    // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 
                                 else{
                                     parent.exp=globalValue.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
+                                    //不确定正确性
+                                    // parent.type=element.type;
                                 } 
                                 parent.type=((VarType)tmpType).type;
                                 value=tmpValue;
@@ -494,11 +501,15 @@ public class AddExp extends InitVal{
                                     Value tmptmpValue=new Value("0");
                                     parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                     parent.kind="ArrayElement";
+                                     //TODO:不确定正确性
+                                    //  parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 else{
                                     
                                     parent.exp=basicBlock.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
+                                    //不确定正确性
+                                    // parent.type=element.type;
                                 } 
                                 parent.type=((VarType)tmpType).type;
                                 value=tmpValue;
@@ -515,10 +526,14 @@ public class AddExp extends InitVal{
                                     Value tmptmpValue=new Value("0");
                                     parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                     parent.kind="ArrayElement";
+                                    //TODO:不确定正确性
+                                    // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 else{
                                     parent.exp=basicBlock.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
+                                    //TODO:不确定正确性
+                                    // parent.type=element.type;
                                 } 
                                 parent.type=((VarType)tmpType).type;
                                 value=tmpValue;

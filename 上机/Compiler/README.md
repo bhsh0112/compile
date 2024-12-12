@@ -6,78 +6,7 @@
 
   ![image-20241210093525607](/Users/shanhao/Library/Application Support/typora-user-images/image-20241210093525607.png)
 
-- 执行下面代码出现冗余标签：(解决但不确定正确性)
-
-  ```
-  int main(){
-      for(;0;){
-          int a;
-          if(a==1){
-              break;
-              printf("success");
-          }
-      }
-      return 0;
-  }
-  ```
-
-  问题：执行以下代码出现多余Br
-
-  ```
-  int main(){
-      int i;
-      for(;0;){
-          int a=1;
-          if(a==1){
-              continue;
-              printf("success");
-          }
-          int b=0;
-      }
-      return 0;
-  }
-  ```
-
-  
-
-- 解决冗余Br方法有误
-
-  ①br指令错误
-
-  ②以下代码仍存在冗余
-
-  ```
-  int main(){
-      int i;
-      for(;0;){
-          //int a=1;
-          if(1==1){
-              //continue;
-              printf("success");
-          }
-          //int b=0;
-      }
-      return 0;
-  }
-  ```
-
-  ③执行以下代码少br指令
-
-  ```
-  int main(){
-      int i;
-      for(;0;){
-          int a=1;
-          if(a==1){
-              break;
-          }
-          int b=0;
-      }
-      return 0;
-  }
-  ```
-
-- Testcase4：数组index为变量名
+- `printf("%c",'1')`会输出对应ascii码而非字符
 
 ### 1 文法解读
 

@@ -19,6 +19,6 @@ public class SdivInst extends Instruction{
 		String lval=getName();
 		String left = operands.get(0).getName();
 		String right = operands.get(1).getName();
-		writer.write("\t" + lval + " = sdiv i32 " + left + ", " + right);
+		writer.write("\t" + lval + " = sdiv i32 " + left + ", " + right+"\n");
 	}
 }

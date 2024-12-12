@@ -81,7 +81,9 @@ public class PrintfInst extends Instruction{
         int indexStr=0,indexValue=0;
         for(int i=0;i<varTypes.size();i++){
             if(varTypes.get(i).equals("char")){
+                System.out.println(((AddExp)addExps.get(indexValue)).type);
                 if(((AddExp)addExps.get(indexValue)).type.equals("char")){
+                    // System.out.println("success");
                     Value tmpZextInst=basicBlock.createZextInst(addExps.get(indexValue).value);
                     Value [] operands=new Value[2];
                     ArrayList<VarType> paraTypeList=new ArrayList<>();
@@ -91,6 +93,16 @@ public class PrintfInst extends Instruction{
                     operands[1]=tmpZextInst;
                     basicBlock.createCallInst(tmpFunction,operands);
                     
+                }
+                else if(addExps.get(indexValue).type.equals("charImm")){
+                    //TODO:理论上不会再出现
+                    Value [] operands=new Value[2];
+                    ArrayList<VarType> paraTypeList=new ArrayList<>();
+                    paraTypeList.add(new VarType("int"));
+                    Function tmpFunction=new Function(new ReturnType("void"), "putint", paraTypeList);
+                    operands[0]=tmpFunction;
+                    operands[1]=new Value(String.valueOf(((int)addExps.get(indexValue).value.name.charAt(1))));
+                    basicBlock.createCallInst(tmpFunction,operands);
                 }
                 else{
                     //TODO

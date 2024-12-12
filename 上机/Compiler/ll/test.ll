@@ -48,7 +48,8 @@ define dso_local i32 @calculate(i32 %0, i32* %1) {
 	%17 = load i32, i32* %3
 	%18 = sub nsw i32 %17, %13
 	%19 = mul nsw i32 %10, %18
-	%20 = sdiv i32 %19, %16	%21 = load i32, i32* %3
+	%20 = sdiv i32 %19, %16
+	%21 = load i32, i32* %3
 	%22 = srem i32 %20, %21
 	%23 = sub nsw i32 %22, -3
 	%24 = add nsw i32 %23, 6
@@ -123,29 +124,29 @@ define dso_local i32 @main() {
 	store i32 5, i32* %10
 	%11 = alloca [10 x i32]
 	%12 = alloca [12 x i8]
-	%13 = getelementptr inbounds [12 x i8], [12 x i8]* %12, i32 0, i32 1
+	%13 = getelementptr inbounds [12 x i8], [12 x i8]* %12, i32 0, i32 0
 	store i8 113, i8* %13
-	%14 = getelementptr inbounds [12 x i8], [12 x i8]* %13, i32 0, i32 2
+	%14 = getelementptr inbounds [12 x i8], [12 x i8]* %13, i32 0, i32 1
 	store i8 119, i8* %14
-	%15 = getelementptr inbounds [12 x i8], [12 x i8]* %14, i32 0, i32 3
+	%15 = getelementptr inbounds [12 x i8], [12 x i8]* %14, i32 0, i32 2
 	store i8 101, i8* %15
-	%16 = getelementptr inbounds [12 x i8], [12 x i8]* %15, i32 0, i32 4
+	%16 = getelementptr inbounds [12 x i8], [12 x i8]* %15, i32 0, i32 3
 	store i8 114, i8* %16
-	%17 = getelementptr inbounds [12 x i8], [12 x i8]* %16, i32 0, i32 5
+	%17 = getelementptr inbounds [12 x i8], [12 x i8]* %16, i32 0, i32 4
 	store i8 116, i8* %17
-	%18 = getelementptr inbounds [12 x i8], [12 x i8]* %17, i32 0, i32 6
+	%18 = getelementptr inbounds [12 x i8], [12 x i8]* %17, i32 0, i32 5
 	store i8 121, i8* %18
-	%19 = getelementptr inbounds [12 x i8], [12 x i8]* %18, i32 0, i32 7
+	%19 = getelementptr inbounds [12 x i8], [12 x i8]* %18, i32 0, i32 6
 	store i8 117, i8* %19
-	%20 = getelementptr inbounds [12 x i8], [12 x i8]* %19, i32 0, i32 8
+	%20 = getelementptr inbounds [12 x i8], [12 x i8]* %19, i32 0, i32 7
 	store i8 105, i8* %20
-	%21 = getelementptr inbounds [12 x i8], [12 x i8]* %20, i32 0, i32 9
+	%21 = getelementptr inbounds [12 x i8], [12 x i8]* %20, i32 0, i32 8
 	store i8 111, i8* %21
-	%22 = getelementptr inbounds [12 x i8], [12 x i8]* %21, i32 0, i32 10
+	%22 = getelementptr inbounds [12 x i8], [12 x i8]* %21, i32 0, i32 9
 	store i8 112, i8* %22
-	%23 = getelementptr inbounds [12 x i8], [12 x i8]* %22, i32 0, i32 11
+	%23 = getelementptr inbounds [12 x i8], [12 x i8]* %22, i32 0, i32 10
 	store i8 92, i8* %23
-	%24 = getelementptr inbounds [12 x i8], [12 x i8]* %23, i32 0, i32 12
+	%24 = getelementptr inbounds [12 x i8], [12 x i8]* %23, i32 0, i32 11
 	store i8 110, i8* %24
 	%25 = alloca [10 x i8]
 	%26 = getelementptr inbounds [10 x i8], [10 x i8]* %25, i32 0, i32 1
@@ -167,7 +168,7 @@ define dso_local i32 @main() {
 	%34 = load i32, i32* %1
 	%35 = getelementptr inbounds i32, i32* %11, i32 %34
 	%36 = load i32, i32* %1
-	store i32 %36, i32* %11
+	store i32 %36, i32* %35
 	%37 = load i32, i32* %1
 	%38 = icmp eq i32 %37, 4
 	br i1 %38, label %39, label %44

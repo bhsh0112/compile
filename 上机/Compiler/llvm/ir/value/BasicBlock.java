@@ -250,7 +250,7 @@ public class BasicBlock extends Value{
 							for(int j=1;j<str.length()-1;j++){
 								char ch=str.charAt(j);
 								Value tmpValue1=new Value("0");
-								Value tmpValue2=new Value(String.valueOf(j));
+								Value tmpValue2=new Value(String.valueOf(j-1));
 								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
 								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 							}
@@ -600,7 +600,7 @@ public class BasicBlock extends Value{
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
 							if(element.kind.equals("Array")){
-								createGetElementPtrInst(ttType, element.value, new Value[] {index});
+								tmpValue=createGetElementPtrInst(ttType, element.value, new Value[] {index});
 							}
 							break;
 						} 
@@ -612,7 +612,7 @@ public class BasicBlock extends Value{
 							VarType ttType=new VarType(element.type);
 							tmpType=ttType;
 							if(element.kind.equals("Array")){
-								createGetElementPtrInst(ttType, element.value, new Value[] {index});
+								tmpValue=createGetElementPtrInst(ttType, element.value, new Value[] {index});
 							}
 							break;
 						} 
