@@ -99,9 +99,7 @@ public class AddExp extends InitVal{
             //变量名
             if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("<LVal>")){
                 if(symbol.getASTNode(ASTparent, new int[] {0,0}).children.size()==1){
-                    System.out.println("success");
                     ATparent.value=symbol.getASTNodeContent(ASTparent,new int[] {0,0,0,0});//普通变量
-                    System.out.println(ATparent.value);
                     // ATparent.kind="Var";
                 }
                 else{//数组元素
@@ -109,7 +107,6 @@ public class AddExp extends InitVal{
                     ATparent.kind="ArrayElement";
                     String arrayName=symbol.getASTNodeContent(ASTparent,new int[] {0,0,0,0});//数组名
                     AddExp newAddExp=new AddExp(this.basicBlock);
-                    System.out.println("start");
                     newAddExp.llvmAddExp(symbol.getASTNode(ASTparent,new int[] {0,0,2,0}), null);
 				    Value index=newAddExp.value;
                     int stackSize=Module.symbolStack.stack.size();
@@ -220,8 +217,6 @@ public class AddExp extends InitVal{
     }
     public void orderAT(AddTreeNode parent,BufferedWriter writer) throws IOException{
         if(parent==null) return;
-        System.out.println(parent.value);
-        // System.out.println(this.basicBlock);
         for(AddTreeNode child:parent.children){
             orderAT(child,writer);
         }
@@ -253,7 +248,6 @@ public class AddExp extends InitVal{
                     writer.write(parent.children.get(0).value+", "+parent.children.get(2).value+"\n");
                 }
                 else{
-                    //TODO：数字加字符情况未解决
                     if(parent.children.get(0).value.startsWith("\'")){
                         parent.children.get(0).value=String.valueOf((int)(parent.children.get(0).value.charAt(1)));
                     }
@@ -286,7 +280,6 @@ public class AddExp extends InitVal{
         else{//局部
             if(parent.value.equals("+")||parent.value.equals("-")||parent.value.equals("*")||parent.value.equals("/")||parent.value.equals("%")) return;
             if(parent.children.size()==0){
-                // System.out.println("success2");
                 if(parent.value.matches("\\d+")){
                     // flashType("intImm");
                     parent.type="intImm";
@@ -306,7 +299,6 @@ public class AddExp extends InitVal{
 
                 }
                 else{
-                    System.out.println("success2");
                     Value tmpValue=null,tmpType=null;
                     boolean tmpFlag=false;
                     // for(STTStack.Element element:Module.symbolStack.stack){

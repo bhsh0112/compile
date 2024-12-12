@@ -379,6 +379,7 @@ public class BasicBlock extends Value{
 					BasicBlock entranceBasicBlock=null;
 					this.afterBasicBlock=new BasicBlock();
 					this.afterBasicBlock.label=new Label(this.afterBasicBlock);
+					System.out.println("for: "+this);
 
 					//无论是否缺省ForStmt1，都新建一个子基本块，缺省时用于存Br指令
 					jumpIndexs.add(instructions.size());
@@ -401,7 +402,6 @@ public class BasicBlock extends Value{
 						ForStmt2=new BasicBlock();
 						ForStmt2.orderAST(parent.children.get(6));
 					}
-					//TODO:只完成了没缺省的情况
 					else if(parent.children.size()==8){//一个缺省
 						if(symbol.getASTNodeContent(parent, new int[]{2}).equals(";")){//缺省ForStmt1     
 							//TODO:处理LOrExp
@@ -466,7 +466,7 @@ public class BasicBlock extends Value{
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals("<ForStmt>")){//留ForStmt2 
 							ForStmt2=new BasicBlock();
-							ForStmt2.orderAST(parent.children.get(6));
+							ForStmt2.orderAST(parent.children.get(4));
 						}
 					}
 					else if(parent.children.size()==6){//三个缺省
@@ -509,11 +509,9 @@ public class BasicBlock extends Value{
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);
 					}
-					System.out.println("for: "+Stmt+" "+Stmt.nextBasicBlock);
 					if(symbol.getASTNodeContent(parent,new int[]{ parent.children.size()-1,0}).equals("<Block>")) Stmt.orderAST(symbol.getASTNode(parent,new int[]{ parent.children.size()-1,0}));
 					else Stmt.orderAST(parent.children.get(parent.children.size()-1));
 					//TODO:存在问题
-					// System.out.println(Stmt.children.size()+" "+(Stmt.children.get(Stmt.children.size()-1)).instructions.size());
 					if(Stmt.children.size()>0&&(Stmt.children.get(Stmt.children.size()-1)).instructions.size()==0){//防止冗余标签
 						// Stmt.children.get(Stmt.children.size()-1).createBrInst(this.afterBasicBlock);
 					}
@@ -522,13 +520,20 @@ public class BasicBlock extends Value{
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
 					BasicBlock tmp=this;
-					while(tmp.afterBasicBlock==null) tmp=tmp.parent;
+					while(tmp.afterBasicBlock==null){
+						System.out.println("break: "+tmp);
+						tmp=tmp.parent;
+					} 
 					this.createBrInst(tmp.afterBasicBlock);
+					// while(tmp.isStmt==false) tmp=tmp.parent;
+					// this.createBrInst(tmp.parent.afterBasicBlock);
 					tmp=this;
 					while(tmp.isStmt==false){
 						tmp=tmp.parent;
 					} 
+
 					// tmp.addBrFlag=false;
+
 					this.addBrFlag=false;
 					this.stop=true;
 					// return;
@@ -538,7 +543,6 @@ public class BasicBlock extends Value{
 					while(tmp.isStmt==false){
 						tmp=tmp.parent;
 					} 
-					System.out.println("if: "+tmp+" "+tmp.nextBasicBlock);
 					this.createBrInst(tmp.nextBasicBlock);
 					// tmp.addBrFlag=false;
 					this.addBrFlag=false;
@@ -558,9 +562,7 @@ public class BasicBlock extends Value{
 			//处理LVal
 			String ident=symbol.getASTNodeContent(parent, new int[] {0,0});
 			Value index=null;
-			// System.out.print
 			if(parent.children.size()==4){
-				System.out.println("success");
 				AddExp newAddExp=new AddExp(this);
 				newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2,0}), null);
 				index=newAddExp.value;
@@ -613,7 +615,6 @@ public class BasicBlock extends Value{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
-				System.out.println(tmpType+" "+tmpAddExp);
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){

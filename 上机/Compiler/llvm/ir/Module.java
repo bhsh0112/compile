@@ -88,6 +88,7 @@ public class Module {
             else if(parent.name.equals("<ConstDecl>")){
                 String originType=symbol.getASTNodeContent(parent,new int[] {1,0});
                 int num=(parent.children.size()-2)/2;
+                //Todo:globalFlag应当可以去掉
                 if(globalFlag){
                     for(int i=0;i<num;i++){
                         String declName=symbol.getASTNodeContent(parent,new int[]{2*i+2,0,0});
