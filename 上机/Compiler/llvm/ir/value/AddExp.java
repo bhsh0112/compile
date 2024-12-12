@@ -133,38 +133,21 @@ public class AddExp extends InitVal{
                         }
                         else{
                             if(element.name.equals(arrayName)){
-                                // System.out.println(element.type);
-                                // Value ptrValue=null;
-                                // VarType ptrType=null;
-                                // Value newGetElementPtrInst=null;
-                                // if(element.type.endsWith("Ptr")){
-                                //     VarType newVarType=new VarType(element.type);
-                                //     ptrValue=basicBlock.createLoadInst(newVarType,element.value);
-                                //     ptrType=new VarType(element.type.substring(0,element.type.length()-3));
-                                //     System.out.println(ptrType.type);
-                                //     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new Value[] {index});
-                                    
-                                // }
-                                // else{
-                                //     ptrType=new VarType(element.type+"R",element.size);
-                                //     ptrValue=element.value;
-                                //     Value tmpValue=new Value("0");
-                                //     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new Value[] {tmpValue,index});
-                                //     ptrType=new VarType(element.type);
-                                // }
-                                // ATparent.exp=basicBlock.createLoadInst(ptrType,newGetElementPtrInst);
-
                                 if(element.size==0){//函数参数
                                     System.out.println(element.type);
                                     Value newLoadInst=basicBlock.createLoadInst(new VarType(element.type),element.value);
                                     Value newGetElementPtrInst=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)), newLoadInst, new Value[] {index});
                                     ATparent.exp=basicBlock.createLoadInst(new VarType(element.type.substring(0,element.type.length()-3)),newGetElementPtrInst);
+                                    
                                     ATparent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 else{//内部变量
                                     Value tmpValue=new Value("0");
                                     Value newGetElementPtrInst=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), element.value, new Value[] {tmpValue,index});
                                     ATparent.exp=basicBlock.createLoadInst(new VarType(element.type.substring(0,element.type.length()-3)),newGetElementPtrInst);
+                                    // Value tmpValue=new Value("0");
+                                    // Value newGetElementPtrInst=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), element.value, new Value[] {tmpValue,tmpValue});
+                                    // ATparent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)), newGetElementPtrInst, new Value[] {index});
                                     ATparent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 break;
@@ -268,7 +251,7 @@ public class AddExp extends InitVal{
                     
                 }
                 else if(parent.value.equals("ArrayElement")&&parent.kind.equals("ArrayElement")){
-
+                    //在buildtree过程中实现
                 }
                 else{//变量名+数组名
                     Value tmpValue=null,tmpType=null;
@@ -285,9 +268,9 @@ public class AddExp extends InitVal{
                                 tmpType=ttType;
                                 if(element.kind.equals("Array")){//数组名
                                     Value tmptmpValue=new Value("0");
-                                    // parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                     
-                                    parent.exp=tmpValue;
+                                    // parent.exp=tmpValue;
                                     parent.kind="Var";
                                     parent.type=((VarType)tmpType).type;
                                 }
@@ -516,8 +499,9 @@ public class AddExp extends InitVal{
                                 tmpType=ttType;
                                 if(element.kind.equals("Array")){
                                     Value tmptmpValue=new Value("0");
-                                    // parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
-                                    parent.exp=tmpValue;
+                                    parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    // parent.exp=tmpValue;
+                                    parent.kind="Var";
                                      //TODO:不确定正确性
                                     //  parent.type=element.type.substring(0,element.type.length()-3);
                                 }

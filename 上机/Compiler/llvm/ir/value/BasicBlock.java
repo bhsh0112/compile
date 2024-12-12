@@ -199,9 +199,16 @@ public class BasicBlock extends Value{
 						for(int j=1;j<str.length()-1;j++){
 							char ch=str.charAt(j);
 							Value tmpValue1=new Value("0");
-							Value tmpValue2=new Value(String.valueOf(j));
-							ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-							createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+							Value tmpValue2=new Value(String.valueOf(j-1));
+							if(j==1){
+								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
+								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+							}
+							else{
+								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
+								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+							}
+							
 						}
 					}
 					else{
@@ -251,8 +258,15 @@ public class BasicBlock extends Value{
 								char ch=str.charAt(j);
 								Value tmpValue1=new Value("0");
 								Value tmpValue2=new Value(String.valueOf(j-1));
-								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+								if(j==1){
+									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
+									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);	
+								
+								}
+								else{
+									ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
+									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+								}
 							}
 						}
 						else{
@@ -602,7 +616,8 @@ public class BasicBlock extends Value{
 							tmpValue=element.value;
 							if(element.kind.equals("Array")){
 								// tmpValue=createLoadInst(loadType,element.value);
-								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
+								Value tmptmpValue=new Value("0");
+								tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[] {tmptmpValue,index});
 								ttType.type=(ttType.type.endsWith("Ptr"))?ttType.type.substring(0,ttType.type.length()-3):ttType.type;
 							}
 							tmpType=ttType;
@@ -628,7 +643,9 @@ public class BasicBlock extends Value{
 								VarType ttType=new VarType(element.type);
 								tmpValue=element.value;
 								if(element.kind.equals("Array")){
-									tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)), tmpValue, new Value[] {index});
+									Value tmptmpValue=new Value("0");
+									Value newGetElementPrtInst=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[] {tmptmpValue,tmptmpValue});
+									tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)), newGetElementPrtInst, new Value[] {index});
 									ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
 								}
 								tmpType=ttType;

@@ -1,14 +1,17 @@
-#include <stdio.h>
-
-int a[3 + 3] = {1, 2, 3, 4, 5, 6};
-int foo(int x, int y[]) {
-    return x + y[2];
+int fibonacci[15];
+void cal_fibonacci()
+{
+	fibonacci[1] = 1;
+	int i;
+	for (i = 2; i < 15; i = i + 1)
+	{
+		fibonacci[i] = fibonacci[i - 1] + fibonacci[i - 2];
+	}
+	return;
 }
 
-int main() {
-    int c[3] = {1, 2, 3};
-    a[1]=c[4];
-    int x = foo(a[4], a);
-    // printf("%d - %d\n", x, foo(c[0], c));
+int main()
+{
+	
     return 0;
 }
