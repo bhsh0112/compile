@@ -449,9 +449,10 @@ public class BasicBlock extends Value{
 							ForStmt2=new BasicBlock();
 							ForStmt2.orderAST(parent.children.get(5));
 						}
-						else if(symbol.getASTNodeContent(parent, new int[]{6}).equals(";")){//缺省ForStmt2
+						else if(symbol.getASTNodeContent(parent, new int[]{6}).equals(")")){//缺省ForStmt2
 							// ForStmt1=new BasicBlock();
 							ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
+							// System.out.println()
 							// jumpIndexs.add(instructions.size());
 							// children.add(ForStmt1);
 						

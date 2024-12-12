@@ -167,6 +167,8 @@ public class AddExp extends InitVal{
             else{
                 ATparent.kind="Imm";
                 ATparent.value=symbol.getASTNodeContent(ASTparent,new int[] {0,0,0});
+                ATparent.value=(ATparent.value.matches("\\d+"))?ATparent.value:String.valueOf((int)(ATparent.value.charAt(1)));//消除字符常量
+                ATparent.type="intImm";
                 ATparent.exp=new Value(ATparent.value);
             } 
         }
@@ -567,6 +569,8 @@ public class AddExp extends InitVal{
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }
+                System.out.println(left.value+" "+left.type);
+                System.out.println(right.value+" "+right.type);
                 if(left.type.equals("intImm")&&right.type.equals("intImm")){
                     switch(parent.children.get(1).value){
                         case "+":
