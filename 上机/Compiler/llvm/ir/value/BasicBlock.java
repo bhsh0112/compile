@@ -600,10 +600,9 @@ public class BasicBlock extends Value{
 							tmpFlag=true;
 							VarType ttType=new VarType(element.type);
 							VarType loadType=new VarType(element.type);
-							Value tmpLoadInst=createLoadInst(loadType,element.value);
-							System.out.println(ttType.type+" "+tmpLoadInst);
-							tmpValue=tmpLoadInst;
+							tmpValue=element.value;
 							if(element.kind.equals("Array")){
+								tmpValue=createLoadInst(loadType,element.value);
 								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
 								ttType.type=(ttType.type.endsWith("Ptr"))?ttType.type.substring(0,ttType.type.length()-3):ttType.type;
 							}
@@ -616,11 +615,11 @@ public class BasicBlock extends Value{
 							tmpFlag=true;
 							VarType ttType=new VarType(element.type);
 							VarType loadType=new VarType(element.type);
-							Value tmpLoadInst=createLoadInst(loadType,element.value);
-							System.out.println(ttType.type+" "+tmpLoadInst);
-							tmpValue=tmpLoadInst;
+							tmpValue=element.value;
 							if(element.kind.equals("Array")){
+								tmpValue=createLoadInst(loadType,element.value);
 								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
+								System.out.print(parent);
 								ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
 							}
 							
