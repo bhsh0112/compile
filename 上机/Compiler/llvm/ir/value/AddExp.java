@@ -247,7 +247,6 @@ public class AddExp extends InitVal{
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
                     value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
-                    System.out.println(value.name);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -478,7 +477,6 @@ public class AddExp extends InitVal{
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
                     value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
-                    System.out.println(value.name);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -569,8 +567,6 @@ public class AddExp extends InitVal{
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }
-                System.out.println(left.value+" "+left.type);
-                System.out.println(right.value+" "+right.type);
                 if(left.type.equals("intImm")&&right.type.equals("intImm")){
                     switch(parent.children.get(1).value){
                         case "+":

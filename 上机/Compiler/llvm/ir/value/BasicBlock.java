@@ -101,6 +101,7 @@ public class BasicBlock extends Value{
 	}
 	public Value createLoadInst(VarType dataType,Value value){
 		LoadInst newLoadInst=new LoadInst(dataType,value);
+		System.out.println(newLoadInst);
 		instructions.add(newLoadInst);
 		return newLoadInst;
 	}
@@ -267,7 +268,6 @@ public class BasicBlock extends Value{
 						AddExp tmpAddExp=new AddExp(this);
 						tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+1,2,0,0}), null);
 						Value from=tmpAddExp.value;
-						System.out.println("from: "+from.name+" "+tmpAddExp.type);
 						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
@@ -598,24 +598,33 @@ public class BasicBlock extends Value{
 					if(element.level==0){
 						if(element.value.getName().substring(1).equals(ident)){
 							tmpFlag=true;
-							tmpValue=element.value;
 							VarType ttType=new VarType(element.type);
-							tmpType=ttType;
+							VarType loadType=new VarType(element.type);
+							Value tmpLoadInst=createLoadInst(loadType,element.value);
+							System.out.println(ttType.type+" "+tmpLoadInst);
+							tmpValue=tmpLoadInst;
 							if(element.kind.equals("Array")){
-								tmpValue=createGetElementPtrInst(ttType, element.value, new Value[] {index});
+								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
+								ttType.type=(ttType.type.endsWith("Ptr"))?ttType.type.substring(0,ttType.type.length()-3):ttType.type;
 							}
+							tmpType=ttType;
 							break;
 						} 
 					}
 					else{
 						if(element.name.equals(ident)){
 							tmpFlag=true;
-							tmpValue=element.value;
 							VarType ttType=new VarType(element.type);
-							tmpType=ttType;
+							VarType loadType=new VarType(element.type);
+							Value tmpLoadInst=createLoadInst(loadType,element.value);
+							System.out.println(ttType.type+" "+tmpLoadInst);
+							tmpValue=tmpLoadInst;
 							if(element.kind.equals("Array")){
-								tmpValue=createGetElementPtrInst(ttType, element.value, new Value[] {index});
+								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
+								ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
 							}
+							
+							tmpType=ttType;
 							break;
 						} 
 					}
@@ -637,7 +646,6 @@ public class BasicBlock extends Value{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
-				System.out.println("from: "+from.name+" "+tmpAddExp.type);
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){

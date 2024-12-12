@@ -194,7 +194,7 @@ public class Module {
                 for(int i=0;i<paraNum;i++){ 
                     Value ptr=newbasicblock.createAllocaInst(paraTypes.get(i));
                     newbasicblock.createStoreInst(paraTypes.get(i),newFunction.params.get(i), ptr);
-                    symbolStack.pushStack(1,paraTypes.get(i).type,"Para",paraNames[i],ptr,0,null);
+                    symbolStack.pushStack(1,paraTypes.get(i).type,(paraTypes.get(i).type.endsWith("Ptr"))?"Array":"Var",paraNames[i],ptr,0,null);
                 }
                 newbasicblock.orderAST(parent.children.get(parent.children.size()-1));
                 if(((newbasicblock.instructions.size()==0)||!(newbasicblock.instructions.get(newbasicblock.instructions.size()-1) instanceof ReturnInst))&&retType.type.equals("void")){

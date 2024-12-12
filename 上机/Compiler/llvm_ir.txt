@@ -39,10 +39,12 @@ define dso_local i32 @setIndex(i32* %0, i32 %1, i32 %2) {
 	%11 = load i32, i32* %10
 	store i32 %11, i32* %7
 	%12 = load i32, i32* %5
-	%13 = load i32, i32* %6
-	store i32* %13, i32** %4
-	%14 = load i32, i32* %7
-	ret i32 %14
+	%13 = load i32*, i32** %4
+	%14 = getelementptr inbounds i32, i32* %13, i32 %12
+	%15 = load i32, i32* %6
+	store i32 %15, i32* %14
+	%16 = load i32, i32* %7
+	ret i32 %16
 }
 define dso_local i32 @main() {
 	%1 = alloca [5 x i32]
