@@ -25,7 +25,7 @@ public class PrintfInst extends Instruction{
 
 
 
-    public PrintfInst(Value... operands){
+    public PrintfInst(Value... operands) throws IOException{
         super(operands);
         this.format=(StringConst)operands[0];
         for(int i=1;i<operands.length;i++){
@@ -37,7 +37,7 @@ public class PrintfInst extends Instruction{
 		// }
 		// super.getName();
     }
-    public void splitString(){
+    public void splitString() throws IOException{
         int start=1;
         for(int i=1;i<this.format.content.length()-1;i++){
             if(this.format.content.charAt(i)=='\\'){

@@ -8,7 +8,7 @@ import llvm.ir.value.Type.VarType;
 
 public class InitVal extends Value {
     VarType type;
-    AddExp val;
+    public AddExp val;
     ASTNode valRoot;
     String ans;
 
@@ -21,32 +21,41 @@ public class InitVal extends Value {
         this.val=val;
     }
 
-    public InitVal(VarType type,ASTNode valRoot) {
+    public InitVal(VarType type,ASTNode valRoot,GlobalValue globalValue) {
         this.type=type;
         this.valRoot=valRoot;
-        val=new AddExp(valRoot);
+        this.val=new AddExp(globalValue);
     }
     public InitVal(VarType type,String ans) {
         this.type=type;
         this.ans=ans;
+        this.val=new AddExp(ans);
+    }
+
+    public void orderAddExp() throws IOException{
+        this.val.llvmAddExp(valRoot, null);
     }
 
 
     public String output(BufferedWriter writer) throws IOException{
-        String str=null;
+        Value finalValue=null;
         if (ans != null) {
-            str=ans;
+            finalValue=new Value(ans);
         }
-        else str=val.output(writer);
-        String value;
-        if(type.Type2String().equals("i32")&&str.startsWith("\'")){
-            value=String.valueOf((int)(str.charAt(1)));
+        else{
+            // str=val.output(writer);
+            finalValue=this.val.value;
+
+        } 
+        if(finalValue.name!=null&&finalValue.name.startsWith("\'")){
+            // System
+            finalValue.name=String.valueOf((int)(finalValue.name.charAt(1)));
         }
-        else if(type.Type2String().equals("i8")&&(!str.startsWith("\'"))){
-            value=Integer.valueOf(str).toString();
+        //TODO:调价似乎需要更改
+        else if(type.Type2String().equals("i8")&&finalValue.name!=null&&(!finalValue.name.startsWith("\'"))){
+            finalValue.name=Integer.valueOf(finalValue.name).toString();
         }
-        else value=str;
-        writer.write(type.Type2String()+" " +value);
-        return str;
+        writer.write(type.Type2String()+" " +finalValue.getName());
+        return finalValue.name;
     }
 }

@@ -20,18 +20,24 @@ public class AddExp extends InitVal{
     Value parentValue;
     ASTNode AddExp;
     BasicBlock basicBlock=null;
+    GlobalValue globalValue=null;
     public Value value;
     public String type;
     public boolean notFlag=false;
 
     public AddExp(String ans){
         this.ans=ans;
+        //TODO:后加，是否会有其他影响？
+        this.value=new Value(ans);
     }
     public AddExp(ASTNode AddExp){
         this.AddExp=AddExp;
     }
     public AddExp(BasicBlock block){
         this.basicBlock=block;
+    }
+    public AddExp(GlobalValue globalValue){
+        this.globalValue=globalValue;
     }
 
     public String llvmAddExp(ASTNode parent,BufferedWriter writer) throws IOException{
@@ -221,72 +227,15 @@ public class AddExp extends InitVal{
             orderAT(child,writer);
         }
         if(this.basicBlock==null){//全局
-            if(parent.children.size()==0){
-
-            }
-            else{
-                if(parent.children.get(0).value.startsWith("%")||parent.children.get(2).value.startsWith("%")){
-                    parent.value=this.getName();
-                    writer.write("\t"+parent.value+ " = ");
-                    switch(parent.children.get(1).value){
-                        case "+":
-                            writer.write("add nsw ");
-                            break;
-                        case "-":
-                            writer.write("sub nsw ");
-                            break;
-                        case "*":
-                            writer.write("mul nsw ");
-                            break;
-                        case "/":
-                            writer.write("sdiv ");
-                            break;
-                        case "%":
-                            writer.write("srem ");
-                            break;
-                    }
-                    writer.write(parent.children.get(0).value+", "+parent.children.get(2).value+"\n");
-                }
-                else{
-                    if(parent.children.get(0).value.startsWith("\'")){
-                        parent.children.get(0).value=String.valueOf((int)(parent.children.get(0).value.charAt(1)));
-                    }
-                    if(parent.children.get(2).value.startsWith("\'")){
-                        parent.children.get(2).value=String.valueOf((int)(parent.children.get(2).value.charAt(1)));
-                    }
-                    int num1=Integer.parseInt(parent.children.get(0).value);
-                    int num2=Integer.parseInt(parent.children.get(2).value);
-                    switch(parent.children.get(1).value){
-                        case "+":
-                            parent.value=String.valueOf(num1+num2);
-                            break;
-                        case "-":
-                            parent.value=String.valueOf(num1-num2);
-                            break;
-                        case "*":
-                            parent.value=String.valueOf(num1*num2);
-                            break;
-                        case "/":
-                            parent.value=String.valueOf(num1/num2);
-                            break;
-                        case "%":
-                            parent.value=String.valueOf(num1%num2);
-                            break;
-                    }
-                }
-            }
-            
-        }
-        else{//局部
             if(parent.value.equals("+")||parent.value.equals("-")||parent.value.equals("*")||parent.value.equals("/")||parent.value.equals("%")) return;
             if(parent.children.size()==0){
-                if(parent.value.matches("\\d+")){
+                if(parent.value.matches("\\d+")){//数字常量
                     // flashType("intImm");
                     parent.type="intImm";
                     value=new ImmediateValue(parent.value);
                     parent.exp=value;
                 }
-                else if(parent.value.matches("\\'.\\'")){
+                else if(parent.value.matches("\\'.\\'")){//字符常量
                     // flashType("charImm");
                     parent.type="charImm";
                     value=new ImmediateValue(parent.value);
@@ -298,7 +247,229 @@ public class AddExp extends InitVal{
                 else if(parent.value.equals("ArrayElement")&&parent.kind.equals("ArrayElement")){
 
                 }
+                else{//变量名
+                    Value tmpValue=null,tmpType=null;
+                    boolean tmpFlag=false;
+                    // for(STTStack.Element element:Module.symbolStack.stack){
+                    int stackSize=Module.symbolStack.stack.size();
+                    for(int i=stackSize-1;i>=0;i--){
+                        STTStack.Element element=Module.symbolStack.stack.get(i);
+                        if(element.level==0){
+                            if(element.value.getName().substring(1).equals(parent.value)){
+                                tmpFlag=true;
+                                tmpValue=element.value;
+                                VarType ttType=new VarType(element.type);
+                                tmpType=ttType;
+                                if(element.kind.equals("Array")){
+                                    Value tmptmpValue=new Value("0");
+                                    parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    parent.kind="ArrayElement";
+                                    parent.type=((VarType)tmpType).type;
+                                }
+                                else if(element.kind.equals("Const")){
+                                    parent.exp=new Value(element.immValue);
+                                    parent.value=element.immValue;
+                                    parent.type=(element.immValue.matches("\\d+"))?"intImm":"charImm";
+
+                                    // System.out.println(element.immValue+" "+)
+                                }
+                                else{
+                                    
+                                    parent.exp=globalValue.createLoadInst((VarType)tmpType,tmpValue);
+                                    parent.kind="Var";
+                                    parent.type=((VarType)tmpType).type;
+                                } 
+                                
+                                value=tmpValue;
+                                break;
+                            } 
+                        }
+                        else{
+                            if(element.name.equals(parent.value)){
+                                tmpFlag=true;
+                                tmpValue=element.value;
+                                VarType ttType=new VarType(element.type);
+                                tmpType=ttType;
+                                if(element.kind.equals("Array")){
+                                    Value tmptmpValue=new Value("0");
+                                    parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    parent.kind="ArrayElement";
+                                }
+                                
+                                else{
+                                    parent.exp=globalValue.createLoadInst((VarType)tmpType,tmpValue);
+                                    parent.kind="Var";
+                                } 
+                                parent.type=((VarType)tmpType).type;
+                                value=tmpValue;
+                                break;
+                            } 
+                        }
+                        
+                    }
+                    if(tmpFlag){
+                        
+                        
+                    }
+                    else{
+
+                    }
+                }
+                
+            }
+            else{
+                AddTreeNode left,right;
+                left=parent.children.get(0);
+                right=parent.children.get(2);
+                if(left.type.equals("charImm")){
+                    left.value=String.valueOf((int)(left.value.charAt(1)));
+                    left.exp=new Value(left.value);
+                    left.type="intImm";
+                }
+                if(right.type.equals("charImm")){
+                    right.value=String.valueOf((int)(right.value.charAt(1)));
+                    right.exp=new Value(right.value);
+                    right.type="intImm";
+                }
+                if(left.type.equals("intImm")&&right.type.equals("intImm")){
+                    switch(parent.children.get(1).value){
+                        case "+":
+                            value=new Value(String.valueOf(Integer.valueOf(left.value)+Integer.valueOf(right.value)));
+                            parent.exp=value;
+                            parent.value=value.name;
+                            parent.type="intImm";
+                            break;
+                        case "-":
+                            value=new Value(String.valueOf(Integer.valueOf(left.value)-Integer.valueOf(right.value)));
+                            parent.exp=value;
+                            parent.value=value.name;
+                            parent.type="intImm";
+                            break;
+                        case "*": 
+                            value=new Value(String.valueOf(Integer.valueOf(left.value)*Integer.valueOf(right.value)));
+                            parent.exp=value;
+                            parent.value=value.name;
+                            parent.type="intImm";
+                            break;
+                        case "/":
+                            value=new Value(String.valueOf(Integer.valueOf(left.value)/Integer.valueOf(right.value)));
+                            parent.exp=value;
+                            parent.value=value.name;
+                            parent.type="intImm";
+                            break;
+                        case "%":
+                            value=new Value(String.valueOf(Integer.valueOf(left.value)%Integer.valueOf(right.value)));
+                            parent.exp=value;
+                            parent.value=value.name;
+                            parent.type="intImm";
+                            break;
+                    }
+                }
                 else{
+                    switch(parent.children.get(1).value){
+                        case "+":
+                            value=globalValue.createAddInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            parent.exp=value;
+                            parent.type="int";
+                            break;
+                        case "-":
+                            value=globalValue.createSubInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            parent.exp=value;
+                            parent.type="int";
+                            break;
+                        case "*": 
+                            value=globalValue.createMulInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            parent.exp=value;
+                            parent.type="int";
+                            break;
+                        case "/":
+                            value=globalValue.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);    
+                            parent.exp=value;
+                            parent.type="int";
+                            break;
+                        case "%":
+                            value=globalValue.createSremInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            parent.exp=value;
+                            parent.type="int";
+                            break;
+                    }
+                }
+            }
+            flashType(parent); 
+                // if(parent.children.get(0).value.startsWith("%")||parent.children.get(2).value.startsWith("%")){
+                //     parent.value=this.getName();
+                //     writer.write("\t"+parent.value+ " = ");
+                //     switch(parent.children.get(1).value){
+                //         case "+":
+                //             writer.write("add nsw ");
+                //             break;
+                //         case "-":
+                //             writer.write("sub nsw ");
+                //             break;
+                //         case "*":
+                //             writer.write("mul nsw ");
+                //             break;
+                //         case "/":
+                //             writer.write("sdiv ");
+                //             break;
+                //         case "%":
+                //             writer.write("srem ");
+                //             break;
+                //     }
+                //     writer.write(parent.children.get(0).value+", "+parent.children.get(2).value+"\n");
+                // }
+                // else{
+                //     if(parent.children.get(0).value.startsWith("\'")){
+                //         parent.children.get(0).value=String.valueOf((int)(parent.children.get(0).value.charAt(1)));
+                //     }
+                //     if(parent.children.get(2).value.startsWith("\'")){
+                //         parent.children.get(2).value=String.valueOf((int)(parent.children.get(2).value.charAt(1)));
+                //     }
+                //     int num1=Integer.parseInt(parent.children.get(0).value);
+                //     int num2=Integer.parseInt(parent.children.get(2).value);
+                //     switch(parent.children.get(1).value){
+                //         case "+":
+                //             parent.value=String.valueOf(num1+num2);
+                //             break;
+                //         case "-":
+                //             parent.value=String.valueOf(num1-num2);
+                //             break;
+                //         case "*":
+                //             parent.value=String.valueOf(num1*num2);
+                //             break;
+                //         case "/":
+                //             parent.value=String.valueOf(num1/num2);
+                //             break;
+                //         case "%":
+                //             parent.value=String.valueOf(num1%num2);
+                //             break;
+                //     }
+                // }
+            
+            
+        }
+        else{//局部
+            if(parent.value.equals("+")||parent.value.equals("-")||parent.value.equals("*")||parent.value.equals("/")||parent.value.equals("%")) return;
+            if(parent.children.size()==0){
+                if(parent.value.matches("\\d+")){//数字常量
+                    // flashType("intImm");
+                    parent.type="intImm";
+                    value=new ImmediateValue(parent.value);
+                    parent.exp=value;
+                }
+                else if(parent.value.matches("\\'.\\'")){//字符常量
+                    // flashType("charImm");
+                    parent.type="charImm";
+                    value=new ImmediateValue(parent.value);
+                    parent.exp=value;
+                }
+                else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
+                    
+                }
+                else if(parent.value.equals("ArrayElement")&&parent.kind.equals("ArrayElement")){
+
+                }
+                else{//变量名
                     Value tmpValue=null,tmpType=null;
                     boolean tmpFlag=false;
                     // for(STTStack.Element element:Module.symbolStack.stack){

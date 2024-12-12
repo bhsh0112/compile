@@ -8,6 +8,7 @@ import java.util.List;
 import dataStructure.ASTNode.ASTNode;
 import llvm.ir.value.Type.*;
 import llvm.ir.value.inst.AddInst;
+import llvm.ir.value.inst.GetelementptrInst;
 import llvm.ir.value.inst.Instruction;
 import llvm.ir.value.inst.LoadInst;
 import llvm.ir.value.inst.MulInst;
@@ -31,7 +32,6 @@ public class GlobalValue extends Value{
     public GlobalValue(){}
     public GlobalValue(VarType type,String name) {
         super(name);
-
         this.dataType = type;
     }
 
@@ -53,21 +53,24 @@ public class GlobalValue extends Value{
         formatString=new FormatString(str);
         return formatString;
     }
-    public ArrayList<InitVal> createInitVal(VarType type,ASTNode InitVal){
+    public ArrayList<InitVal> createInitVal(VarType type,ASTNode InitVal) throws IOException{
         initvals=new ArrayList<InitVal>();
         int initSize=InitVal.children.size();
         int initNum=0;
+        boolean stringConstFlag=false;
         if(initSize==1){
             initNum=1;
             if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
-                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
+                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}),this);
                 initvals.add(newInitval);
             } 
             else if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<ConstExp>")){
-                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}));
+                InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}),this);
                 initvals.add(newInitval);
             }
-            else{
+            else{//字符串常量
+                System.out.println("success");
+                stringConstFlag=true;
                 String str=symbol.getASTNodeContent(InitVal,new int[] {0,0});
                 for(int i=1;i<str.length()-1;i++){
                     InitVal newInitval=new InitVal(new VarType("char"),new AddExp("\'"+str.charAt(i)+"\'"));
@@ -81,8 +84,13 @@ public class GlobalValue extends Value{
         else{
             initNum=(initSize-2)/2+1;
             for(int i=0;i<initNum;i++){
-                InitVal newInitval=new InitVal(new VarType(type.type.substring(0, type.type.length()-1)), symbol.getASTNode(InitVal, new int[] {2*i+1,0}));
+                InitVal newInitval=new InitVal(new VarType(type.type.substring(0, type.type.length()-1)), symbol.getASTNode(InitVal, new int[] {2*i+1,0}),this);
                 initvals.add(newInitval);
+            }
+        }
+        if(!stringConstFlag){
+            for(InitVal initVal:initvals){
+                initVal.orderAddExp();
             }
         }
         
@@ -139,22 +147,33 @@ public class GlobalValue extends Value{
 		instructions.add(newTruncInst);
 		return newTruncInst;
 	}
+    public Value createGetElementPtrInst(VarType type,Value ptr,Value[] indexs){
+		GetelementptrInst newGetelementptrInst=new GetelementptrInst(type, ptr, indexs);
+		instructions.add(newGetelementptrInst);
+		return newGetelementptrInst;
+	}
 
     
 
     public void output(BufferedWriter writer) throws IOException {
+        // for(InitVal initVal:initvals){
+        //     initVal.orderAddExp();
+        // }
         for(Instruction instruction:instructions){
             instruction.output(writer);
         }
         if(formatString!=null) formatString.output(writer);
         else{
+            int indexInitVal=0;
             writer.write(getName()+" = dso_local global ");
             if(initvals==null) writer.write("zeroinitializer");
             else if(initvals.size()==1) initvals.get(0).output(writer);
             else{
+                writer.write(this.dataType.Type2String()+" ");
                 writer.write("[");
                 boolean firstFlag=true;
                 for(InitVal initVal:initvals){
+                    indexInitVal++;
                     if(firstFlag){
                         firstFlag=false;
                     }
@@ -162,6 +181,12 @@ public class GlobalValue extends Value{
                         writer.write(",");
                     }
                     initVal.output(writer);
+                }
+                //局部变量的数组声明也需要类似补充
+                while(indexInitVal<this.dataType.size){//不足未指明元素
+                    writer.write(",");
+                    writer.write(initvals.get(0).type.Type2String()+" "+"0");
+                    indexInitVal++;
                 }
                 writer.write("]");
             }

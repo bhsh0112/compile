@@ -116,7 +116,7 @@ public class BasicBlock extends Value{
 		instructions.add(newCallInst);
 		return newCallInst;
 	}
-	public Value createPrintfInst(Value... operands){
+	public Value createPrintfInst(Value... operands) throws IOException{
 		PrintfInst newPrintfInst=new PrintfInst(operands);
 		instructions.add(newPrintfInst);
 		return newPrintfInst;
@@ -167,9 +167,10 @@ public class BasicBlock extends Value{
 						from.name=String.valueOf((int)(from.name.charAt(1)));
 					}
 					createStoreInst(new VarType(declType),from,ptr);
-					Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
+					Module.symbolStack.pushStack(this.level,declType,"Const",declName,ptr,0,from.name);
 				}
 				else{//数组
+					//TODO:是否需要把常量数组的每一个元素推进符号栈
 					AddExp newAddExp=new AddExp("tmpAddExp");
                     int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+2,2,0}), null));
 					Value ptr=createAllocaInst(new VarType(declType+"R",size));
@@ -197,7 +198,7 @@ public class BasicBlock extends Value{
 						//TODO:是否存在？
 					}
 					//TODO:如何推入符号栈？
-					Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size);
+					Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size,null);
 					//TODO:类型转换？
 				}
 			}
@@ -238,7 +239,7 @@ public class BasicBlock extends Value{
 							//TODO:是否存在？
 						}
 						//TODO:如何推入符号栈？
-						Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size);
+						Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size,null);
 						//TODO:类型转换？
 					}
 					else{//变量
@@ -252,7 +253,7 @@ public class BasicBlock extends Value{
 							from.name=String.valueOf((int)(from.name.charAt(1)));
 						}
 						createStoreInst(new VarType(declType),from,ptr);
-						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
+						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
 					}
 				}
 				else{//无初值
@@ -261,11 +262,11 @@ public class BasicBlock extends Value{
 						int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
 						Value ptr=createAllocaInst(new VarType(declType+"R",size));
 						//TODO:如何推入符号栈？
-						Module.symbolStack.pushStack(this.level,declType,"Array",declName,ptr,size);
+						Module.symbolStack.pushStack(this.level,declType,"Array",declName,ptr,size,null);
 					}
 					else{//变量
 						Value ptr=createAllocaInst(new VarType(declType));
-						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0);
+						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
 					}
 					
 				}

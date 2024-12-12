@@ -16,7 +16,7 @@ public class StrNameAllocator {
    }
 
    public String alloc() {
-      String var1 = "@str" ;
+      String var1 = "@.str" ;
       if(this.count>0) var1=var1+ "."+Integer.toString(this.count);
       ++this.count;
       return var1;

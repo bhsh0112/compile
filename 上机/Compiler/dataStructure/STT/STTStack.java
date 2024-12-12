@@ -18,14 +18,24 @@ public class STTStack {
         public Value value;
         public String kind;
         public int size;
+        public String immValue;//仅用于常量定义
 
-        public Element(int level, String type,String kind,String name,Value value,int size) {
+        // public Element(int level, String type,String kind,String name,Value value,int size) {
+        //     this.level = level;
+        //     this.type = type;
+        //     this.value=value;
+        //     this.name=name;
+        //     this.kind=kind;
+        //     this.size=size;
+        // }
+        public Element(int level, String type,String kind,String name,Value value,int size,String immValue) {
             this.level = level;
             this.type = type;
             this.value=value;
             this.name=name;
             this.kind=kind;
             this.size=size;
+            this.immValue=immValue;
         }
     }
 
@@ -35,8 +45,8 @@ public class STTStack {
         this.level=level;
     }
 
-    public Element pushStack(int level, String type,String kind,String name,Value value,int size) {
-        Element element = new Element(level, type,kind,name,value,size);
+    public Element pushStack(int level, String type,String kind,String name,Value value,int size,String immValue) {
+        Element element = new Element(level, type,kind,name,value,size,immValue);
         stack.add(element);
         top++;
         return element;
