@@ -22,6 +22,7 @@ public class PrintfInst extends Instruction{
     ArrayList<String> strs=new ArrayList<>();
     ArrayList<String> varTypes=new ArrayList<>();
     ArrayList<FormatString> formatStrings=new ArrayList<FormatString>();
+    public ArrayList<Instruction> zextInsts=new ArrayList<>();
 
 
 

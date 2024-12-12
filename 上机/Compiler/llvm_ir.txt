@@ -88,6 +88,7 @@ define dso_local void @print(i8 %0) {
 	%4 = zext i8 %3 to i32
 	call void @putch(i32 %4)
 	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
+	ret void
 }
 define dso_local i8 @get_first(i8* %0) {
 	%2 = alloca i8*

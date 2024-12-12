@@ -69,7 +69,6 @@ public class GlobalValue extends Value{
                 initvals.add(newInitval);
             }
             else{//字符串常量
-                System.out.println("success");
                 stringConstFlag=true;
                 String str=symbol.getASTNodeContent(InitVal,new int[] {0,0});
                 for(int i=1;i<str.length()-1;i++){

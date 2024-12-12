@@ -401,7 +401,6 @@ public class BasicBlock extends Value{
 					BasicBlock entranceBasicBlock=null;
 					this.afterBasicBlock=new BasicBlock();
 					this.afterBasicBlock.label=new Label(this.afterBasicBlock);
-					System.out.println("for: "+this);
 
 					//无论是否缺省ForStmt1，都新建一个子基本块，缺省时用于存Br指令
 					jumpIndexs.add(instructions.size());
@@ -527,8 +526,6 @@ public class BasicBlock extends Value{
 						
 					}
 					else{
-						System.out.println("success");
-						System.out.println(Stmt.instructions.size());
 						Stmt.nextBasicBlock=ForStmt2;
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);
@@ -545,7 +542,6 @@ public class BasicBlock extends Value{
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
 					BasicBlock tmp=this;
 					while(tmp.afterBasicBlock==null){
-						System.out.println("break: "+tmp);
 						tmp=tmp.parent;
 					} 
 					this.createBrInst(tmp.afterBasicBlock);
@@ -712,6 +708,7 @@ public class BasicBlock extends Value{
 			}
 			if(!(ins instanceof BrInst)){
 				if(!(ins instanceof ReturnInst||ins instanceof CallInst||ins instanceof StoreInst||ins instanceof PrintfInst)){
+					if(ins instanceof ZextInst) System.out.println("success");
 					ins.getName();
 				}
 				if(ins instanceof CallInst && ((CallInst)ins).lval!=null){

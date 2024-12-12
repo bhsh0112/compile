@@ -9,7 +9,7 @@ import dataStructure.ASTNode.ASTNode;
 import dataStructure.STT.STTStack;
 import symbol.symbol;
 import llvm.ir.value.Type.*;
-
+import llvm.ir.value.inst.ReturnInst;
 import llvm.ir.value.*;
 
 public class Module {
@@ -197,6 +197,9 @@ public class Module {
                     symbolStack.pushStack(1,paraTypes.get(i).type,"Para",paraNames[i],ptr,0,null);
                 }
                 newbasicblock.orderAST(parent.children.get(parent.children.size()-1));
+                if((!(newbasicblock.instructions.get(newbasicblock.instructions.size()-1) instanceof ReturnInst))&&retType.type.equals("void")){
+                    newbasicblock.createReturnInst(new ReturnType("void"),null);
+                }
                 symbolStack.rmCurLevel(1);
                 return;
             }
