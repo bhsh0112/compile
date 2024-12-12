@@ -166,7 +166,7 @@ public class GlobalValue extends Value{
         else{
             int indexInitVal=0;
             writer.write(getName()+" = dso_local global ");
-            if(initvals==null) writer.write("zeroinitializer");
+            if(initvals==null||initvals.size()==0) writer.write(this.dataType.Type2String()+" zeroinitializer");
             else if(initvals.size()==1) initvals.get(0).output(writer);
             else{
                 writer.write(this.dataType.Type2String()+" ");
@@ -184,8 +184,14 @@ public class GlobalValue extends Value{
                 }
                 //局部变量的数组声明也需要类似补充
                 while(indexInitVal<this.dataType.size){//不足未指明元素
-                    writer.write(",");
-                    writer.write(initvals.get(0).type.Type2String()+" "+"0");
+                    if(firstFlag){
+                        firstFlag=false;
+                    }
+                    else{
+                        writer.write(",");
+                    }
+                    Type tmpType=new Type(this.dataType.type.substring(0,this.dataType.type.length()-1));
+                    writer.write(tmpType.Type2String()+" "+"0");
                     indexInitVal++;
                 }
                 writer.write("]");
