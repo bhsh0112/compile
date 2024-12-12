@@ -176,7 +176,7 @@ public class BasicBlock extends Value{
 					Value ptr=createAllocaInst(new VarType(declType+"R",size));
 					Value originPtr=ptr;
 					int initNum=(symbol.getASTNode(parent, new int[]{2*i+2,5}).children.size()-2)/2+1;
-					if(initNum>=1){
+					if(initNum>1){
 						for(int j=0;j<initNum;j++){
 							if(j==0){
 								Value tmpValue1=new Value("0");
@@ -192,6 +192,16 @@ public class BasicBlock extends Value{
 							tmpAddExp.llvmAddExp(AddExp, null);
 							Value from=tmpAddExp.value;
 							createStoreInst(new VarType(declType),from,ptr);
+						}
+					}
+					else if(initNum==1){//TODO:应当只能是字符串
+						String str=symbol.getASTNodeContent(parent, new int[]{2*i+2,5,0,0});
+						for(int j=1;j<str.length()-1;j++){
+							char ch=str.charAt(j);
+							Value tmpValue1=new Value("0");
+							Value tmpValue2=new Value(String.valueOf(j));
+							ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
+							createStoreInst(new VarType("char"),new Value("\'"+ch+"\'"),ptr);
 						}
 					}
 					else{
@@ -217,7 +227,7 @@ public class BasicBlock extends Value{
 						Value ptr=createAllocaInst(new VarType(declType+"R",size));
 						Value originPtr=ptr;
 						int initNum=(symbol.getASTNode(parent, new int[]{2*i+1,5}).children.size()-2)/2+1;
-						if(initNum>=1){
+						if(initNum>1){//数组初值
 							for(int j=0;j<initNum;j++){
 								if(j==0){
 									Value tmpValue1=new Value("0");
@@ -233,6 +243,16 @@ public class BasicBlock extends Value{
 								tmpAddExp.llvmAddExp(AddExp, null);
 								Value from=tmpAddExp.value;
 								createStoreInst(new VarType(declType),from,ptr);
+							}
+						}
+						else if(initNum==1){//TODO:应当只能是字符串
+							String str=symbol.getASTNodeContent(parent, new int[]{2*i+1,5,0,0});
+							for(int j=1;j<str.length()-1;j++){
+								char ch=str.charAt(j);
+								Value tmpValue1=new Value("0");
+								Value tmpValue2=new Value(String.valueOf(j));
+								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
+								createStoreInst(new VarType("char"),new Value("\'"+ch+"\'"),ptr);
 							}
 						}
 						else{
