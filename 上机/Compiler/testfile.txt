@@ -1,111 +1,97 @@
-//#include <stdio.h>
+const int a = 10, ty=90;
+const int b[3] = {1, 2, 3};
+int x = 5, z=114514;
+int y[3];
+int global_var = 0;
+char buaa='\0';
+const char aa[5]="abc\0";
+char aaa[6]="xyz";
 
-const int MAX_SIZE = 10;
-int global_var;
-char str[10] = {'3', '\''};
-
-int add(int a, int b) {
-    return a + b;
+int g(int arr[]) {
+    return arr[0]+arr[arr[1]+-arr[0]];
 }
 
-int calculate(int a, int b[]) {
-    int res = add(a, b[0]) * (a - b[1]) / (b[2]) % a - (-(-(-3))) + (+ - + -6);
-    if (res <= 5) {
-        return 1;
-    } else {
-        return 0;
-    }
-    return -1;
+char foo(int aa, int bb){
+    return 'o'; /*nothing is true*/
 }
 
-void printName() {
-    global_var = global_var + 1;
-    if (global_var != 0) {
-        printf("22373040\n");
-    }
+void fooo(int aa, int bb){
     return;
 }
 
-void print(char ch) {
-    printf("%c\n", ch);
+int func() {
+    global_var = global_var + 1;
+    return 1;
 }
-
-char get_first(char str[]) {
-    return str[0];
-}
-
-//int getchar() {
-//    char c;
-//    scanf("%c", &c);
-//    return (int) c;
-//}
-//
-//int getint() {
-//    int t;
-//    scanf("%d", &t);
-//    while (getchar() != '\n');
-//    return t;
-//}
-
 int main() {
-//    freopen("a.in", "r", stdin);
-//    freopen("a.out", "w", stdout);
-    printName();
+    printf("21374067\n");
+    int i = 0;
+    char c = 'a';
+    const char ch = 'b';
 
-    int i = 0, ii = 8;
-    char c;
+    int p = +-10;
+    int q = (p + 5) * 2 / 1 + 0;
+    if (p < 20 || !func()) {
+        p = p - 1;
+    } else if (p>0 && func()){
+        p = p + 1;;
+        {
+            p+1;
+            //block
+        }
+        {
+            //another block
+        }
+    }
 
-    i = getint();
+    printf("%d\n",p);
+
+    for (i = 0; i < 6; i = i + 1) {
+        printf("i: %d\n", i);
+        continue;
+    }
+
+    int array[3] = {1, 2, 3};
+    int res = func();
+
+
+    int gi;
+    gi = getint();
+
+    i = g(array);
     c = getchar();
 
-    printf("Input integer: %d\n", i);
-    printf("Input character: %c\n", c);
+    for (c='a'; c < (127 % 128) || i != 0; c = c+1) {
+        c=c+1;
+        if (c=='x'){
+            break;
+        }
+    }
+    for (c='a';; c = c+1) {
+        c=c+1;
+        if (c=='x'){
+            break;
+        }
+    }
 
-    const int local_const = 5;
-    int arr[10];
-    char str[12] = "qwertyuiop\n";
-    const char _str[10] = "str";
 
-    for (i = 0; i < MAX_SIZE; i = i + 1) {
-        arr[i] = i;
-        if (i == 4 && i < c || i >= 9) {
-            printf("i is 4 or 9!\n");
-            int j;
-            for (j = 1;; j = j + j) {
-                if (j > 100) {
+    printf("%c\n",c);
+    printf("%d\n",c);
+    if (c > 0 && c < 0 && c<=0 && c>=0 && c!=0 && c==0){
+    for (;!c; c = c+1) {
+                c=c+1;
+                if (c=='x'){
                     break;
-                } else if (j != 32) {
-                    continue;
-                }
-                printf("j is 32!\n");
-            }
-        }
-        if (i % 2 == 0) {
-            for (;;) {
-                break;
-            }
-        } else {
-        }
-    }
-
-    {
-        const int arr[20] = {3, 2, 1};
-        int sum = 0, i = 0;
-        {
-            for (; i < MAX_SIZE; i = i + 1) {
-                if (i < 3) {
-                    sum = sum + arr[i];
                 }
             }
-        }
-        printf("Sum of array elements: %d\n", sum);
-    }
 
-    if (!calculate(i, arr)) {
-        print(get_first(str));
+        for(;;) c='a';
+        for(c=c;;) c='b';
+        for(;;c=c) c='c';
+        for(;c!=c;) c='d';
+        for(c=c;c!=c;) c='e';
+        for(c=c;;c=c) c='f';
+        for(;c!=c;c=c) c='g';
     }
-
-    /*test*/
-    printf("Test finished!\n");
     return 0;
 }

@@ -81,7 +81,6 @@ public class PrintfInst extends Instruction{
         int indexStr=0,indexValue=0;
         for(int i=0;i<varTypes.size();i++){
             if(varTypes.get(i).equals("char")){
-                System.out.println(((AddExp)addExps.get(indexValue)).type);
                 if(((AddExp)addExps.get(indexValue)).type.equals("char")){
                     // System.out.println("success");
                     Value tmpZextInst=basicBlock.createZextInst(addExps.get(indexValue).value);

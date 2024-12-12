@@ -267,6 +267,7 @@ public class BasicBlock extends Value{
 						AddExp tmpAddExp=new AddExp(this);
 						tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+1,2,0,0}), null);
 						Value from=tmpAddExp.value;
+						System.out.println("from: "+from.name+" "+tmpAddExp.type);
 						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
@@ -635,6 +636,7 @@ public class BasicBlock extends Value{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
+				System.out.println("from: "+from.name+" "+tmpAddExp.type);
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
@@ -708,7 +710,6 @@ public class BasicBlock extends Value{
 			}
 			if(!(ins instanceof BrInst)){
 				if(!(ins instanceof ReturnInst||ins instanceof CallInst||ins instanceof StoreInst||ins instanceof PrintfInst)){
-					if(ins instanceof ZextInst) System.out.println("success");
 					ins.getName();
 				}
 				if(ins instanceof CallInst && ((CallInst)ins).lval!=null){

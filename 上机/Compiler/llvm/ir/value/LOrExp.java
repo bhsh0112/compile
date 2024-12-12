@@ -145,8 +145,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("slt",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("slt",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }
@@ -158,8 +159,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sgt",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sgt",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }
@@ -171,8 +173,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sle",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sle",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }
@@ -184,8 +187,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sge",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("sge",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }
@@ -197,8 +201,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("eq",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("eq",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }
@@ -210,8 +215,9 @@ public class LOrExp extends Value {
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.value=CTparent.nowBasicBlock.createCmpInst("ne",CTparent.leftChildren.varType, operands);
             CTparent.varType="int";
+            CTparent.value=CTparent.nowBasicBlock.createCmpInst("ne",CTparent.varType, operands);
+            
             CTparent.cmpInst=CTparent.value;
             CTparent.removeChildren();
         }

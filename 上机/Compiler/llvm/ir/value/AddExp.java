@@ -148,7 +148,6 @@ public class AddExp extends InitVal{
                                     newGetElementPtrInst=basicBlock.createGetElementPtrInst(ptrType, ptrValue, new Value[] {tmpValue,index});
                                     ptrType=new VarType(element.type);
                                 }
-                                System.out.println("success:"+ptrType.Type2String());
                                 ATparent.exp=basicBlock.createLoadInst(ptrType,newGetElementPtrInst);
                                 //TODO:不确定更改正确性
                                 // ATparent.type=element.type;
@@ -246,6 +245,7 @@ public class AddExp extends InitVal{
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
                     value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    System.out.println(value.name);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -474,8 +474,9 @@ public class AddExp extends InitVal{
                     //TODO:这是否会有消极影响
                     // parent.type="charImm";
                     // value=new ImmediateValue(parent.value);
-                    parent.type="charImm";
+                    parent.type="intImm";
                     value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    System.out.println(value.name);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
