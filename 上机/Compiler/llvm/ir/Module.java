@@ -107,7 +107,7 @@ public class Module {
                             VarType type=new VarType(originType+"R",size);
                             String name=symbol.getASTNodeContent(parent,new int[] {2*i+2,0,0});
                             GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+2,5}));
-                            symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size,null);
+                            symbolStack.pushStack(0,originType+"Ptr","Array",declName,newGlobalValue,size,null);
                         }
                         
                     }
@@ -127,13 +127,12 @@ public class Module {
                         String declName=symbol.getASTNodeContent(parent,new int[]{2*i+1,0,0});
                         if(symbol.getASTNodeContent(parent,new int[] {2*i+1,symbol.getASTNode(parent,new int[] {2*i+1}).children.size()-1}).equals("<InitVal>")){//有初值
                             if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==6){//数组
-                                //有用！！！！！！
                                 AddExp newAddExp=new AddExp("tmpAddExp");
                                 int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
                                 VarType type=new VarType(originType+"R",size);
                                 String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
                                 GlobalValue newGlobalValue=createGlobalValue(type,name,symbol.getASTNode(parent,new int[] {2*i+1,5}));
-                                symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size,null);
+                                symbolStack.pushStack(0,originType+"Ptr","Array",declName,newGlobalValue,size,null);
                             }
                             else{//变量
                                 VarType type=new VarType(originType);
@@ -150,7 +149,7 @@ public class Module {
                                 VarType type=new VarType(originType+"R",size);
                                 String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
                                 GlobalValue newGlobalValue=createGlobalValue(type,name,null);
-                                symbolStack.pushStack(0,originType,"Array",declName,newGlobalValue,size,null);
+                                symbolStack.pushStack(0,originType+"Ptr","Array",declName,newGlobalValue,size,null);
                             }
                             else{//变量
                                 VarType type=new VarType(originType);

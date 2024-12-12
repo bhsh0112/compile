@@ -1,15 +1,14 @@
-#include<stdio.h> 
-int setIndex(int arr[], int index, int val) {
-    int temp = arr[index];
-    arr[index] = val;
-    return temp;
+#include <stdio.h>
+
+int a[3 + 3] = {1, 2, 3, 4, 5, 6};
+int foo(int x, int y[]) {
+    return x + y[2];
 }
 
 int main() {
-    int arr[1];
-    printf("%d\n",setIndex(arr,0,1));
-    printf("%d",arr[0]);
-
+    int c[3] = {1, 2, 3};
+    a[1]=c[4];
+    int x = foo(a[4], a);
+    // printf("%d - %d\n", x, foo(c[0], c));
     return 0;
 }
-

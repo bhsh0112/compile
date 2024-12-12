@@ -4,441 +4,236 @@ declare void @putint(i32)
 declare void @putch(i32)
 declare void @putstr(i8*)
 
-@ig1 = dso_local global i32 zeroinitializer
-@.str = private unnamed_addr constant [10 x i8] c"22371144\0A\00", align 1
-@.str.1 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.2 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.3 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.5 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.6 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.7 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.8 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.9 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.10 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@.str.11 = private unnamed_addr constant [2 x i8] c" \00", align 1
+@a1 = dso_local global [10 x i32] zeroinitializer
+@a2 = dso_local global [5 x i32] zeroinitializer
+@a3 = dso_local global [5 x i32] zeroinitializer
+@a4 = dso_local global [5 x i32] [i32 1,i32 2,i32 3,i32 0,i32 0]
+@c1 = dso_local global [10 x i8] zeroinitializer
+@c2 = dso_local global [5 x i8] zeroinitializer
+@c3 = dso_local global [5 x i8] zeroinitializer
+@c4 = dso_local global [5 x i8] [i8 104,i8 101,i8 121,i8 0,i8 0]
+@c5 = dso_local global [10 x i8] [i8 104,i8 101,i8 108,i8 108,i8 111,i8 92,i8 0,i8 0,i8 0,i8 0]
+@.str = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.1 = private unnamed_addr constant [10 x i8] c"21374275\0A\00", align 1
+@.str.2 = private unnamed_addr constant [7 x i8] c"sum = \00", align 1
+@.str.3 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.4 = private unnamed_addr constant [9 x i8] c"c4[0] = \00", align 1
+@.str.5 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.6 = private unnamed_addr constant [9 x i8] c"c5[0] = \00", align 1
+@.str.7 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.8 = private unnamed_addr constant [5 x i8] c"t = \00", align 1
+@.str.9 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.10 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.11 = private unnamed_addr constant [11 x i8] c"sum + 1 = \00", align 1
 @.str.12 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-define dso_local i32 @fuc1() {
-	ret i32 1
-}
-define dso_local i8 @fuc2() {
-	ret i8 97
-}
-define dso_local void @fuc3() {
-	ret void
-}
-define dso_local i32 @fuc4(i32 %0) {
-	%2 = alloca i32
-	store i32 %0, i32* %2
-	ret i32 1
-}
-define dso_local i32 @fuc5(i32 %0, i32 %1) {
-	%3 = alloca i32
-	store i32 %0, i32* %3
+define dso_local i32 @f1(i32* %0, i32 %1) {
+	%3 = alloca i32*
+	store i32* %0, i32** %3
 	%4 = alloca i32
 	store i32 %1, i32* %4
-	ret i32 1
+	%5 = alloca i32
+	store i32 0, i32* %5
+	%6 = alloca i32
+	store i32 0, i32* %6
+	br label %7
+
+7:
+	%8 = load i32, i32* %6
+	%9 = load i32, i32* %4
+	%10 = icmp slt i32 %8, %9
+	br i1 %10, label %11, label %21
+
+11:
+	%12 = load i32, i32* %6
+	%13 = load i32*, i32** %3
+	%14 = getelementptr inbounds i32, i32* %13, i32 %12
+	%15 = load i32, i32* %14
+	%16 = load i32, i32* %5
+	%17 = add nsw i32 %16, %15
+	store i32 %17, i32* %5
+	br label %18
+
+18:
+	%19 = load i32, i32* %6
+	%20 = add nsw i32 %19, 1
+	store i32 %20, i32* %6
+	br label %7
+
+21:
+	%22 = load i32, i32* %5
+	ret i32 %22
 }
-define dso_local i32 @fuc6(i32 %0, i32* %1) {
-	%3 = alloca i32
-	store i32 %0, i32* %3
-	%4 = alloca i32*
-	store i32* %1, i32** %4
+define dso_local i32 @f2(i32 %0) {
+	%2 = alloca i32
+	store i32 %0, i32* %2
+	%3 = load i32, i32* %2
+	%4 = icmp eq i32 %3, 1
+	br i1 %4, label %5, label %6
+
+5:
 	ret i32 1
+
+6:
+	%7 = load i32, i32* %2
+	%8 = icmp eq i32 %7, 2
+	br i1 %8, label %9, label %10
+
+9:
+	ret i32 1
+
+10:
+	%11 = load i32, i32* %2
+	%12 = sub nsw i32 %11, 1
+	%13 = call i32 @f2(i32 %12)
+	%14 = load i32, i32* %2
+	%15 = sub nsw i32 %14, 2
+	%16 = call i32 @f2(i32 %15)
+	%17 = add nsw i32 %13, %16
+	ret i32 %17
+
+18:
+	br label %19
+
+19:
+	ret i32 -1
+}
+define dso_local void @f3(i8* %0) {
+	%2 = alloca i8*
+	store i8* %0, i8** %2
+	%3 = load i8*, i8** %2
+	%4 = getelementptr inbounds i8, i8* %3, i32 0
+	%5 = load i8, i8* %4
+	%6 = zext i8 %5 to i32
+	call void @putch(i32 %6)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str, i64 0, i64 0))
+	ret void
+}
+define dso_local i32 @f4(i32* %0, i32* %1, i32 %2) {
+	%4 = alloca i32*
+	store i32* %0, i32** %4
+	%5 = alloca i32*
+	store i32* %1, i32** %5
+	%6 = alloca i32
+	store i32 %2, i32* %6
+	%7 = alloca i32
+	%8 = alloca i32
+	store i32 0, i32* %8
+	store i32 0, i32* %7
+	br label %9
+
+9:
+	%10 = load i32, i32* %7
+	%11 = load i32, i32* %6
+	%12 = icmp slt i32 %10, %11
+	br i1 %12, label %13, label %28
+
+13:
+	%14 = load i32, i32* %7
+	%15 = load i32*, i32** %4
+	%16 = getelementptr inbounds i32, i32* %15, i32 %14
+	%17 = load i32, i32* %16
+	%18 = load i32, i32* %7
+	%19 = load i32*, i32** %5
+	%20 = getelementptr inbounds i32, i32* %19, i32 %18
+	%21 = load i32, i32* %20
+	%22 = load i32, i32* %8
+	%23 = mul nsw i32 %17, %21
+	%24 = add nsw i32 %22, %23
+	store i32 %24, i32* %8
+	br label %25
+
+25:
+	%26 = load i32, i32* %7
+	%27 = add nsw i32 %26, 1
+	store i32 %27, i32* %7
+	br label %9
+
+28:
+	%29 = load i32, i32* %8
+	ret i32 %29
 }
 define dso_local i32 @main() {
 	%1 = alloca i32
-	store i32 1, i32* %1
-	%2 = alloca i32
-	store i32 1, i32* %2
-	%3 = alloca i32
-	store i32 1, i32* %3
-	%4 = alloca [5 x i32]
-	%5 = getelementptr inbounds [5 x i32], [5 x i32]* %4, i32 0, i32 0
-	store i32 1, i32* %5
-	%6 = getelementptr inbounds i32, i32* %5, i32 1
-	store i32 2, i32* %6
-	%7 = getelementptr inbounds i32, i32* %6, i32 1
-	store i32 3, i32* %7
-	%8 = getelementptr inbounds i32, i32* %7, i32 1
-	store i32 4, i32* %8
-	%9 = getelementptr inbounds i32, i32* %8, i32 1
-	store i32 5, i32* %9
-	%10 = alloca [3 x i32]
-	%11 = getelementptr inbounds [3 x i32], [3 x i32]* %10, i32 0, i32 0
-	store i32 1, i32* %11
-	%12 = getelementptr inbounds i32, i32* %11, i32 1
-	store i32 2, i32* %12
-	%13 = getelementptr inbounds i32, i32* %12, i32 1
-	store i32 3, i32* %13
-	%14 = alloca i32
-	store i32 2, i32* %14
-	%15 = alloca i8
-	store i8 97, i8* %15
-	%16 = alloca i8
-	store i8 97, i8* %16
-	%17 = alloca i8
-	store i8 98, i8* %17
-	%18 = alloca [5 x i8]
-	%19 = getelementptr inbounds [5 x i8], [5 x i8]* %18, i32 0, i32 1
-	store i8 97, i8* %19
-	%20 = getelementptr inbounds [5 x i8], [5 x i8]* %19, i32 0, i32 2
-	store i8 98, i8* %20
-	%21 = getelementptr inbounds [5 x i8], [5 x i8]* %20, i32 0, i32 3
-	store i8 99, i8* %21
-	%22 = getelementptr inbounds [5 x i8], [5 x i8]* %21, i32 0, i32 4
-	store i8 100, i8* %22
-	%23 = alloca [5 x i8]
-	%24 = getelementptr inbounds [5 x i8], [5 x i8]* %23, i32 0, i32 1
-	store i8 97, i8* %24
-	%25 = getelementptr inbounds [5 x i8], [5 x i8]* %24, i32 0, i32 2
-	store i8 98, i8* %25
-	%26 = getelementptr inbounds [5 x i8], [5 x i8]* %25, i32 0, i32 3
-	store i8 99, i8* %26
-	%27 = getelementptr inbounds [5 x i8], [5 x i8]* %26, i32 0, i32 4
-	store i8 100, i8* %27
-	%28 = alloca i8
-	store i8 97, i8* %28
-	%29 = alloca i32
-	%30 = alloca i32
-	%31 = alloca i32
-	%32 = alloca [5 x i32]
-	%33 = alloca i32
-	store i32 1, i32* %33
-	%34 = alloca [5 x i32]
-	%35 = getelementptr inbounds [5 x i32], [5 x i32]* %34, i32 0, i32 0
+	call void @putstr(i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str.1, i64 0, i64 0))
+	%2 = getelementptr inbounds i32, i32* @a4, i32 3
+	store i32 4, i32* %2
+	%3 = getelementptr inbounds i32, i32* @a4, i32 4
+	store i32 5, i32* %3
+	%4 = alloca i32
+	%5 = call i32 @f1(i32* @a4, i32 5)
+	store i32 %5, i32* %4
+	%6 = load i32, i32* %4
+	call void @putstr(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str.2, i64 0, i64 0))
+	call void @putint(i32 %6)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.3, i64 0, i64 0))
+	%7 = getelementptr inbounds [5 x i8], [5 x i8]* @c4, i32 0, i32 0
+	%8 = load i8, i8* %7
+	call void @putstr(i8* getelementptr inbounds ([9 x i8], [9 x i8]* @.str.4, i64 0, i64 0))
+	%9 = zext i8 %8 to i32
+	call void @putch(i32 %9)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.5, i64 0, i64 0))
+	%10 = getelementptr inbounds [10 x i8], [10 x i8]* @c5, i32 0, i32 0
+	%11 = load i8, i8* %10
+	call void @putstr(i8* getelementptr inbounds ([9 x i8], [9 x i8]* @.str.6, i64 0, i64 0))
+	%12 = zext i8 %11 to i32
+	call void @putch(i32 %12)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.7, i64 0, i64 0))
+	%13 = alloca i32
+	store i32 100, i32* %13
+	%14 = load i32, i32* %13
+	%15 = add nsw i32 %14, 1
+	%16 = srem i32 %15, 25
+	%17 = mul nsw i32 %16, 5
+	%18 = sub nsw i32 %17, 1
+	store i32 %18, i32* %13
+	%19 = load i32, i32* %13
+	call void @putstr(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.8, i64 0, i64 0))
+	call void @putint(i32 %19)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.9, i64 0, i64 0))
+	%20 = call i32 @f2(i32 10)
+	store i32 %20, i32* %13
+	%21 = load i32, i32* %13
+	call void @putint(i32 %21)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.10, i64 0, i64 0))
+	%22 = alloca [10 x i8]
+	%23 = getelementptr inbounds [10 x i8], [10 x i8]* %22, i32 0, i32 0
+	store i8 49, i8* %23
+	%24 = getelementptr inbounds [10 x i8], [10 x i8]* %23, i32 0, i32 1
+	store i8 50, i8* %24
+	%25 = getelementptr inbounds [10 x i8], [10 x i8]* %24, i32 0, i32 2
+	store i8 51, i8* %25
+	%26 = getelementptr inbounds [10 x i8], [10 x i8]* %25, i32 0, i32 3
+	store i8 52, i8* %26
+	%27 = getelementptr inbounds [10 x i8], [10 x i8]* %26, i32 0, i32 4
+	store i8 53, i8* %27
+	%28 = getelementptr inbounds [10 x i8], [10 x i8]* %27, i32 0, i32 5
+	store i8 54, i8* %28
+	%29 = getelementptr inbounds [10 x i8], [10 x i8]* %22, i32 0, i32 0
+	call void @f3(i8* %29)
+	call void @f3(i8* @c4)
+	call void @f3(i8* @c5)
+	%30 = alloca [3 x i32]
+	%31 = getelementptr inbounds [3 x i32], [3 x i32]* %30, i32 0, i32 0
+	store i32 2, i32* %31
+	%32 = getelementptr inbounds i32, i32* %31, i32 1
+	store i32 3, i32* %32
+	%33 = getelementptr inbounds i32, i32* %32, i32 1
+	store i32 4, i32* %33
+	%34 = alloca [3 x i32]
+	%35 = getelementptr inbounds [3 x i32], [3 x i32]* %34, i32 0, i32 0
 	store i32 1, i32* %35
 	%36 = getelementptr inbounds i32, i32* %35, i32 1
-	store i32 2, i32* %36
+	store i32 5, i32* %36
 	%37 = getelementptr inbounds i32, i32* %36, i32 1
-	store i32 3, i32* %37
-	%38 = getelementptr inbounds i32, i32* %37, i32 1
-	store i32 4, i32* %38
-	%39 = getelementptr inbounds i32, i32* %38, i32 1
-	store i32 5, i32* %39
-	%40 = alloca i8
-	%41 = alloca i8
-	store i8 97, i8* %41
-	%42 = alloca i8
-	%43 = alloca i8
-	store i8 97, i8* %43
-	%44 = alloca [5 x i8]
-	%45 = alloca [5 x i8]
-	%46 = getelementptr inbounds [5 x i8], [5 x i8]* %45, i32 0, i32 0
-	store i8 97, i8* %46
-	%47 = getelementptr inbounds [5 x i8], [5 x i8]* %46, i32 0, i32 1
-	store i8 98, i8* %47
-	%48 = getelementptr inbounds [5 x i8], [5 x i8]* %47, i32 0, i32 2
-	store i8 99, i8* %48
-	%49 = getelementptr inbounds [5 x i8], [5 x i8]* %48, i32 0, i32 3
-	store i8 100, i8* %49
-	call void @putstr(i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str, i64 0, i64 0))
-	%50 = alloca i32
-	store i32 0, i32* %50
-	%51 = alloca i8
-	store i8 0, i8* %51
-	%52 = call i32 @getint()
-	store i32 %52, i32* %50
-	%53 = call i32 @getchar()
-	%54 = trunc i32 %53 to i8
-	store i8 %54, i8* %51
-	%55 = alloca i32
-	store i32 6, i32* %55
-	%56 = alloca i32
-	store i32 4, i32* %56
-	%57 = alloca i32
-	store i32 4, i32* %57
-	%58 = alloca i32
-	store i32 9, i32* %58
-	%59 = load i32, i32* %55
-	%60 = load i32, i32* %56
-	%61 = load i32, i32* %57
-	%62 = load i32, i32* %58
-	call void @putint(i32 %59)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
-	call void @putint(i32 %60)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.2, i64 0, i64 0))
-	call void @putint(i32 %61)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.3, i64 0, i64 0))
-	call void @putint(i32 %62)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.4, i64 0, i64 0))
-	%63 = alloca i32
-	store i32 1, i32* %63
-	%64 = alloca i32
-	store i32 1, i32* %64
-	%65 = alloca i32
-	store i32 1, i32* %65
-	%66 = load i32, i32* %63
-	%67 = load i32, i32* %64
-	%68 = add nsw i32 %66, %67
-	%69 = load i32, i32* %65
-	%70 = sub nsw i32 %68, %69
-	store i32 %70, i32* %55
-	%71 = load i32, i32* %63
-	%72 = load i32, i32* %64
-	%73 = mul nsw i32 %71, %72
-	%74 = load i32, i32* %65
-	%75 = add nsw i32 %73, %74
-	store i32 %75, i32* %56
-	%76 = load i32, i32* %65
-	%77 = load i32, i32* %63
-	%78 = load i32, i32* %64
-	%79 = mul nsw i32 %77, %78
-	%80 = add nsw i32 %76, %79
-	store i32 %80, i32* %57
-	%81 = load i32, i32* %55
-	%82 = load i32, i32* %56
-	%83 = load i32, i32* %57
-	%84 = load i32, i32* %58
-	call void @putint(i32 %81)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.5, i64 0, i64 0))
-	call void @putint(i32 %82)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.6, i64 0, i64 0))
-	call void @putint(i32 %83)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.7, i64 0, i64 0))
-	call void @putint(i32 %84)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.8, i64 0, i64 0))
-	%85 = load i32, i32* %63
-	%86 = srem i32 %85, 4
-	%87 = add nsw i32 %86, 1
-	store i32 %87, i32* %55
-	%88 = load i32, i32* %63
-	%89 = sdiv i32 %88, 1
-	%90 = add nsw i32 %89, 0
-	store i32 %90, i32* %56
-	%91 = load i32, i32* %63
-	%92 = load i32, i32* %64
-	%93 = mul nsw i32 %91, %92
-	%94 = load i32, i32* %65
-	%95 = sdiv i32 %93, %94
-	store i32 %95, i32* %57
-	%96 = load i32, i32* %63
-	%97 = load i32, i32* %64
-	%98 = load i32, i32* %65
-	%99 = add nsw i32 %97, %98
-	%100 = mul nsw i32 %96, %99
-	store i32 %100, i32* %58
-	%101 = load i32, i32* %55
-	%102 = load i32, i32* %56
-	%103 = load i32, i32* %57
-	%104 = load i32, i32* %58
-	call void @putint(i32 %101)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.9, i64 0, i64 0))
-	call void @putint(i32 %102)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.10, i64 0, i64 0))
-	call void @putint(i32 %103)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.11, i64 0, i64 0))
-	call void @putint(i32 %104)
+	store i32 7, i32* %37
+	%38 = getelementptr inbounds [3 x i32], [3 x i32]* %30, i32 0, i32 0
+	%39 = getelementptr inbounds [3 x i32], [3 x i32]* %34, i32 0, i32 0
+	%40 = getelementptr inbounds [3 x i32], [3 x i32]* %30, i32 0, i32 1
+	%41 = load i32, i32* %40
+	%42 = call i32 @f4(i32* %38, i32* %39, i32 %41)
+	%43 = add nsw i32 %42, 1
+	call void @putstr(i8* getelementptr inbounds ([11 x i8], [11 x i8]* @.str.11, i64 0, i64 0))
+	call void @putint(i32 %43)
 	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.12, i64 0, i64 0))
-	%105 = load i32, i32* %55
-	%106 = add nsw i32 0, %105
-	store i32 %106, i32* %55
-	%107 = load i32, i32* %56
-	%108 = call i32 @fuc4(i32 %107)
-	store i32 %108, i32* %55
-	%109 = load i32, i32* %55
-	%110 = load i32, i32* %56
-	%111 = call i32 @fuc5(i32 %109, i32 %110)
-	store i32 %111, i32* %55
-	%112 = call i32 @fuc1()
-	store i32 %112, i32* %55
-	%113 = load i32, i32* %55
-	%114 = sub nsw i32 0, %113
-	store i32 %114, i32* %55
-	%115 = load i32, i32* %55
-	%116 = sub nsw i32 0, %115
-	store i32 %116, i32* %55
-	%117 = getelementptr inbounds i32, i32* %34, i32 0
-	store i32 1, i32* %117
-	%118 = load i32, i32* %63
-	%119 = icmp eq i32 %118, 1
-	br i1 %119, label %120, label %121
-
-120:
-	br label %121
-
-121:
-	%122 = load i32, i32* %64
-	%123 = icmp eq i32 %122, 0
-	br i1 %123, label %124, label %125
-
-124:
-	br label %126
-
-125:
-	br label %126
-
-126:
-	store i32 1, i32* %55
-	br label %127
-
-127:
-	%128 = load i32, i32* %55
-	%129 = icmp slt i32 %128, 10
-	br i1 %129, label %130, label %134
-
-130:
-	br label %131
-
-131:
-	%132 = load i32, i32* %55
-	%133 = add nsw i32 %132, 1
-	store i32 %133, i32* %55
-	br label %127
-
-134:
-	store i32 1, i32* %55
-	br label %135
-
-135:
-	%136 = load i32, i32* %55
-	%137 = icmp slt i32 %136, 10
-	br i1 %137, label %138, label %142
-
-138:
-	br label %139
-
-139:
-	%140 = load i32, i32* %55
-	%141 = add nsw i32 %140, 1
-	store i32 %141, i32* %55
-	br label %135
-
-142:
-	store i32 1, i32* %55
-	store i32 1, i32* %55
-	br label %143
-
-143:
-	%144 = load i32, i32* %55
-	%145 = icmp eq i32 %144, 10
-	br i1 %145, label %146, label %147
-
-146:
-	br label %151
-
-147:
-	br label %148
-
-148:
-	%149 = load i32, i32* %55
-	%150 = add nsw i32 %149, 1
-	store i32 %150, i32* %55
-	br label %143
-
-151:
-	store i32 1, i32* %55
-	br label %152
-
-152:
-	%153 = load i32, i32* %55
-	%154 = icmp slt i32 %153, 10
-	br i1 %154, label %155, label %159
-
-155:
-	br label %156
-
-156:
-	%157 = load i32, i32* %55
-	%158 = add nsw i32 %157, 1
-	store i32 %158, i32* %55
-	br label %152
-
-159:
-	store i32 1, i32* %55
-	br label %160
-
-160:
-	%161 = load i32, i32* %55
-	%162 = icmp slt i32 %161, 10
-	br i1 %162, label %163, label %166
-
-163:
-	%164 = load i32, i32* %55
-	%165 = add nsw i32 %164, 1
-	store i32 %165, i32* %55
-	br label %160
-
-166:
-	store i32 1, i32* %55
-	store i32 1, i32* %55
-	br label %167
-
-167:
-	%168 = load i32, i32* %55
-	%169 = add nsw i32 %168, 1
-	store i32 %169, i32* %55
-	%170 = load i32, i32* %55
-	%171 = icmp eq i32 %170, 10
-	br i1 %171, label %172, label %173
-
-172:
-	br label %175
-
-173:
-	br label %167
-
-174:
-	br label %167
-
-175:
-	store i32 1, i32* %55
-	br label %176
-
-176:
-	%177 = load i32, i32* %55
-	%178 = icmp eq i32 %177, 10
-	br i1 %178, label %179, label %180
-
-179:
-	br label %184
-
-180:
-	br label %181
-
-181:
-	%182 = load i32, i32* %55
-	%183 = add nsw i32 %182, 1
-	store i32 %183, i32* %55
-	br label %176
-
-184:
-	store i32 1, i32* %55
-	br label %185
-
-185:
-	%186 = load i32, i32* %55
-	%187 = add nsw i32 %186, 1
-	store i32 %187, i32* %55
-	%188 = load i32, i32* %55
-	%189 = icmp eq i32 %188, 10
-	br i1 %189, label %190, label %191
-
-190:
-	br label %192
-
-191:
-	br label %185
-
-192:
-	store i32 1, i32* %55
-	store i32 1, i32* %55
-	br label %193
-
-193:
-	%194 = load i32, i32* %55
-	%195 = icmp slt i32 %194, 10
-	br i1 %195, label %196, label %199
-
-196:
-	%197 = load i32, i32* %55
-	%198 = add nsw i32 %197, 1
-	store i32 %198, i32* %55
-	br label %193
-
-199:
-	%200 = load i32, i32* %55
-	%201 = load i32, i32* %56
-	%202 = add nsw i32 %200, %201
 	ret i32 0
 }

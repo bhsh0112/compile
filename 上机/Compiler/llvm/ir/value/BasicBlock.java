@@ -101,7 +101,6 @@ public class BasicBlock extends Value{
 	}
 	public Value createLoadInst(VarType dataType,Value value){
 		LoadInst newLoadInst=new LoadInst(dataType,value);
-		System.out.println(newLoadInst);
 		instructions.add(newLoadInst);
 		return newLoadInst;
 	}
@@ -209,7 +208,7 @@ public class BasicBlock extends Value{
 						//TODO:是否存在？
 					}
 					//TODO:如何推入符号栈？
-					Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size,null);
+					Module.symbolStack.pushStack(this.level,declType+"Ptr","Array",declName,originPtr,size,null);
 					//TODO:类型转换？
 				}
 			}
@@ -260,7 +259,7 @@ public class BasicBlock extends Value{
 							//TODO:是否存在？
 						}
 						//TODO:如何推入符号栈？
-						Module.symbolStack.pushStack(this.level,declType,"Array",declName,originPtr,size,null);
+						Module.symbolStack.pushStack(this.level,declType+"Ptr","Array",declName,originPtr,size,null);
 						//TODO:类型转换？
 					}
 					else{//变量
@@ -283,7 +282,7 @@ public class BasicBlock extends Value{
 						int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
 						Value ptr=createAllocaInst(new VarType(declType+"R",size));
 						//TODO:如何推入符号栈？
-						Module.symbolStack.pushStack(this.level,declType,"Array",declName,ptr,size,null);
+						Module.symbolStack.pushStack(this.level,declType+"Ptr","Array",declName,ptr,size,null);
 					}
 					else{//变量
 						Value ptr=createAllocaInst(new VarType(declType));
@@ -602,7 +601,7 @@ public class BasicBlock extends Value{
 							VarType loadType=new VarType(element.type);
 							tmpValue=element.value;
 							if(element.kind.equals("Array")){
-								tmpValue=createLoadInst(loadType,element.value);
+								// tmpValue=createLoadInst(loadType,element.value);
 								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
 								ttType.type=(ttType.type.endsWith("Ptr"))?ttType.type.substring(0,ttType.type.length()-3):ttType.type;
 							}
@@ -612,18 +611,29 @@ public class BasicBlock extends Value{
 					}
 					else{
 						if(element.name.equals(ident)){
-							tmpFlag=true;
-							VarType ttType=new VarType(element.type);
-							VarType loadType=new VarType(element.type);
-							tmpValue=element.value;
-							if(element.kind.equals("Array")){
-								tmpValue=createLoadInst(loadType,element.value);
-								tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
-								System.out.print(parent);
-								ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
+							if(element.size==0){//函数参数
+								tmpFlag=true;
+								VarType ttType=new VarType(element.type);
+								VarType loadType=new VarType(element.type);
+								tmpValue=element.value;
+								if(element.kind.equals("Array")){
+									tmpValue=createLoadInst(loadType,element.value);
+									tmpValue=createGetElementPtrInst(ttType, tmpValue, new Value[] {index});
+									ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
+								}
+								tmpType=ttType;
+							}
+							else{//内部变量
+								tmpFlag=true;
+								VarType ttType=new VarType(element.type);
+								tmpValue=element.value;
+								if(element.kind.equals("Array")){
+									tmpValue=createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[] {index});
+									ttType.type=(element.type.endsWith("Ptr"))?element.type.substring(0,element.type.length()-3):element.type;
+								}
+								tmpType=ttType;
 							}
 							
-							tmpType=ttType;
 							break;
 						} 
 					}

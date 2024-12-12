@@ -7,7 +7,7 @@ import llvm.ir.value.Value;
 import llvm.ir.value.Type.VarType;
 
 public class GetelementptrInst extends Instruction {
-    VarType type;
+    public VarType type;
     Value ptr;
     Value[] indexs;
 
