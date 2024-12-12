@@ -4,172 +4,318 @@ declare void @putint(i32)
 declare void @putch(i32)
 declare void @putstr(i8*)
 
-@global = dso_local global i32 0
-@.str = private unnamed_addr constant [10 x i8] c"21376218\0A\00", align 1
-@.str.1 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.2 = private unnamed_addr constant [14 x i8] c"Finish test1\0A\00", align 1
-define dso_local i32 @func_cond() {
-	%1 = load i32, i32* @global
-	%2 = add nsw i32 %1, 1
-	store i32 %2, i32* @global
-	%3 = load i32, i32* @global
-	ret i32 %3
-}
-define dso_local void @test_if() {
-	br label %5
+@next = dso_local global [8 x i32] [i32 1,i32 0,i32 0,i32 -1,i32 -1,i32 0,i32 0,i32 1]
+@len = dso_local global i32 3
+@xxx = dso_local global [2 x i32] [i32 1,i32 2]
+@ans = dso_local global i32 0
+@arr = dso_local global [2 x i32] [i32 3,i32 1]
+@.str = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.1 = private unnamed_addr constant [7 x i8] c"Hello \00", align 1
+@.str.2 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.3 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.5 = private unnamed_addr constant [14 x i8] c"judgeB 2,3 = \00", align 1
+@.str.6 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+define dso_local i32 @getDif3N(i32 %0, i32 %1) {
+	%3 = alloca i32
+	store i32 %0, i32* %3
+	%4 = alloca i32
+	store i32 %1, i32* %4
+	%5 = alloca i32
+	store i32 1, i32* %5
+	%6 = alloca i32
+	store i32 1, i32* %6
+	%7 = alloca i32
+	store i32 1, i32* %7
+	%8 = alloca i32
+	store i32 0, i32* %8
+	%9 = alloca [2 x i32]
+	%10 = getelementptr inbounds [2 x i32], [2 x i32]* %9, i32 0, i32 0
+	store i32 1, i32* %10
+	%11 = getelementptr inbounds i32, i32* %10, i32 1
+	store i32 2, i32* %11
+	br label %12
 
-1:
-	%2 = call i32 @func_cond()
-	%3 = icmp ne i32 %2, 0
-	br i1 %3, label %4, label %5
-
-4:
-	br label %5
-
-5:
-	br label %9
-
-6:
-	%7 = call i32 @func_cond()
-	%8 = icmp ne i32 %7, 0
-	br i1 %8, label %9, label %10
-
-9:
-	br label %10
-
-10:
-	br label %11
-
-11:
-	%12 = call i32 @func_cond()
-	%13 = icmp ne i32 %12, 0
-	br i1 %13, label %14, label %19
-
-14:
-	br label %19
+12:
+	%13 = load i32, i32* %5
+	%14 = icmp sle i32 %13, 3
+	br i1 %14, label %15, label %47
 
 15:
-	%16 = call i32 @func_cond()
-	%17 = icmp ne i32 %16, 0
-	br i1 %17, label %18, label %19
+	store i32 1, i32* %6
+	br label %16
 
-18:
-	br label %19
+16:
+	%17 = load i32, i32* %6
+	%18 = icmp sle i32 %17, 3
+	br i1 %18, label %19, label %44
 
 19:
+	store i32 1, i32* %7
 	br label %20
 
 20:
-	%21 = call i32 @func_cond()
-	%22 = icmp ne i32 %21, 0
-	br i1 %22, label %23, label %27
+	%21 = load i32, i32* %7
+	%22 = icmp sle i32 %21, 3
+	br i1 %22, label %23, label %41
 
 23:
-	br label %27
-
-24:
-	%25 = call i32 @func_cond()
-	%26 = icmp ne i32 %25, 0
-	br i1 %26, label %28, label %27
+	%24 = load i32, i32* %5
+	%25 = load i32, i32* %6
+	%26 = icmp ne i32 %24, %25
+	br i1 %26, label %27, label %38
 
 27:
-	br label %28
+	%28 = load i32, i32* %5
+	%29 = load i32, i32* %7
+	%30 = icmp ne i32 %28, %29
+	br i1 %30, label %31, label %38
 
-28:
-	br label %32
-
-29:
-	%30 = call i32 @func_cond()
-	%31 = icmp ne i32 %30, 0
-	br i1 %31, label %36, label %32
-
-32:
-	%33 = call i32 @func_cond()
-	%34 = icmp ne i32 %33, 0
-	br i1 %34, label %35, label %37
+31:
+	%32 = load i32, i32* %6
+	%33 = load i32, i32* %7
+	%34 = icmp ne i32 %32, %33
+	br i1 %34, label %35, label %38
 
 35:
-	br label %36
-
-36:
-	br label %37
-
-37:
+	%36 = load i32, i32* %8
+	%37 = add nsw i32 %36, 1
+	store i32 %37, i32* %8
 	br label %38
 
 38:
-	%39 = call i32 @func_cond()
-	%40 = icmp ne i32 %39, 0
-	br i1 %40, label %46, label %41
+	%39 = load i32, i32* %7
+	%40 = add nsw i32 %39, 1
+	store i32 %40, i32* %7
+	br label %20
 
 41:
-	%42 = call i32 @func_cond()
-	%43 = icmp ne i32 %42, 0
-	br i1 %43, label %44, label %46
+	%42 = load i32, i32* %6
+	%43 = add nsw i32 %42, 1
+	store i32 %43, i32* %6
+	br label %16
 
 44:
-	br label %45
-
-45:
-	br label %46
-
-46:
-	br label %50
+	%45 = load i32, i32* %5
+	%46 = add nsw i32 %45, 1
+	store i32 %46, i32* %5
+	br label %12
 
 47:
-	%48 = call i32 @func_cond()
-	%49 = icmp ne i32 %48, 0
-	br i1 %49, label %53, label %50
+	%48 = load i32, i32* %8
+	ret i32 %48
+}
+define dso_local i32 @judgeB(i32 %0, i32 %1) {
+	%3 = alloca i32
+	store i32 %0, i32* %3
+	%4 = alloca i32
+	store i32 %1, i32* %4
+	%5 = load i32, i32* %3
+	%6 = load i32, i32* %4
+	%7 = icmp sle i32 %5, %6
+	br i1 %7, label %8, label %23
 
-50:
-	%51 = call i32 @func_cond()
-	%52 = icmp ne i32 %51, 0
-	br i1 %52, label %53, label %54
+8:
+	%9 = load i32, i32* %3
+	%10 = load i32, i32* %4
+	%11 = icmp slt i32 %9, %10
+	br i1 %11, label %12, label %16
 
-53:
-	br label %54
+12:
+	%13 = load i32, i32* %3
+	%14 = load i32, i32* %4
+	%15 = sub nsw i32 %13, %14
+	ret i32 %15
 
-54:
-	%55 = call i32 @func_cond()
-	%56 = icmp ne i32 %55, 0
-	br i1 %56, label %57, label %61
+16:
+	%17 = load i32, i32* %3
+	%18 = load i32, i32* %4
+	%19 = icmp eq i32 %17, %18
+	br i1 %19, label %20, label %21
 
-57:
-	br label %58
+20:
+	ret i32 0
 
-58:
-	%59 = call i32 @func_cond()
-	%60 = icmp ne i32 %59, 0
-	br i1 %60, label %61, label %62
+21:
+	br label %22
 
-61:
-	br label %62
+22:
+	br label %43
 
-62:
-	%63 = call i32 @func_cond()
-	%64 = icmp eq i32 1, %63
-	br i1 %64, label %65, label %66
+23:
+	%24 = load i32, i32* %3
+	%25 = load i32, i32* %4
+	%26 = icmp sge i32 %24, %25
+	br i1 %26, label %27, label %42
 
-65:
-	br label %66
+27:
+	%28 = load i32, i32* %3
+	%29 = load i32, i32* %4
+	%30 = icmp sgt i32 %28, %29
+	br i1 %30, label %31, label %35
 
-66:
-	%67 = call i32 @func_cond()
-	%68 = icmp ne i32 1, %67
-	br i1 %68, label %69, label %70
+31:
+	%32 = load i32, i32* %3
+	%33 = load i32, i32* %4
+	%34 = sub nsw i32 %32, %33
+	ret i32 %34
 
-69:
-	br label %70
+35:
+	%36 = load i32, i32* %3
+	%37 = load i32, i32* %4
+	%38 = icmp eq i32 %36, %37
+	br i1 %38, label %39, label %40
 
-70:
+39:
+	ret i32 0
+
+40:
+	br label %41
+
+41:
+	br label %42
+
+42:
+	br label %43
+
+43:
+	ret i32 0
+}
+define dso_local void @printArr(i32* %0) {
+	%2 = alloca i32*
+	store i32* %0, i32** %2
+	%3 = alloca i32
+	store i32 0, i32* %3
+	br label %4
+
+4:
+	%5 = load i32, i32* %3
+	%6 = icmp slt i32 %5, 2
+	br i1 %6, label %7, label %14
+
+7:
+	%8 = load i32, i32* %3
+	%9 = load i32*, i32** %2
+	%10 = getelementptr inbounds i32, i32* %9, i32 %8
+	%11 = load i32, i32* %10
+	call void @putint(i32 %11)
+	%12 = load i32, i32* %3
+	%13 = add nsw i32 %12, 1
+	store i32 %13, i32* %3
+	br label %4
+
+14:
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str, i64 0, i64 0))
+	ret void
+}
+define dso_local void @printHello() {
+	%1 = alloca i32
+	%2 = call i32 @getint()
+	store i32 %2, i32* %1
+	%3 = load i32, i32* %1
+	call void @putstr(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str.1, i64 0, i64 0))
+	call void @putint(i32 %3)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.2, i64 0, i64 0))
+	ret void
+}
+define dso_local i32 @add(i32 %0) {
+	%2 = alloca i32
+	store i32 %0, i32* %2
+	%3 = alloca i32
+	%4 = load i32, i32* %2
+	%5 = add nsw i32 %4, 3
+	store i32 %5, i32* %3
+	%6 = load i32, i32* %3
+	ret i32 %6
+}
+define dso_local void @opp() {
 	ret void
 }
 define dso_local i32 @main() {
-	call void @putstr(i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str, i64 0, i64 0))
-	call void @test_if()
-	%1 = load i32, i32* @global
-	call void @putint(i32 %1)
-	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
-	call void @putstr(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str.2, i64 0, i64 0))
+	%1 = alloca i32
+	store i32 3, i32* %1
+	%2 = alloca i32
+	store i32 0, i32* %2
+	%3 = alloca i32
+	store i32 1, i32* %3
+	%4 = load i32, i32* %3
+	%5 = icmp ne i32 %4, 0
+	br i1 %5, label %7, label %6
+
+6:
+	store i32 0, i32* %3
+	br label %7
+
+7:
+	store i32 1, i32* %3
+	store i32 -1, i32* %3
+	%8 = alloca i32
+	%9 = getelementptr inbounds [8 x i32], [8 x i32]* @next, i32 0, i32 0
+	%10 = load i32, i32* %9
+	%11 = load i32, i32* %2
+	%12 = add nsw i32 %11, 1
+	%13 = sdiv i32 18, %12
+	%14 = sub nsw i32 %13, 14
+	%15 = add nsw i32 %14, %10
+	store i32 %15, i32* %8
+	br label %16
+
+16:
+	%17 = load i32, i32* %2
+	%18 = icmp sle i32 %17, 5
+	br i1 %18, label %19, label %35
+
+19:
+	%20 = load i32, i32* %2
+	%21 = icmp eq i32 %20, 3
+	br i1 %21, label %22, label %25
+
+22:
+	%23 = load i32, i32* %2
+	%24 = add nsw i32 %23, 1
+	store i32 %24, i32* %2
+	br label %16
+
+25:
+	%26 = load i32, i32* %2
+	%27 = icmp eq i32 %26, 5
+	br i1 %27, label %28, label %29
+
+28:
+	br label %35
+
+29:
+	%30 = alloca i32
+	%31 = load i32, i32* %2
+	store i32 %31, i32* %30
+	br label %32
+
+32:
+	%33 = load i32, i32* %2
+	%34 = add nsw i32 %33, 1
+	store i32 %34, i32* %2
+	br label %16
+
+35:
+	%36 = call i32 @getint()
+	store i32 %36, i32* %1
+	%37 = load i32, i32* %1
+	%38 = call i32 @add(i32 %37)
+	call void @putint(i32 %38)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.3, i64 0, i64 0))
+	%39 = call i32 @getDif3N(i32 1, i32 999)
+	store i32 %39, i32* %1
+	%40 = load i32, i32* %1
+	call void @putint(i32 %40)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.4, i64 0, i64 0))
+	%41 = call i32 @judgeB(i32 2, i32 3)
+	store i32 %41, i32* %1
+	%42 = load i32, i32* %1
+	call void @putstr(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str.5, i64 0, i64 0))
+	call void @putint(i32 %42)
+	call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.6, i64 0, i64 0))
+	call void @printHello()
+	%43 = getelementptr inbounds [2 x i32], [2 x i32]* @arr, i32 0, i32 0
+	call void @printArr(i32* %43)
 	ret i32 0
 }
