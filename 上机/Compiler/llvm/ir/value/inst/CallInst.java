@@ -33,11 +33,15 @@ public class CallInst extends Instruction {
         }
         else if(func.name.equals("putint")){
             FunctionParam para=func.params.get(0);
-            writer.write("\tcall void @putint(i32 "+para.getName()+")\n");
+            writer.write("\tcall void @putint(i32 "+operands.get(1).getName()+")\n");
         }
         else if(func.name.equals("putch")){
             FunctionParam para=func.params.get(0);
-            writer.write("\tcall void @putch(i32 "+para.getName()+")\n");
+            writer.write("\tcall void @putch(i32 "+operands.get(1).getName()+")\n");
+        }
+        else if(func.name.equals("putstr")){
+            FunctionParam para=func.params.get(0);
+            writer.write("\tcall void @putstr(i8* getelementptr inbounds (["+operands.get(1).getName()+" x i8], ["+operands.get(1).getName()+" x i8]* "+operands.get(2).getName()+", i64 0, i64 0))\n");
         }
         else{
             if(lval==null){

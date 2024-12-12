@@ -116,9 +116,9 @@ public class BasicBlock extends Value{
 		instructions.add(newCallInst);
 		return newCallInst;
 	}
-	public Value createPrintfInst(Value... operands) throws IOException{
-		PrintfInst newPrintfInst=new PrintfInst(operands);
-		instructions.add(newPrintfInst);
+	public Value createPrintfInst(BasicBlock basicBlock,Value... operands) throws IOException{
+		PrintfInst newPrintfInst=new PrintfInst(basicBlock,operands);
+		// instructions.add(newPrintfInst);
 		return newPrintfInst;
 	}
 	public Value createBrInst(Value... operands){
@@ -201,7 +201,7 @@ public class BasicBlock extends Value{
 							Value tmpValue1=new Value("0");
 							Value tmpValue2=new Value(String.valueOf(j));
 							ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-							createStoreInst(new VarType("char"),new Value("\'"+ch+"\'"),ptr);
+							createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 						}
 					}
 					else{
@@ -252,7 +252,7 @@ public class BasicBlock extends Value{
 								Value tmpValue1=new Value("0");
 								Value tmpValue2=new Value(String.valueOf(j));
 								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-								createStoreInst(new VarType("char"),new Value("\'"+ch+"\'"),ptr);
+								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 							}
 						}
 						else{
@@ -329,7 +329,7 @@ public class BasicBlock extends Value{
 						tmpAddExp.llvmAddExp(addExp, null);
 						operands[i]=tmpAddExp;
 					}
-					createPrintfInst(operands);
+					createPrintfInst(this,operands);
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("if")){
 					LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{2,0}));
