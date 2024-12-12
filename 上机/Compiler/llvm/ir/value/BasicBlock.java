@@ -348,7 +348,7 @@ public class BasicBlock extends Value{
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
 						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(newNextBasicBlock);
-						elseBasicBlock.createBrInst(newNextBasicBlock);
+						if(elseBasicBlock.addBrFlag)elseBasicBlock.createBrInst(newNextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -417,7 +417,7 @@ public class BasicBlock extends Value{
 							Cond.parent=this;
 							
 							ForStmt2=new BasicBlock();
-							ForStmt2.orderAST(parent.children.get(6));
+							ForStmt2.orderAST(parent.children.get(5));
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{4}).equals(";")){//缺省cond
 							// ForStmt1=new BasicBlock();
@@ -426,7 +426,7 @@ public class BasicBlock extends Value{
 							// children.add(ForStmt1);
 							
 							ForStmt2=new BasicBlock();
-							ForStmt2.orderAST(parent.children.get(6));
+							ForStmt2.orderAST(parent.children.get(5));
 						}
 						else if(symbol.getASTNodeContent(parent, new int[]{6}).equals(";")){//缺省ForStmt2
 							// ForStmt1=new BasicBlock();
@@ -506,6 +506,8 @@ public class BasicBlock extends Value{
 						
 					}
 					else{
+						System.out.println("success");
+						System.out.println(Stmt.instructions.size());
 						Stmt.nextBasicBlock=ForStmt2;
 						ForStmt2.nextBasicBlock=entranceBasicBlock;
 						ForStmt2.createBrInst(entranceBasicBlock);

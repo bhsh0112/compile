@@ -237,8 +237,12 @@ public class AddExp extends InitVal{
                 }
                 else if(parent.value.matches("\\'.\\'")){//字符常量
                     // flashType("charImm");
-                    parent.type="charImm";
-                    value=new ImmediateValue(parent.value);
+
+                    //TODO:这是否会有消极影响
+                    // parent.type="charImm";
+                    // value=new ImmediateValue(parent.value);
+                    parent.type="intImm";
+                    value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -459,8 +463,12 @@ public class AddExp extends InitVal{
                 }
                 else if(parent.value.matches("\\'.\\'")){//字符常量
                     // flashType("charImm");
+                    
+                    //TODO:这是否会有消极影响
+                    // parent.type="charImm";
+                    // value=new ImmediateValue(parent.value);
                     parent.type="charImm";
-                    value=new ImmediateValue(parent.value);
+                    value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
