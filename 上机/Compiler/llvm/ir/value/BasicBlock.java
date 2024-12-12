@@ -33,7 +33,7 @@ public class BasicBlock extends Value{
 
 	public boolean addBrFlag=true;//进continue，break会用到
 
-	public boolean stop=false;//出现break或continue时，不遍历本block的后序指令
+	public boolean stop=false;//1.出现break或continue时，不遍历本block的后序指令;2.return后不添加br在内的任何指令
     
 	public BasicBlock(){
 
@@ -296,6 +296,7 @@ public class BasicBlock extends Value{
 		else if(parent.name.equals("<Stmt>")){
 			if(symbol.getASTNode(parent,new int[]{0}) instanceof TNode){
 				if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("return")){
+					this.stop=true;
 					if(parent.children.size()==2){//无返回值
 						createReturnInst(parentFunction.retType,null);
 					}
@@ -367,8 +368,8 @@ public class BasicBlock extends Value{
 					}
 					if(elseBasicBlock!=null){//有else
 						newLOrExp.main(ifBasicBlock,elseBasicBlock);
-						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(newNextBasicBlock);
-						if(elseBasicBlock.addBrFlag)elseBasicBlock.createBrInst(newNextBasicBlock);
+						if(ifBasicBlock.addBrFlag&&(!ifBasicBlock.stop))ifBasicBlock.createBrInst(newNextBasicBlock);
+						if(elseBasicBlock.addBrFlag&&(!elseBasicBlock.stop))elseBasicBlock.createBrInst(newNextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -382,7 +383,7 @@ public class BasicBlock extends Value{
 					}
 					else{//无else
 						newLOrExp.main(ifBasicBlock,newNextBasicBlock);
-						if(ifBasicBlock.addBrFlag)ifBasicBlock.createBrInst(newNextBasicBlock);
+						if(ifBasicBlock.addBrFlag&&(!ifBasicBlock.stop))ifBasicBlock.createBrInst(newNextBasicBlock);
 						for(int i=0;i<newLOrExp.numBasicBlock;i++){
 							jumpIndexs.add(instructions.size());
 						}
@@ -538,7 +539,7 @@ public class BasicBlock extends Value{
 					if(Stmt.children.size()>0&&(Stmt.children.get(Stmt.children.size()-1)).instructions.size()==0){//防止冗余标签
 						// Stmt.children.get(Stmt.children.size()-1).createBrInst(this.afterBasicBlock);
 					}
-					if(Stmt.addBrFlag) Stmt.createBrInst(Stmt.nextBasicBlock);
+					if(Stmt.addBrFlag&&(!Stmt.stop)) Stmt.createBrInst(Stmt.nextBasicBlock);
 					return;
 				}
 				else if(symbol.getASTNodeContent(parent, new int[]{0}).equals("break")){
