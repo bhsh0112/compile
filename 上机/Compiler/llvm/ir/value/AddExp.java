@@ -88,9 +88,11 @@ public class AddExp extends InitVal{
                 buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
             }
             else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("!")){
-                this.notFlag=true;
+                // this.notFlag=true;
                 // ATparent.addChild(new AddTreeNode("tmp"));
-                buildTreeUnaryExp(ATparent,ASTparent.children.get(1));
+                ATparent.addChild(new AddTreeNode("!"));
+                ATparent.addChild(new AddTreeNode("tmp"));
+                buildTreeUnaryExp(ATparent.children.get(1),ASTparent.children.get(1));
             }
             else{
                 System.out.println("error\n");
@@ -382,27 +384,72 @@ public class AddExp extends InitVal{
                 else{
                     switch(parent.children.get(1).value){
                         case "+":
-                            value=globalValue.createAddInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=globalValue.createAddInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "-":
-                            value=globalValue.createSubInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=globalValue.createSubInst((left.type.equals("char"))?
+                            basicBlock.createZextInst("char",left.exp):
+                                (left.type.equals("bool"))?
+                                basicBlock.createZextInst("bool",left.exp):
+                                left.exp, 
+                            (right.type.equals("char"))?
+                            basicBlock.createZextInst("char",right.exp):
+                                (right.type.equals("bool"))?
+                                basicBlock.createZextInst("bool", right.exp):
+                                right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "*": 
-                            value=globalValue.createMulInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=globalValue.createMulInst((left.type.equals("char"))?
+                            basicBlock.createZextInst("char",left.exp):
+                                (left.type.equals("bool"))?
+                                basicBlock.createZextInst("bool",left.exp):
+                                left.exp, 
+                            (right.type.equals("char"))?
+                            basicBlock.createZextInst("char",right.exp):
+                                (right.type.equals("bool"))?
+                                basicBlock.createZextInst("bool", right.exp):
+                                right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "/":
-                            value=globalValue.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);    
+                            value=globalValue.createSdivInst((left.type.equals("char"))?
+                            basicBlock.createZextInst("char",left.exp):
+                                (left.type.equals("bool"))?
+                                basicBlock.createZextInst("bool",left.exp):
+                                left.exp, 
+                            (right.type.equals("char"))?
+                            basicBlock.createZextInst("char",right.exp):
+                                (right.type.equals("bool"))?
+                                basicBlock.createZextInst("bool", right.exp):
+                                right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "%":
-                            value=globalValue.createSremInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=globalValue.createSremInst((left.type.equals("char"))?
+                            basicBlock.createZextInst("char",left.exp):
+                                (left.type.equals("bool"))?
+                                basicBlock.createZextInst("bool",left.exp):
+                                left.exp, 
+                            (right.type.equals("char"))?
+                            basicBlock.createZextInst("char",right.exp):
+                                (right.type.equals("bool"))?
+                                basicBlock.createZextInst("bool", right.exp):
+                                right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
@@ -501,6 +548,15 @@ public class AddExp extends InitVal{
                 }
                 
             }
+            else if(parent.children.size()==2){//取反
+                // Value newValue=parent.children.get(1).exp;
+                String type=parent.children.get(1).type;
+                Value newValue=(type.equals("bool"))?basicBlock.createZextInst("bool", parent.children.get(1).exp):(type.equals("char"))?basicBlock.createZextInst("char", parent.children.get(1).exp):parent.children.get(1).exp;
+                //TODO:char是否需要类型转换？
+                value=basicBlock.createCmpInst("eq","i32",newValue,new Value("0"));
+                parent.exp=value;
+                parent.type="bool";
+            }
             else{
                 AddTreeNode left,right;
                 left=parent.children.get(0);
@@ -552,27 +608,72 @@ public class AddExp extends InitVal{
                 else{
                     switch(parent.children.get(1).value){
                         case "+":
-                            value=basicBlock.createAddInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=basicBlock.createAddInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "-":
-                            value=basicBlock.createSubInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=basicBlock.createSubInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "*": 
-                            value=basicBlock.createMulInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=basicBlock.createMulInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "/":
-                            value=basicBlock.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);    
+                            value=basicBlock.createSdivInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "%":
-                            value=basicBlock.createSremInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
+                            value=basicBlock.createSremInst((left.type.equals("char"))?
+                                basicBlock.createZextInst("char",left.exp):
+                                    (left.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool",left.exp):
+                                    left.exp, 
+                                (right.type.equals("char"))?
+                                basicBlock.createZextInst("char",right.exp):
+                                    (right.type.equals("bool"))?
+                                    basicBlock.createZextInst("bool", right.exp):
+                                    right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;

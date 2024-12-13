@@ -4,28 +4,25 @@ declare void @putint(i32)
 declare void @putch(i32)
 declare void @putstr(i8*)
 
+@.str = private unnamed_addr constant [6 x i8] c"error\00", align 1
+@.str.1 = private unnamed_addr constant [7 x i8] c"sucess\00", align 1
 define dso_local i8 @fun() {
 	ret i8 97
 }
 define dso_local i32 @main() {
-	%1 = alloca i32
-	store i32 1, i32* %1
-	%2 = alloca i32
-	store i32 1, i32* %2
-	%3 = alloca i32
-	store i32 1, i32* %3
-	%4 = load i32, i32* %1
-	%5 = load i32, i32* %2
-	%6 = load i32, i32* %3
-	%7 = icmp sle i32 %5, %6
-	
-	%8 = icmp eq i32 %4, %7
-	br i1 %8, label %9, label %10
+	%1 = icmp eq i32 5436, 0
+	%2 = zext i1 %1 to i32
+	%3 = icmp sge i32 %2, 2
+	br i1 %3, label %4, label %5
 
-9:
-	br label %10
+4:
+	call void @putstr(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str, i64 0, i64 0))
+	br label %6
 
-10:
-	%11 = load i32, i32* %1
-	ret i32 %11
+5:
+	call void @putstr(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str.1, i64 0, i64 0))
+	br label %6
+
+6:
+	ret i32 0
 }
