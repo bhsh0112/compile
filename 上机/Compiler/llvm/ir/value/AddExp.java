@@ -6,6 +6,7 @@ import java.io.IOException;
 import dataStructure.ASTNode.ASTNode;
 import dataStructure.STT.STTStack;
 import llvm.AddTreeNode;
+import llvm.CharConst2Int;
 import symbol.symbol;
 
 import llvm.ir.Module;
@@ -163,8 +164,7 @@ public class AddExp extends InitVal{
                     ATparent.value=ATparent.value;
                 }
                 else{
-                    if(ATparent.value.charAt(1)=='\\') ATparent.value=String.valueOf((int)(ATparent.value.charAt(2)));
-                    else ATparent.value=String.valueOf((int)(ATparent.value.charAt(1)));
+                    ATparent.value=CharConst2Int.main(ATparent.value);
                 }
                 //消除字符常量
                 ATparent.type="intImm";
@@ -245,8 +245,7 @@ public class AddExp extends InitVal{
                     // parent.type="charImm";
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
-                    if(parent.value.charAt(1)=='\\') value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(2))));
-                    else value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    parent.value=CharConst2Int.main(parent.value);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -342,14 +341,12 @@ public class AddExp extends InitVal{
                 left=parent.children.get(0);
                 right=parent.children.get(2);
                 if(left.type.equals("charImm")){
-                    if(left.value.charAt(1)=='\\') left.value=String.valueOf((int)(left.value.charAt(2)));
-                    else left.value=String.valueOf((int)(left.value.charAt(1)));
+                    left.value=CharConst2Int.main(left.value);
                     left.exp=new Value(left.value);
                     left.type="intImm";
                 }
                 if(right.type.equals("charImm")){
-                    if(right.value.charAt(1)=='\\') right.value=String.valueOf((int)(right.value.charAt(2)));
-                    else right.value=String.valueOf((int)(right.value.charAt(1)));
+                    right.value=CharConst2Int.main(right.value);
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }
@@ -435,8 +432,7 @@ public class AddExp extends InitVal{
                     // parent.type="charImm";
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
-                    if(parent.value.charAt(1)=='\\') value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(2))));
-                    else value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    parent.value=CharConst2Int.main(parent.value);
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -521,14 +517,12 @@ public class AddExp extends InitVal{
                 left=parent.children.get(0);
                 right=parent.children.get(2);
                 if(left.type.equals("charImm")){
-                    if(left.value.charAt(1)=='\\') left.value=String.valueOf((int)(left.value.charAt(2)));
-                    else left.value=String.valueOf((int)(left.value.charAt(1)));
+                    left.value=CharConst2Int.main(left.value);
                     left.exp=new Value(left.value);
                     left.type="intImm";
                 }
                 if(right.type.equals("charImm")){
-                    if(right.value.charAt(1)=='\\') right.value=String.valueOf((int)(right.value.charAt(2)));
-                    else right.value=String.valueOf((int)(right.value.charAt(1)));
+                    right.value=CharConst2Int.main(right.value);
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }

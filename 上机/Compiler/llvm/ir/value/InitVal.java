@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import dataStructure.ASTNode.ASTNode;
+import llvm.CharConst2Int;
 import llvm.ir.value.Type.VarType;
 
 public class InitVal extends Value {
@@ -48,8 +49,7 @@ public class InitVal extends Value {
 
         } 
         if(finalValue.name!=null&&finalValue.name.startsWith("\'")){
-            if(finalValue.name.charAt(1)=='\\') finalValue.name=String.valueOf((int)(finalValue.name.charAt(2)));
-            else finalValue.name=String.valueOf((int)(finalValue.name.charAt(1)));
+            finalValue.name=CharConst2Int.main(finalValue.name);
         }
         //TODO:条件似乎需要更改
         else if(type.Type2String().equals("i8")&&finalValue.name!=null&&(!finalValue.name.startsWith("\'"))){

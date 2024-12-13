@@ -14,6 +14,7 @@ import dataStructure.STT.STTStack;
 import llvm.ir.value.Type.ReturnType;
 import llvm.ir.value.Type.VarType;
 import llvm.ir.value.inst.*;
+import llvm.CharConst2Int;
 import llvm.ir.Module;
 import symbol.symbol;
 
@@ -164,8 +165,7 @@ public class BasicBlock extends Value{
 					if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 					else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 					else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
-						if(from.name.charAt(1)=='\\') from.name=String.valueOf((int)(from.name.charAt(2)));
-						else from.name=String.valueOf((int)(from.name.charAt(1)));
+						from.name=CharConst2Int.main(from.name);
 					}
 					createStoreInst(new VarType(declType),from,ptr);
 					Module.symbolStack.pushStack(this.level,declType,"Const",declName,ptr,0,from.name);
@@ -293,8 +293,7 @@ public class BasicBlock extends Value{
 						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
-							if(from.name.charAt(1)=='\\') from.name=String.valueOf((int)(from.name.charAt(2)));
-							else from.name=String.valueOf((int)(from.name.charAt(1)));
+							from.name=CharConst2Int.main(from.name);
 						}
 						createStoreInst(new VarType(declType),from,ptr);
 						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
@@ -335,8 +334,7 @@ public class BasicBlock extends Value{
 						}
 						else if((tmpAddExp.type.equals("charImm")&&this.parentFunction.retType.type.equals("int"))){
 							Value newValue=null;
-							if(tmpAddExp.value.name.charAt(1)=='\\') newValue=new Value(String.valueOf((int)(tmpAddExp.value.name.charAt(2))));
-							else newValue=new Value(String.valueOf((int)(tmpAddExp.value.name.charAt(1))));
+							newValue=new Value(CharConst2Int.main(tmpAddExp.value.name));
 							createReturnInst(parentFunction.retType,newValue);
 						}
 						else if((tmpAddExp.type.equals("int")&&this.parentFunction.retType.type.equals("char"))){
@@ -689,8 +687,7 @@ public class BasicBlock extends Value{
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
-					if(from.name.charAt(1)=='\\') from.name=String.valueOf((int)(from.name.charAt(2)));
-					else from.name=String.valueOf((int)(from.name.charAt(1)));
+					from.name=CharConst2Int.main(from.name);
 				}
 				createStoreInst((VarType)tmpType,from,tmpValue);
 			}
