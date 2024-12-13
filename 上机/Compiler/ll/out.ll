@@ -3,31 +3,31 @@ source_filename = "llvm-link"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx13.3.0"
 
-@MAX_SIZE = dso_local global i32 10
-@global_var = dso_local global i32 0
-@str = dso_local global [10 x i8] c"3\\\00\00\00\00\00\00\00\00"
+@MAX_SIZE = constant i32 10, align 4
+@str = global <{ i8, i8, [8 x i8] }> <{ i8 51, i8 39, [8 x i8] zeroinitializer }>, align 1
+@global_var = global i32 0, align 4
 @.str = private unnamed_addr constant [10 x i8] c"22373040\0A\00", align 1
-@.str.1 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.2 = private unnamed_addr constant [16 x i8] c"Input integer: \00", align 1
-@.str.3 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.4 = private unnamed_addr constant [18 x i8] c"Input character: \00", align 1
-@.str.5 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.6 = private unnamed_addr constant [14 x i8] c"i is 4 or 9!\0A\00", align 1
-@.str.7 = private unnamed_addr constant [10 x i8] c"j is 32!\0A\00", align 1
-@.str.8 = private unnamed_addr constant [24 x i8] c"Sum of array elements: \00", align 1
-@.str.9 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.10 = private unnamed_addr constant [16 x i8] c"Test finished!\0A\00", align 1
-@.str.11 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
-@.str.1.14 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
-@.str.2.19 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
-@.str.3.20 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
-@.str.4.21 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.5.24 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
+@.str.1 = private unnamed_addr constant [4 x i8] c"%c\0A\00", align 1
+@.str.2 = private unnamed_addr constant [19 x i8] c"Input integer: %d\0A\00", align 1
+@.str.3 = private unnamed_addr constant [21 x i8] c"Input character: %c\0A\00", align 1
+@__const.main.str = private unnamed_addr constant [12 x i8] c"qwertyuiop\0A\00", align 1
+@__const.main._str = private unnamed_addr constant [10 x i8] c"str\00\00\00\00\00\00\00", align 1
+@.str.4 = private unnamed_addr constant [14 x i8] c"i is 4 or 9!\0A\00", align 1
+@.str.5 = private unnamed_addr constant [10 x i8] c"j is 32!\0A\00", align 1
+@.str.6 = private unnamed_addr constant [27 x i8] c"Sum of array elements: %d\0A\00", align 1
+@.str.7 = private unnamed_addr constant [16 x i8] c"Test finished!\0A\00", align 1
+@.str.8 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
+@.str.1.11 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.2.12 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
+@.str.3.13 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
+@.str.4.14 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.5.15 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 
-define dso_local i32 @add(i32 %0, i32 %1) {
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @add(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
-  store i32 %0, ptr %3, align 4
   %4 = alloca i32, align 4
+  store i32 %0, ptr %3, align 4
   store i32 %1, ptr %4, align 4
   %5 = load i32, ptr %3, align 4
   %6 = load i32, ptr %4, align 4
@@ -35,302 +35,287 @@ define dso_local i32 @add(i32 %0, i32 %1) {
   ret i32 %7
 }
 
-define dso_local i32 @calculate(i32 %0, ptr %1) {
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @calculate(i32 noundef %0, ptr noundef %1) #0 {
   %3 = alloca i32, align 4
-  store i32 %0, ptr %3, align 4
-  %4 = alloca ptr, align 8
-  store ptr %1, ptr %4, align 8
-  %5 = alloca i32, align 4
-  %6 = load i32, ptr %3, align 4
-  %7 = load ptr, ptr %4, align 8
-  %8 = getelementptr inbounds i32, ptr %7, i32 0
-  %9 = load i32, ptr %8, align 4
-  %10 = call i32 @add(i32 %6, i32 %9)
-  %11 = load ptr, ptr %4, align 8
-  %12 = getelementptr inbounds i32, ptr %11, i32 1
-  %13 = load i32, ptr %12, align 4
-  %14 = load ptr, ptr %4, align 8
-  %15 = getelementptr inbounds i32, ptr %14, i32 2
-  %16 = load i32, ptr %15, align 4
-  %17 = load i32, ptr %3, align 4
-  %18 = sub nsw i32 %17, %13
-  %19 = mul nsw i32 %10, %18
-  %20 = sdiv i32 %19, %16
-  %21 = load i32, ptr %3, align 4
-  %22 = srem i32 %20, %21
-  %23 = sub nsw i32 %22, -3
-  %24 = add nsw i32 %23, 6
-  store i32 %24, ptr %5, align 4
-  %25 = load i32, ptr %5, align 4
-  %26 = icmp sle i32 %25, 5
-  br i1 %26, label %27, label %28
-
-27:                                               ; preds = %2
-  ret i32 1
+  %4 = alloca i32, align 4
+  %5 = alloca ptr, align 8
+  %6 = alloca i32, align 4
+  store i32 %0, ptr %4, align 4
+  store ptr %1, ptr %5, align 8
+  %7 = load i32, ptr %4, align 4
+  %8 = load ptr, ptr %5, align 8
+  %9 = getelementptr inbounds i32, ptr %8, i64 0
+  %10 = load i32, ptr %9, align 4
+  %11 = call i32 @add(i32 noundef %7, i32 noundef %10)
+  %12 = load i32, ptr %4, align 4
+  %13 = load ptr, ptr %5, align 8
+  %14 = getelementptr inbounds i32, ptr %13, i64 1
+  %15 = load i32, ptr %14, align 4
+  %16 = sub nsw i32 %12, %15
+  %17 = mul nsw i32 %11, %16
+  %18 = load ptr, ptr %5, align 8
+  %19 = getelementptr inbounds i32, ptr %18, i64 2
+  %20 = load i32, ptr %19, align 4
+  %21 = sdiv i32 %17, %20
+  %22 = load i32, ptr %4, align 4
+  %23 = srem i32 %21, %22
+  %24 = sub nsw i32 %23, -3
+  %25 = add nsw i32 %24, 6
+  store i32 %25, ptr %6, align 4
+  %26 = load i32, ptr %6, align 4
+  %27 = icmp sle i32 %26, 5
+  br i1 %27, label %28, label %29
 
 28:                                               ; preds = %2
-  ret i32 0
+  store i32 1, ptr %3, align 4
+  br label %30
 
-29:                                               ; No predecessors!
-  ret i32 -1
+29:                                               ; preds = %2
+  store i32 0, ptr %3, align 4
+  br label %30
+
+30:                                               ; preds = %29, %28
+  %31 = load i32, ptr %3, align 4
+  ret i32 %31
 }
 
-define dso_local void @printName() {
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define void @printName() #0 {
   %1 = load i32, ptr @global_var, align 4
   %2 = add nsw i32 %1, 1
   store i32 %2, ptr @global_var, align 4
   %3 = load i32, ptr @global_var, align 4
   %4 = icmp ne i32 %3, 0
-  br i1 %4, label %5, label %6
+  br i1 %4, label %5, label %7
 
 5:                                                ; preds = %0
-  call void @putstr(ptr @.str)
-  br label %6
+  %6 = call i32 (ptr, ...) @printf(ptr noundef @.str)
+  br label %7
 
-6:                                                ; preds = %5, %0
+7:                                                ; preds = %5, %0
   ret void
 }
 
-define dso_local void @print(i8 %0) {
+declare i32 @printf(ptr noundef, ...) #1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define void @print(i8 noundef signext %0) #0 {
   %2 = alloca i8, align 1
   store i8 %0, ptr %2, align 1
   %3 = load i8, ptr %2, align 1
-  %4 = zext i8 %3 to i32
-  call void @putch(i32 %4)
-  call void @putstr(ptr @.str.1)
+  %4 = sext i8 %3 to i32
+  %5 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %4)
   ret void
 }
 
-define dso_local i8 @get_first(ptr %0) {
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define signext i8 @get_first(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
-  %4 = getelementptr inbounds i8, ptr %3, i32 0
+  %4 = getelementptr inbounds i8, ptr %3, i64 0
   %5 = load i8, ptr %4, align 1
   ret i8 %5
 }
 
-define dso_local i32 @main() {
-  call void @printName()
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
   %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
   %2 = alloca i32, align 4
-  store i32 8, ptr %2, align 4
-  %3 = alloca i8, align 1
-  %4 = call i32 @getint()
-  store i32 %4, ptr %1, align 4
-  %5 = call i32 @getchar()
-  %6 = trunc i32 %5 to i8
-  store i8 %6, ptr %3, align 1
-  %7 = load i32, ptr %1, align 4
-  call void @putstr(ptr @.str.2)
-  call void @putint(i32 %7)
-  call void @putstr(ptr @.str.3)
-  %8 = load i8, ptr %3, align 1
-  call void @putstr(ptr @.str.4)
-  %9 = zext i8 %8 to i32
-  call void @putch(i32 %9)
-  call void @putstr(ptr @.str.5)
-  %10 = alloca i32, align 4
-  store i32 5, ptr %10, align 4
-  %11 = alloca [10 x i32], align 4
-  %12 = alloca [12 x i8], align 1
-  %13 = getelementptr inbounds [12 x i8], ptr %12, i32 0, i32 0
-  store i8 113, ptr %13, align 1
-  %14 = getelementptr inbounds i8, ptr %13, i32 1
-  store i8 119, ptr %14, align 1
-  %15 = getelementptr inbounds i8, ptr %14, i32 2
-  store i8 101, ptr %15, align 1
-  %16 = getelementptr inbounds i8, ptr %15, i32 3
-  store i8 114, ptr %16, align 1
-  %17 = getelementptr inbounds i8, ptr %16, i32 4
-  store i8 116, ptr %17, align 1
-  %18 = getelementptr inbounds i8, ptr %17, i32 5
-  store i8 121, ptr %18, align 1
-  %19 = getelementptr inbounds i8, ptr %18, i32 6
-  store i8 117, ptr %19, align 1
-  %20 = getelementptr inbounds i8, ptr %19, i32 7
-  store i8 105, ptr %20, align 1
-  %21 = getelementptr inbounds i8, ptr %20, i32 8
-  store i8 111, ptr %21, align 1
-  %22 = getelementptr inbounds i8, ptr %21, i32 9
-  store i8 112, ptr %22, align 1
-  %23 = getelementptr inbounds i8, ptr %22, i32 10
-  store i8 92, ptr %23, align 1
-  %24 = getelementptr inbounds i8, ptr %23, i32 11
-  store i8 110, ptr %24, align 1
-  %25 = alloca [10 x i8], align 1
-  %26 = getelementptr inbounds [10 x i8], ptr %25, i32 0, i32 0
-  store i8 115, ptr %26, align 1
-  %27 = getelementptr inbounds i8, ptr %26, i32 1
-  store i8 116, ptr %27, align 1
-  %28 = getelementptr inbounds i8, ptr %27, i32 2
-  store i8 114, ptr %28, align 1
+  %3 = alloca i32, align 4
+  %4 = alloca i8, align 1
+  %5 = alloca i32, align 4
+  %6 = alloca [10 x i32], align 4
+  %7 = alloca [12 x i8], align 1
+  %8 = alloca [10 x i8], align 1
+  %9 = alloca i32, align 4
+  %10 = alloca [20 x i32], align 4
+  %11 = alloca i32, align 4
+  %12 = alloca i32, align 4
   store i32 0, ptr %1, align 4
-  br label %29
+  call void @printName()
+  store i32 0, ptr %2, align 4
+  store i32 8, ptr %3, align 4
+  %13 = call i32 @getint()
+  store i32 %13, ptr %2, align 4
+  %14 = call i32 @getchar()
+  %15 = trunc i32 %14 to i8
+  store i8 %15, ptr %4, align 1
+  %16 = load i32, ptr %2, align 4
+  %17 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %16)
+  %18 = load i8, ptr %4, align 1
+  %19 = sext i8 %18 to i32
+  %20 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %19)
+  store i32 5, ptr %5, align 4
+  call void @llvm.memcpy.p0.p0.i64(ptr align 1 %7, ptr align 1 @__const.main.str, i64 12, i1 false)
+  call void @llvm.memcpy.p0.p0.i64(ptr align 1 %8, ptr align 1 @__const.main._str, i64 10, i1 false)
+  store i32 0, ptr %2, align 4
+  br label %21
 
-29:                                               ; preds = %73, %0
-  %30 = load i32, ptr %1, align 4
-  %31 = load i32, ptr @MAX_SIZE, align 4
-  %32 = icmp slt i32 %30, %31
-  br i1 %32, label %33, label %76
+21:                                               ; preds = %66, %0
+  %22 = load i32, ptr %2, align 4
+  %23 = icmp slt i32 %22, 10
+  br i1 %23, label %24, label %69
 
-33:                                               ; preds = %29
-  %34 = load i32, ptr %1, align 4
-  %35 = getelementptr inbounds [10 x i32], ptr %11, i32 0, i32 %34
-  %36 = load i32, ptr %1, align 4
-  store i32 %36, ptr %35, align 4
-  %37 = load i32, ptr %1, align 4
-  %38 = icmp eq i32 %37, 4
-  br i1 %38, label %39, label %44
+24:                                               ; preds = %21
+  %25 = load i32, ptr %2, align 4
+  %26 = load i32, ptr %2, align 4
+  %27 = sext i32 %26 to i64
+  %28 = getelementptr inbounds [10 x i32], ptr %6, i64 0, i64 %27
+  store i32 %25, ptr %28, align 4
+  %29 = load i32, ptr %2, align 4
+  %30 = icmp eq i32 %29, 4
+  br i1 %30, label %31, label %36
 
-39:                                               ; preds = %33
-  %40 = load i32, ptr %1, align 4
-  %41 = load i8, ptr %3, align 1
-  %42 = zext i8 %41 to i32
-  %43 = icmp slt i32 %40, %42
-  br i1 %43, label %47, label %44
+31:                                               ; preds = %24
+  %32 = load i32, ptr %2, align 4
+  %33 = load i8, ptr %4, align 1
+  %34 = sext i8 %33 to i32
+  %35 = icmp slt i32 %32, %34
+  br i1 %35, label %39, label %36
 
-44:                                               ; preds = %39, %33
-  %45 = load i32, ptr %1, align 4
-  %46 = icmp sge i32 %45, 9
-  br i1 %46, label %47, label %64
+36:                                               ; preds = %31, %24
+  %37 = load i32, ptr %2, align 4
+  %38 = icmp sge i32 %37, 9
+  br i1 %38, label %39, label %57
 
-47:                                               ; preds = %44, %39
-  call void @putstr(ptr @.str.6)
-  %48 = alloca i32, align 4
-  store i32 1, ptr %48, align 4
-  br label %49
+39:                                               ; preds = %36, %31
+  %40 = call i32 (ptr, ...) @printf(ptr noundef @.str.4)
+  store i32 1, ptr %9, align 4
+  br label %41
 
-49:                                               ; preds = %59, %47
-  %50 = load i32, ptr %48, align 4
-  %51 = icmp sgt i32 %50, 100
-  br i1 %51, label %52, label %53
+41:                                               ; preds = %52, %39
+  %42 = load i32, ptr %9, align 4
+  %43 = icmp sgt i32 %42, 100
+  br i1 %43, label %44, label %45
 
-52:                                               ; preds = %49
+44:                                               ; preds = %41
+  br label %56
+
+45:                                               ; preds = %41
+  %46 = load i32, ptr %9, align 4
+  %47 = icmp ne i32 %46, 32
+  br i1 %47, label %48, label %49
+
+48:                                               ; preds = %45
+  br label %52
+
+49:                                               ; preds = %45
+  br label %50
+
+50:                                               ; preds = %49
+  %51 = call i32 (ptr, ...) @printf(ptr noundef @.str.5)
+  br label %52
+
+52:                                               ; preds = %50, %48
+  %53 = load i32, ptr %9, align 4
+  %54 = load i32, ptr %9, align 4
+  %55 = add nsw i32 %53, %54
+  store i32 %55, ptr %9, align 4
+  br label %41
+
+56:                                               ; preds = %44
+  br label %57
+
+57:                                               ; preds = %56, %36
+  %58 = load i32, ptr %2, align 4
+  %59 = srem i32 %58, 2
+  %60 = icmp eq i32 %59, 0
+  br i1 %60, label %61, label %64
+
+61:                                               ; preds = %57
+  br label %62
+
+62:                                               ; preds = %61
   br label %63
 
-53:                                               ; preds = %49
-  %54 = load i32, ptr %48, align 4
-  %55 = icmp ne i32 %54, 32
-  br i1 %55, label %56, label %57
+63:                                               ; preds = %62
+  br label %65
 
-56:                                               ; preds = %53
-  br label %59
+64:                                               ; preds = %57
+  br label %65
 
-57:                                               ; preds = %53
-  br label %58
+65:                                               ; preds = %64, %63
+  br label %66
 
-58:                                               ; preds = %57
-  call void @putstr(ptr @.str.7)
-  br label %59
+66:                                               ; preds = %65
+  %67 = load i32, ptr %2, align 4
+  %68 = add nsw i32 %67, 1
+  store i32 %68, ptr %2, align 4
+  br label %21, !llvm.loop !6
 
-59:                                               ; preds = %58, %56
-  %60 = load i32, ptr %48, align 4
-  %61 = load i32, ptr %48, align 4
-  %62 = add nsw i32 %60, %61
-  store i32 %62, ptr %48, align 4
-  br label %49
-
-63:                                               ; preds = %52
-  br label %64
-
-64:                                               ; preds = %63, %44
-  %65 = load i32, ptr %1, align 4
-  %66 = srem i32 %65, 2
-  %67 = icmp eq i32 %66, 0
-  br i1 %67, label %68, label %71
-
-68:                                               ; preds = %64
-  br label %69
-
-69:                                               ; preds = %68
-  br label %70
-
-70:                                               ; preds = %69
-  br label %72
-
-71:                                               ; preds = %64
-  br label %72
-
-72:                                               ; preds = %71, %70
+69:                                               ; preds = %21
+  call void @llvm.memset.p0.i64(ptr align 4 %10, i8 0, i64 80, i1 false)
+  %70 = getelementptr inbounds <{ i32, i32, i32, [17 x i32] }>, ptr %10, i32 0, i32 0
+  store i32 3, ptr %70, align 4
+  %71 = getelementptr inbounds <{ i32, i32, i32, [17 x i32] }>, ptr %10, i32 0, i32 1
+  store i32 2, ptr %71, align 4
+  %72 = getelementptr inbounds <{ i32, i32, i32, [17 x i32] }>, ptr %10, i32 0, i32 2
+  store i32 1, ptr %72, align 4
+  store i32 0, ptr %11, align 4
+  store i32 0, ptr %12, align 4
   br label %73
 
-73:                                               ; preds = %72
-  %74 = load i32, ptr %1, align 4
-  %75 = add nsw i32 %74, 1
-  store i32 %75, ptr %1, align 4
-  br label %29
+73:                                               ; preds = %87, %69
+  %74 = load i32, ptr %12, align 4
+  %75 = icmp slt i32 %74, 10
+  br i1 %75, label %76, label %90
 
-76:                                               ; preds = %29
-  %77 = alloca [20 x i32], align 4
-  %78 = getelementptr inbounds [20 x i32], ptr %77, i32 0, i32 0
-  store i32 3, ptr %78, align 4
-  %79 = getelementptr inbounds i32, ptr %78, i32 1
-  store i32 2, ptr %79, align 4
-  %80 = getelementptr inbounds i32, ptr %79, i32 1
-  store i32 1, ptr %80, align 4
-  %81 = alloca i32, align 4
-  store i32 0, ptr %81, align 4
-  %82 = alloca i32, align 4
-  store i32 0, ptr %82, align 4
-  br label %83
+76:                                               ; preds = %73
+  %77 = load i32, ptr %12, align 4
+  %78 = icmp slt i32 %77, 3
+  br i1 %78, label %79, label %86
 
-83:                                               ; preds = %97, %76
-  %84 = load i32, ptr %82, align 4
-  %85 = load i32, ptr @MAX_SIZE, align 4
-  %86 = icmp slt i32 %84, %85
-  br i1 %86, label %87, label %100
+79:                                               ; preds = %76
+  %80 = load i32, ptr %11, align 4
+  %81 = load i32, ptr %12, align 4
+  %82 = sext i32 %81 to i64
+  %83 = getelementptr inbounds [20 x i32], ptr %10, i64 0, i64 %82
+  %84 = load i32, ptr %83, align 4
+  %85 = add nsw i32 %80, %84
+  store i32 %85, ptr %11, align 4
+  br label %86
 
-87:                                               ; preds = %83
-  %88 = load i32, ptr %82, align 4
-  %89 = icmp slt i32 %88, 3
-  br i1 %89, label %90, label %96
+86:                                               ; preds = %79, %76
+  br label %87
 
-90:                                               ; preds = %87
-  %91 = load i32, ptr %82, align 4
-  %92 = getelementptr inbounds [20 x i32], ptr %77, i32 0, i32 %91
-  %93 = load i32, ptr %92, align 4
-  %94 = load i32, ptr %81, align 4
-  %95 = add nsw i32 %94, %93
-  store i32 %95, ptr %81, align 4
-  br label %96
+87:                                               ; preds = %86
+  %88 = load i32, ptr %12, align 4
+  %89 = add nsw i32 %88, 1
+  store i32 %89, ptr %12, align 4
+  br label %73, !llvm.loop !8
 
-96:                                               ; preds = %90, %87
-  br label %97
+90:                                               ; preds = %73
+  %91 = load i32, ptr %11, align 4
+  %92 = call i32 (ptr, ...) @printf(ptr noundef @.str.6, i32 noundef %91)
+  %93 = load i32, ptr %2, align 4
+  %94 = getelementptr inbounds [10 x i32], ptr %6, i64 0, i64 0
+  %95 = call i32 @calculate(i32 noundef %93, ptr noundef %94)
+  %96 = icmp ne i32 %95, 0
+  br i1 %96, label %100, label %97
 
-97:                                               ; preds = %96
-  %98 = load i32, ptr %82, align 4
-  %99 = add nsw i32 %98, 1
-  store i32 %99, ptr %82, align 4
-  br label %83
+97:                                               ; preds = %90
+  %98 = getelementptr inbounds [12 x i8], ptr %7, i64 0, i64 0
+  %99 = call signext i8 @get_first(ptr noundef %98)
+  call void @print(i8 noundef signext %99)
+  br label %100
 
-100:                                              ; preds = %83
-  %101 = load i32, ptr %81, align 4
-  call void @putstr(ptr @.str.8)
-  call void @putint(i32 %101)
-  call void @putstr(ptr @.str.9)
-  %102 = load i32, ptr %1, align 4
-  %103 = getelementptr inbounds [10 x i32], ptr %11, i32 0, i32 0
-  %104 = call i32 @calculate(i32 %102, ptr %103)
-  %105 = icmp ne i32 %104, 0
-  br i1 %105, label %109, label %106
-
-106:                                              ; preds = %100
-  %107 = getelementptr inbounds [12 x i8], ptr %12, i32 0, i32 0
-  %108 = call i8 @get_first(ptr %107)
-  call void @print(i8 %108)
-  br label %109
-
-109:                                              ; preds = %106, %100
-  call void @putstr(ptr @.str.10)
+100:                                              ; preds = %97, %90
+  %101 = call i32 (ptr, ...) @printf(ptr noundef @.str.7)
   ret i32 0
 }
+
+; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #2
+
+; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: write)
+declare void @llvm.memset.p0.i64(ptr nocapture writeonly, i8, i64, i1 immarg) #3
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getchar() #0 {
   %1 = alloca i8, align 1
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.11, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.8, ptr noundef %1)
   %3 = load i8, ptr %1, align 1
   %4 = sext i8 %3 to i32
   ret i32 %4
@@ -341,7 +326,7 @@ declare i32 @scanf(ptr noundef, ...) #1
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getint() #0 {
   %1 = alloca i32, align 4
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.14, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.11, ptr noundef %1)
   br label %3
 
 3:                                                ; preds = %6, %0
@@ -350,7 +335,7 @@ define i32 @getint() #0 {
   br i1 %5, label %6, label %7
 
 6:                                                ; preds = %3
-  br label %3, !llvm.loop !6
+  br label %3, !llvm.loop !9
 
 7:                                                ; preds = %3
   %8 = load i32, ptr %1, align 4
@@ -363,7 +348,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   store ptr %0, ptr %2, align 8
-  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.14, ptr noundef %3)
+  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.11, ptr noundef %3)
   store i32 0, ptr %4, align 4
   br label %6
 
@@ -378,14 +363,14 @@ define i32 @getarray(ptr noundef %0) #0 {
   %12 = load i32, ptr %4, align 4
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds i32, ptr %11, i64 %13
-  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.14, ptr noundef %14)
+  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.11, ptr noundef %14)
   br label %16
 
 16:                                               ; preds = %10
   %17 = load i32, ptr %4, align 4
   %18 = add nsw i32 %17, 1
   store i32 %18, ptr %4, align 4
-  br label %6, !llvm.loop !8
+  br label %6, !llvm.loop !10
 
 19:                                               ; preds = %6
   %20 = load i32, ptr %3, align 4
@@ -397,18 +382,16 @@ define void @putint(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.14, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.11, i32 noundef %3)
   ret void
 }
-
-declare i32 @printf(ptr noundef, ...) #1
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define void @putch(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.11, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.8, i32 noundef %3)
   ret void
 }
 
@@ -420,7 +403,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   store i32 %0, ptr %3, align 4
   store ptr %1, ptr %4, align 8
   %6 = load i32, ptr %3, align 4
-  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2.19, i32 noundef %6)
+  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2.12, i32 noundef %6)
   store i32 0, ptr %5, align 4
   br label %8
 
@@ -436,17 +419,17 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   %15 = sext i32 %14 to i64
   %16 = getelementptr inbounds i32, ptr %13, i64 %15
   %17 = load i32, ptr %16, align 4
-  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3.20, i32 noundef %17)
+  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3.13, i32 noundef %17)
   br label %19
 
 19:                                               ; preds = %12
   %20 = load i32, ptr %5, align 4
   %21 = add nsw i32 %20, 1
   store i32 %21, ptr %5, align 4
-  br label %8, !llvm.loop !9
+  br label %8, !llvm.loop !11
 
 22:                                               ; preds = %8
-  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4.21)
+  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4.14)
   ret void
 }
 
@@ -455,14 +438,16 @@ define void @putstr(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5.24, ptr noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5.15, ptr noundef %3)
   ret void
 }
 
 attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #2 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
+attributes #3 = { nocallback nofree nounwind willreturn memory(argmem: write) }
 
-!llvm.ident = !{!0}
+!llvm.ident = !{!0, !0}
 !llvm.module.flags = !{!1, !2, !3, !4, !5}
 
 !0 = !{!"Homebrew clang version 19.1.5"}
@@ -475,3 +460,5 @@ attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-pr
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}
 !9 = distinct !{!9, !7}
+!10 = distinct !{!10, !7}
+!11 = distinct !{!11, !7}

@@ -199,12 +199,14 @@ public class BasicBlock extends Value{
 						for(int j=1;j<str.length()-1;j++){
 							char ch=str.charAt(j);
 							Value tmpValue1=new Value("0");
-							Value tmpValue2=new Value(String.valueOf(j-1));
+							
 							if(j==1){
+								Value tmpValue2=new Value(String.valueOf(j-1));
 								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
 								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 							}
 							else{
+								Value tmpValue2=new Value("1");
 								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
 								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 							}
@@ -257,13 +259,15 @@ public class BasicBlock extends Value{
 							for(int j=1;j<str.length()-1;j++){
 								char ch=str.charAt(j);
 								Value tmpValue1=new Value("0");
-								Value tmpValue2=new Value(String.valueOf(j-1));
+								
 								if(j==1){
+									Value tmpValue2=new Value(String.valueOf(j-1));
 									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
 									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);	
 								
 								}
 								else{
+									Value tmpValue2=new Value("1");
 									ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
 									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
 								}
