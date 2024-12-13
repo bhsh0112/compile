@@ -279,8 +279,8 @@ define dso_local i32 @main() {
 
 91:
 	%92 = load i32, i32* %83
-	%93 = getelementptr inbounds [20 x i32], [20 x i32]* %78, i32 0, i32 0
-	%94 = getelementptr inbounds i32, i32* %93, i32 %92
+	%93 = getelementptr inbounds [20 x i32], [20 x i32]* %78, i32 0, i32 %92
+	%94 = load i32, i32* %93
 	%95 = load i32, i32* %82
 	%96 = add nsw i32 %95, %94
 	store i32 %96, i32* %82
