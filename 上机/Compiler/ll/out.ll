@@ -3,30 +3,142 @@ source_filename = "llvm-link"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx13.3.0"
 
-@MAX_SIZE = dso_local global i32 10
-@global_var = dso_local global i32 0
-@str = dso_local global [10 x i8] c"3'\\\00\00\00\00\00\00\00"
-@.str = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
-@.str.1.2 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
-@.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
-@.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
-@.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.5 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
+@a = dso_local global [10 x i32] zeroinitializer
+@b = dso_local global [2 x i32] [i32 1, i32 2]
+@aa = dso_local global [10 x i8] zeroinitializer
+@bb = dso_local global [10 x i8] c"hello\00\00\00\00\00"
+@.str = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.1 = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.2 = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.3 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.4 = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.5 = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.6 = private unnamed_addr constant [2 x i8] c",\00", align 1
+@.str.7 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.8 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
+@.str.1.9 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.2.14 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
+@.str.3.15 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
+@.str.4.16 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.5.19 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
+
+define dso_local i32 @func1(ptr %0, i32 %1, ptr %2, i8 %3) {
+  %5 = alloca ptr, align 8
+  store ptr %0, ptr %5, align 8
+  %6 = alloca i32, align 4
+  store i32 %1, ptr %6, align 4
+  %7 = alloca ptr, align 8
+  store ptr %2, ptr %7, align 8
+  %8 = alloca i8, align 1
+  store i8 %3, ptr %8, align 1
+  %9 = load ptr, ptr %5, align 8
+  %10 = getelementptr inbounds i32, ptr %9, i32 1
+  %11 = load i32, ptr %10, align 4
+  %12 = load i32, ptr %6, align 4
+  %13 = load ptr, ptr %7, align 8
+  %14 = getelementptr inbounds i8, ptr %13, i32 1
+  %15 = load i8, ptr %14, align 1
+  %16 = load i8, ptr %8, align 1
+  call void @putint(i32 %11)
+  call void @putstr(ptr @.str)
+  call void @putint(i32 %12)
+  call void @putstr(ptr @.str.1)
+  %17 = zext i8 %15 to i32
+  call void @putch(i32 %17)
+  call void @putstr(ptr @.str.2)
+  %18 = zext i8 %16 to i32
+  call void @putch(i32 %18)
+  call void @putstr(ptr @.str.3)
+  %19 = load ptr, ptr %5, align 8
+  %20 = getelementptr inbounds i32, ptr %19, i32 0
+  %21 = load i8, ptr %8, align 1
+  %22 = zext i8 %21 to i32
+  store i32 %22, ptr %20, align 4
+  %23 = load ptr, ptr %5, align 8
+  %24 = getelementptr inbounds i32, ptr %23, i32 1
+  %25 = load i32, ptr %6, align 4
+  store i32 %25, ptr %24, align 4
+  %26 = load ptr, ptr %7, align 8
+  %27 = getelementptr inbounds i8, ptr %26, i32 1
+  %28 = load i8, ptr %8, align 1
+  store i8 %28, ptr %27, align 1
+  ret i32 0
+}
+
+define dso_local i32 @func2(ptr %0, i32 %1, ptr %2, i8 %3) {
+  %5 = alloca ptr, align 8
+  store ptr %0, ptr %5, align 8
+  %6 = alloca i32, align 4
+  store i32 %1, ptr %6, align 4
+  %7 = alloca ptr, align 8
+  store ptr %2, ptr %7, align 8
+  %8 = alloca i8, align 1
+  store i8 %3, ptr %8, align 1
+  %9 = load ptr, ptr %5, align 8
+  %10 = load i32, ptr %6, align 4
+  %11 = load ptr, ptr %7, align 8
+  %12 = load i8, ptr %8, align 1
+  %13 = call i32 @func1(ptr %9, i32 %10, ptr %11, i8 %12)
+  %14 = load ptr, ptr %5, align 8
+  %15 = getelementptr inbounds i32, ptr %14, i32 1
+  %16 = load i32, ptr %15, align 4
+  %17 = load i32, ptr %6, align 4
+  %18 = load ptr, ptr %7, align 8
+  %19 = getelementptr inbounds i8, ptr %18, i32 1
+  %20 = load i8, ptr %19, align 1
+  %21 = load i8, ptr %8, align 1
+  call void @putint(i32 %16)
+  call void @putstr(ptr @.str.4)
+  call void @putint(i32 %17)
+  call void @putstr(ptr @.str.5)
+  %22 = zext i8 %20 to i32
+  call void @putch(i32 %22)
+  call void @putstr(ptr @.str.6)
+  %23 = zext i8 %21 to i32
+  call void @putch(i32 %23)
+  call void @putstr(ptr @.str.7)
+  ret i32 0
+}
 
 define dso_local i32 @main() {
-  %1 = getelementptr inbounds [10 x i8], ptr @str, i32 0, i32 2
-  %2 = load i8, ptr %1, align 1
-  %3 = zext i8 %2 to i32
-  call void @putch(i32 %3)
-  call void @putstr(ptr @.str)
+  %1 = alloca [10 x i32], align 4
+  %2 = alloca [10 x i8], align 1
+  %3 = alloca [2 x i32], align 4
+  %4 = getelementptr inbounds [2 x i32], ptr %3, i32 0, i32 0
+  store i32 1, ptr %4, align 4
+  %5 = getelementptr inbounds i32, ptr %4, i32 1
+  store i32 2, ptr %5, align 4
+  %6 = alloca [3 x i8], align 1
+  %7 = getelementptr inbounds [3 x i8], ptr %6, i32 0, i32 0
+  store i8 49, ptr %7, align 1
+  %8 = getelementptr inbounds [10 x i32], ptr @a, i32 0, i32 0
+  %9 = getelementptr inbounds [10 x i32], ptr @a, i32 0, i32 1
+  %10 = load i32, ptr %9, align 4
+  %11 = getelementptr inbounds [10 x i8], ptr @aa, i32 0, i32 0
+  %12 = getelementptr inbounds [10 x i8], ptr @aa, i32 0, i32 1
+  %13 = load i8, ptr %12, align 1
+  %14 = call i32 @func2(ptr %8, i32 %10, ptr %11, i8 %13)
+  %15 = getelementptr inbounds [10 x i32], ptr %1, i32 0, i32 0
+  %16 = getelementptr inbounds [10 x i32], ptr %1, i32 0, i32 1
+  %17 = load i32, ptr %16, align 4
+  %18 = getelementptr inbounds [10 x i8], ptr %2, i32 0, i32 0
+  %19 = getelementptr inbounds [10 x i8], ptr %2, i32 0, i32 1
+  %20 = load i8, ptr %19, align 1
+  %21 = call i32 @func2(ptr %15, i32 %17, ptr %18, i8 %20)
+  %22 = getelementptr inbounds [2 x i32], ptr %3, i32 0, i32 0
+  %23 = getelementptr inbounds [2 x i32], ptr %3, i32 0, i32 1
+  %24 = load i32, ptr %23, align 4
+  %25 = getelementptr inbounds [3 x i8], ptr %6, i32 0, i32 0
+  %26 = getelementptr inbounds [3 x i8], ptr %6, i32 0, i32 1
+  %27 = load i8, ptr %26, align 1
+  %28 = call i32 @func2(ptr %22, i32 %24, ptr %25, i8 %27)
   ret i32 0
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getchar() #0 {
   %1 = alloca i8, align 1
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.8, ptr noundef %1)
   %3 = load i8, ptr %1, align 1
   %4 = sext i8 %3 to i32
   ret i32 %4
@@ -37,7 +149,7 @@ declare i32 @scanf(ptr noundef, ...) #1
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getint() #0 {
   %1 = alloca i32, align 4
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.9, ptr noundef %1)
   br label %3
 
 3:                                                ; preds = %6, %0
@@ -59,7 +171,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   store ptr %0, ptr %2, align 8
-  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %3)
+  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.9, ptr noundef %3)
   store i32 0, ptr %4, align 4
   br label %6
 
@@ -74,7 +186,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %12 = load i32, ptr %4, align 4
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds i32, ptr %11, i64 %13
-  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %14)
+  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.9, ptr noundef %14)
   br label %16
 
 16:                                               ; preds = %10
@@ -93,7 +205,7 @@ define void @putint(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.2, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.9, i32 noundef %3)
   ret void
 }
 
@@ -104,7 +216,7 @@ define void @putch(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.8, i32 noundef %3)
   ret void
 }
 
@@ -116,7 +228,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   store i32 %0, ptr %3, align 4
   store ptr %1, ptr %4, align 8
   %6 = load i32, ptr %3, align 4
-  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %6)
+  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2.14, i32 noundef %6)
   store i32 0, ptr %5, align 4
   br label %8
 
@@ -132,7 +244,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   %15 = sext i32 %14 to i64
   %16 = getelementptr inbounds i32, ptr %13, i64 %15
   %17 = load i32, ptr %16, align 4
-  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %17)
+  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3.15, i32 noundef %17)
   br label %19
 
 19:                                               ; preds = %12
@@ -142,7 +254,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   br label %8, !llvm.loop !9
 
 22:                                               ; preds = %8
-  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4)
+  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4.16)
   ret void
 }
 
@@ -151,7 +263,7 @@ define void @putstr(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5, ptr noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5.19, ptr noundef %3)
   ret void
 }
 

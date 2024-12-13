@@ -6,6 +6,7 @@ public class CharConst2Int {
 
     }
     public static String main(String str){
+        System.out.println(str);
         if(str.charAt(1)=='\\'){
             switch (str.charAt(2)) {
                 case '0':

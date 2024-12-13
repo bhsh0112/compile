@@ -194,26 +194,53 @@ public class BasicBlock extends Value{
 							Value from=tmpAddExp.value;
 							createStoreInst(new VarType(declType),from,ptr);
 						}
+						//TODO:补全
+						int tmpNum=initNum;
+						while(tmpNum<size){
+							Value tmpValue1=new Value("1");
+							ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue1});
+							Value from=new Value("0");
+							createStoreInst(new VarType(declType),from,ptr);
+							tmpNum++;
+						}
+						
 					}
 					else if(initNum==1){//TODO:应当只能是字符串
 						String str=symbol.getASTNodeContent(parent, new int[]{2*i+2,5,0,0});
+						int tmpNum=0;
 						for(int j=1;j<str.length()-1;j++){
-							char ch=str.charAt(j);
+							System.out.println(str.charAt(j-1)+" "+str.charAt(j)+" "+str.charAt(j+1));
+							String ans=null;
 							Value tmpValue1=new Value("0");
-							if(ch=='\\'&&str.charAt(j-1)!='\\'){
-								continue;
+							boolean addJ=false;
+							if(str.charAt(j)=='\\'){
+								// if(str.charAt(j-1)!='\\') continue;
+								ans=CharConst2Int.main("'"+str.charAt(j)+str.charAt(j+1)+"'");
+								// if(str.charAt(j+1)=='\\') str.charAt(j+1)='0';
+								addJ=true;
 							}
+							else ans=CharConst2Int.main("'"+str.charAt(j)+"'");
 							if(j==1){
+								tmpNum++;
 								Value tmpValue2=new Value(String.valueOf(j-1));
 								ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+								createStoreInst(new VarType("char"),new Value(ans),ptr);
 							}
 							else{
+								tmpNum++;
 								Value tmpValue2=new Value("1");
 								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
-								createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+								createStoreInst(new VarType("char"),new Value(ans),ptr);
 							}
+							if(addJ) j++;
 							
+						}
+						//TODO:补全
+						while(tmpNum<size){
+							Value tmpValue2=new Value("1");
+							ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
+							createStoreInst(new VarType("char"),new Value("0"),ptr);
+							tmpNum++;
 						}
 					}
 					else{
@@ -256,26 +283,52 @@ public class BasicBlock extends Value{
 								Value from=tmpAddExp.value;
 								createStoreInst(new VarType(declType),from,ptr);
 							}
+							//TODO:补全
+							int tmpNum=initNum;
+							while(tmpNum<size){
+								Value tmpValue1=new Value("1");
+								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue1});
+								Value from=new Value("0");
+								createStoreInst(new VarType(declType),from,ptr);
+								tmpNum++;
+							}
+							
 						}
 						else if(initNum==1){//TODO:应当只能是字符串
 							String str=symbol.getASTNodeContent(parent, new int[]{2*i+1,5,0,0});
+							int tmpNum=0;
 							for(int j=1;j<str.length()-1;j++){
-								char ch=str.charAt(j);
+								String ans=null;
 								Value tmpValue1=new Value("0");
-								if(ch=='\\'&&str.charAt(j-1)!='\\'){
-									continue;
+								boolean addJ=false;
+								if(str.charAt(j)=='\\'){
+									// if(str.charAt(j-1)!='\\') continue;
+									ans=CharConst2Int.main("'"+str.charAt(j)+str.charAt(j+1)+"'");
+									// if(str.charAt(j+1)=='\\') str.charAt(j+1)='0';
+									addJ=true;
 								}
+								else ans=CharConst2Int.main("'"+str.charAt(j)+"'");
 								if(j==1){
+									tmpNum++;
 									Value tmpValue2=new Value(String.valueOf(j-1));
 									ptr=createGetElementPtrInst(new VarType(declType+"R",size),ptr,new Value[]{tmpValue1,tmpValue2});
-									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);	
+									createStoreInst(new VarType("char"),new Value(ans),ptr);	
 								
 								}
 								else{
+									tmpNum++;
 									Value tmpValue2=new Value("1");
 									ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
-									createStoreInst(new VarType("char"),new Value(String.valueOf((int)ch)),ptr);
+									createStoreInst(new VarType("char"),new Value(ans),ptr);
 								}
+								if(addJ) j++;
+							}
+							//TODO:补全
+							while(tmpNum<size){
+								Value tmpValue2=new Value("1");
+								ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
+								createStoreInst(new VarType("char"),new Value("0"),ptr);
+								tmpNum++;
 							}
 						}
 						else{

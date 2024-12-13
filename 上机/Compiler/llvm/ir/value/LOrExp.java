@@ -121,6 +121,7 @@ public class LOrExp extends Value {
             if(CTparent.parent==null){
                 if(newAddExp.value!=null){
                     if(newAddExp.value.name!=null) {
+                        // System.out.println("null");
                         if(newAddExp.value.name.equals("0")) CTparent.ans="false";
                         else CTparent.ans="true";
                     }
