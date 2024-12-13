@@ -168,39 +168,7 @@ public class PrintfInst extends Instruction{
    
 
     public void output(BufferedWriter writer) throws IOException{
-        // super.parentBasicBlock.getName();
-        // int indexStr=0,indexValue=0;
-        // for(int i=0;i<varTypes.size();i++){
-        //     if(varTypes.get(i).equals("char")){
-        //         if(((AddExp)addExps.get(indexValue)).type.equals("char")){
-        //             zextInstructions.get(indexZext).output(writer);
-        //             writer.write("\tcall void @putch(i32 "+zextInstructions.get(indexZext++).getName()+")\n");
-                    
-        //         }
-        //         else writer.write("\tcall void @putch(i32 "+addExps.get(indexValue).value.getName()+")\n");
-        //         indexValue++;
-        //     }
-        //     else if(varTypes.get(i).equals("int")){
-        //         if(addExps.get(indexValue).type.equals("char")){
-        //             zextInstructions.get(indexZext).output(writer);
-        //             writer.write("\tcall void @putint(i32 "+zextInstructions.get(indexZext++).getName()+")\n");
-        //         } 
-        //         else if(addExps.get(indexValue).type.equals("charImm")){
-        //             String str=String.valueOf((int)(addExps.get(indexValue).value.name.charAt(1)));
-        //             writer.write("\tcall void @putint(i32 "+str+")\n");
-        //         }
-        //         else writer.write("\tcall void @putint(i32 "+addExps.get(indexValue).value.getName()+")\n");
-        //         indexValue++;
-        //     }
-        //     else if(varTypes.get(i).equals("str")){
-        //         String str=formatStrings.get(indexStr).content;
-        //         int length=(formatStrings.get(indexStr).getLength(str)+1);
-        //         writer.write("\tcall void @putstr(i8* getelementptr inbounds (["+length+" x i8], ["+length+" x i8]* "+formatStrings.get(indexStr).getName()+", i64 0, i64 0))\n");
-        //         indexStr++;
-        //     }
-            
-            
-        // }
+        
     }
 
 }

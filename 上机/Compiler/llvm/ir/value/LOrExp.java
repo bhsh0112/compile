@@ -139,8 +139,14 @@ public class LOrExp extends Value {
         //TODO:类型转换
         else if(CTparent.type.equals("<")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
@@ -153,8 +159,14 @@ public class LOrExp extends Value {
         }
         else if(CTparent.type.equals(">")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
@@ -167,8 +179,14 @@ public class LOrExp extends Value {
         }
         else if(CTparent.type.equals("<=")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
@@ -181,8 +199,14 @@ public class LOrExp extends Value {
         }
         else if(CTparent.type.equals(">=")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
@@ -195,8 +219,14 @@ public class LOrExp extends Value {
         }
         else if(CTparent.type.equals("==")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
@@ -209,8 +239,14 @@ public class LOrExp extends Value {
         }
         else if(CTparent.type.equals("!=")){
             Value[] operands=new Value[2];
-            if(CTparent.leftChildren.varType.equals("charImm")) CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
-            if(CTparent.rightChildren.varType.equals("charImm")) CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            if(CTparent.leftChildren.varType.equals("charImm")){
+                if(CTparent.leftChildren.value.name.charAt(1)=='\\') CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(2)));
+                CTparent.leftChildren.value.name=String.valueOf((int)(CTparent.leftChildren.value.name.charAt(1)));
+            } 
+            if(CTparent.rightChildren.varType.equals("charImm")){
+                if(CTparent.rightChildren.value.name.charAt(1)=='\\') CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(2)));
+                else CTparent.rightChildren.value.name=String.valueOf((int)(CTparent.rightChildren.value.name.charAt(1)));
+            } 
             Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
             Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;

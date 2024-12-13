@@ -48,10 +48,10 @@ public class InitVal extends Value {
 
         } 
         if(finalValue.name!=null&&finalValue.name.startsWith("\'")){
-            // System
-            finalValue.name=String.valueOf((int)(finalValue.name.charAt(1)));
+            if(finalValue.name.charAt(1)=='\\') finalValue.name=String.valueOf((int)(finalValue.name.charAt(2)));
+            else finalValue.name=String.valueOf((int)(finalValue.name.charAt(1)));
         }
-        //TODO:调价似乎需要更改
+        //TODO:条件似乎需要更改
         else if(type.Type2String().equals("i8")&&finalValue.name!=null&&(!finalValue.name.startsWith("\'"))){
             finalValue.name=Integer.valueOf(finalValue.name).toString();
         }

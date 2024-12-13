@@ -77,18 +77,12 @@ public class AddExp extends InitVal{
             if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("-")){
                 ATparent.addChild(new AddTreeNode("0"));
                 ATparent.addChild(new AddTreeNode("-"));
-                // if(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0}).equals("<Number>")) ATparent.addChild(new AddTreeNode(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0,0})));
-                // else ATparent.addChild(new AddTreeNode(String.valueOf((int)(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0,0}).charAt(1)))));
-                //ATparent.addChild(new AddTreeNode(symbol.getASTNodeContent(ASTparent,new int[] {1,0,0,0})));
                 ATparent.addChild(new AddTreeNode("tmp"));
                 buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
             }
             else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("+")){
                 ATparent.addChild(new AddTreeNode("0"));
                 ATparent.addChild(new AddTreeNode("+"));
-                // if(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0}).equals("<Number>")) ATparent.addChild(new AddTreeNode(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0,0})));
-                // else ATparent.addChild(new AddTreeNode(String.valueOf((int)(llvm.getASTNodeContent(ASTparent,new int[] {1,0,0,0}).charAt(1)))));
-                // ATparent.addChild(new AddTreeNode(symbol.getASTNodeContent(ASTparent,new int[] {1,0,0,0})));
                 ATparent.addChild(new AddTreeNode("tmp"));
                 buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
             }
@@ -165,7 +159,14 @@ public class AddExp extends InitVal{
             else{
                 ATparent.kind="Imm";
                 ATparent.value=symbol.getASTNodeContent(ASTparent,new int[] {0,0,0});
-                ATparent.value=(ATparent.value.matches("\\d+"))?ATparent.value:String.valueOf((int)(ATparent.value.charAt(1)));//消除字符常量
+                if(ATparent.value.matches("\\d+")){
+                    ATparent.value=ATparent.value;
+                }
+                else{
+                    if(ATparent.value.charAt(1)=='\\') ATparent.value=String.valueOf((int)(ATparent.value.charAt(2)));
+                    else ATparent.value=String.valueOf((int)(ATparent.value.charAt(1)));
+                }
+                //消除字符常量
                 ATparent.type="intImm";
                 ATparent.exp=new Value(ATparent.value);
             } 
@@ -244,7 +245,8 @@ public class AddExp extends InitVal{
                     // parent.type="charImm";
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
-                    value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    if(parent.value.charAt(1)=='\\') value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(2))));
+                    else value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -340,12 +342,14 @@ public class AddExp extends InitVal{
                 left=parent.children.get(0);
                 right=parent.children.get(2);
                 if(left.type.equals("charImm")){
-                    left.value=String.valueOf((int)(left.value.charAt(1)));
+                    if(left.value.charAt(1)=='\\') left.value=String.valueOf((int)(left.value.charAt(2)));
+                    else left.value=String.valueOf((int)(left.value.charAt(1)));
                     left.exp=new Value(left.value);
                     left.type="intImm";
                 }
                 if(right.type.equals("charImm")){
-                    right.value=String.valueOf((int)(right.value.charAt(1)));
+                    if(right.value.charAt(1)=='\\') right.value=String.valueOf((int)(right.value.charAt(2)));
+                    else right.value=String.valueOf((int)(right.value.charAt(1)));
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }
@@ -413,58 +417,7 @@ public class AddExp extends InitVal{
                     }
                 }
             }
-            flashType(parent); 
-                // if(parent.children.get(0).value.startsWith("%")||parent.children.get(2).value.startsWith("%")){
-                //     parent.value=this.getName();
-                //     writer.write("\t"+parent.value+ " = ");
-                //     switch(parent.children.get(1).value){
-                //         case "+":
-                //             writer.write("add nsw ");
-                //             break;
-                //         case "-":
-                //             writer.write("sub nsw ");
-                //             break;
-                //         case "*":
-                //             writer.write("mul nsw ");
-                //             break;
-                //         case "/":
-                //             writer.write("sdiv ");
-                //             break;
-                //         case "%":
-                //             writer.write("srem ");
-                //             break;
-                //     }
-                //     writer.write(parent.children.get(0).value+", "+parent.children.get(2).value+"\n");
-                // }
-                // else{
-                //     if(parent.children.get(0).value.startsWith("\'")){
-                //         parent.children.get(0).value=String.valueOf((int)(parent.children.get(0).value.charAt(1)));
-                //     }
-                //     if(parent.children.get(2).value.startsWith("\'")){
-                //         parent.children.get(2).value=String.valueOf((int)(parent.children.get(2).value.charAt(1)));
-                //     }
-                //     int num1=Integer.parseInt(parent.children.get(0).value);
-                //     int num2=Integer.parseInt(parent.children.get(2).value);
-                //     switch(parent.children.get(1).value){
-                //         case "+":
-                //             parent.value=String.valueOf(num1+num2);
-                //             break;
-                //         case "-":
-                //             parent.value=String.valueOf(num1-num2);
-                //             break;
-                //         case "*":
-                //             parent.value=String.valueOf(num1*num2);
-                //             break;
-                //         case "/":
-                //             parent.value=String.valueOf(num1/num2);
-                //             break;
-                //         case "%":
-                //             parent.value=String.valueOf(num1%num2);
-                //             break;
-                //     }
-                // }
-            
-            
+            flashType(parent);
         }
         else{//局部
             if(parent.value.equals("+")||parent.value.equals("-")||parent.value.equals("*")||parent.value.equals("/")||parent.value.equals("%")) return;
@@ -482,7 +435,8 @@ public class AddExp extends InitVal{
                     // parent.type="charImm";
                     // value=new ImmediateValue(parent.value);
                     parent.type="intImm";
-                    value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
+                    if(parent.value.charAt(1)=='\\') value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(2))));
+                    else value=new ImmediateValue(String.valueOf((int)(parent.value.charAt(1))));
                     parent.exp=value;
                 }
                 else if(parent.value.equals("FuncCall")&&parent.kind.equals("FuncCall")){
@@ -567,12 +521,14 @@ public class AddExp extends InitVal{
                 left=parent.children.get(0);
                 right=parent.children.get(2);
                 if(left.type.equals("charImm")){
-                    left.value=String.valueOf((int)(left.value.charAt(1)));
+                    if(left.value.charAt(1)=='\\') left.value=String.valueOf((int)(left.value.charAt(2)));
+                    else left.value=String.valueOf((int)(left.value.charAt(1)));
                     left.exp=new Value(left.value);
                     left.type="intImm";
                 }
                 if(right.type.equals("charImm")){
-                    right.value=String.valueOf((int)(right.value.charAt(1)));
+                    if(right.value.charAt(1)=='\\') right.value=String.valueOf((int)(right.value.charAt(2)));
+                    else right.value=String.valueOf((int)(right.value.charAt(1)));
                     right.exp=new Value(right.value);
                     right.type="intImm";
                 }

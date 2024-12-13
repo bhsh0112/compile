@@ -58,7 +58,7 @@ public class GlobalValue extends Value{
         int initSize=InitVal.children.size();
         int initNum=0;
         boolean stringConstFlag=false;
-        if(initSize==1){
+        if(initSize==1){//字符串常量
             initNum=1;
             if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
                 InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}),this);
@@ -72,15 +72,25 @@ public class GlobalValue extends Value{
                 stringConstFlag=true;
                 String str=symbol.getASTNodeContent(InitVal,new int[] {0,0});
                 for(int i=1;i<str.length()-1;i++){
-                    InitVal newInitval=new InitVal(new VarType("char"),new AddExp("\'"+str.charAt(i)+"\'"));
-                    initvals.add(newInitval);
+                    if(str.charAt(i)=='\\'&&str.charAt(i-1)!='\\'){
+                        System.out.println(str.charAt(i));
+                        InitVal newInitval=new InitVal(new VarType("char"),new AddExp("\'"+str.charAt(i)+str.charAt(i+1)+"\'"));
+                        initvals.add(newInitval);
+                        i++;
+                    }
+                    else{
+                        System.out.println(str.charAt(i));
+                        InitVal newInitval=new InitVal(new VarType("char"),new AddExp("\'"+str.charAt(i)+"\'"));
+                        initvals.add(newInitval);
+                    }
+                    
                 }
             }
         }
         else if(initSize==2){
             initNum=0;
         }
-        else{
+        else{//一般定义
             initNum=(initSize-2)/2+1;
             for(int i=0;i<initNum;i++){
                 InitVal newInitval=new InitVal(new VarType(type.type.substring(0, type.type.length()-1)), symbol.getASTNode(InitVal, new int[] {2*i+1,0}),this);
@@ -181,8 +191,8 @@ public class GlobalValue extends Value{
                     }
                     initVal.output(writer);
                 }
-                //局部变量的数组声明也需要类似补充
-                while(indexInitVal<this.dataType.size){//不足未指明元素
+                //TODO:局部变量的数组声明也需要类似补充?
+                while(indexInitVal<this.dataType.size){//补足未指明元素
                     if(firstFlag){
                         firstFlag=false;
                     }
