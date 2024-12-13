@@ -6,13 +6,36 @@ target triple = "arm64-apple-macosx13.3.0"
 @arr = global [15 x i32] zeroinitializer, align 4
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @func2(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  %3 = alloca i32, align 4
+  store ptr %0, ptr %2, align 8
+  store i32 1, ptr %3, align 4
+  %4 = load i32, ptr %3, align 4
+  %5 = load ptr, ptr %2, align 8
+  %6 = load i32, ptr %3, align 4
+  %7 = sext i32 %6 to i64
+  %8 = getelementptr inbounds i32, ptr %5, i64 %7
+  store i32 %4, ptr %8, align 4
+  ret i32 1
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define void @func(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  store ptr %0, ptr %2, align 8
+  %3 = load ptr, ptr %2, align 8
+  %4 = call i32 @func2(ptr noundef %3)
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @main() #0 {
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   store i32 0, ptr %1, align 4
   store i32 0, ptr %2, align 4
-  %3 = load i32, ptr %2, align 4
-  store i32 %3, ptr getelementptr inbounds ([15 x i32], ptr @arr, i64 0, i64 2), align 4
+  call void @func(ptr noundef @arr)
   ret i32 0
 }
 

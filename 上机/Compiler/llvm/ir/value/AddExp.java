@@ -268,8 +268,8 @@ public class AddExp extends InitVal{
                                 tmpType=ttType;
                                 if(element.kind.equals("Array")){//数组名
                                     Value tmptmpValue=new Value("0");
-                                    parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
-                                    
+                                    parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    // parent.exp=basicBlock.createLoadInst(ttType, tmpValue);
                                     // parent.exp=tmpValue;
                                     parent.kind="Var";
                                     parent.type=((VarType)tmpType).type;
@@ -298,9 +298,16 @@ public class AddExp extends InitVal{
                                 VarType ttType=new VarType(element.type);
                                 tmpType=ttType;
                                 if(element.kind.equals("Array")){
-                                    Value tmptmpValue=new Value("0");
-                                    parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
-                                    parent.kind="Var";
+                                    if(element.size==0){//作用域内参数
+                                        parent.exp=globalValue.createLoadInst(ttType, tmpValue);
+                                        parent.kind="Var";
+                                    }
+                                    else{//作用域内定义的数组
+                                        Value tmptmpValue=new Value("0");
+                                        parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                        parent.kind="Var";
+                                    }
+                                    
                                     //TODO:不确定正确性
                                     // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
@@ -497,9 +504,11 @@ public class AddExp extends InitVal{
                                 tmpValue=element.value;
                                 VarType ttType=new VarType(element.type);
                                 tmpType=ttType;
-                                if(element.kind.equals("Array")){
+                                if(element.kind.equals("Array")){//数组名
+                                    System.out.println(element.type);
                                     Value tmptmpValue=new Value("0");
                                     parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                    // parent.exp=basicBlock.createLoadInst(ttType, tmpValue);
                                     // parent.exp=tmpValue;
                                     parent.kind="Var";
                                      //TODO:不确定正确性
@@ -524,9 +533,16 @@ public class AddExp extends InitVal{
                                 VarType ttType=new VarType(element.type);
                                 tmpType=ttType;
                                 if(element.kind.equals("Array")){
-                                    Value tmptmpValue=new Value("0");
-                                    parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
-                                    parent.kind="ArrayElement";
+                                    if(element.size==0){//作用域内参数
+                                        parent.exp=basicBlock.createLoadInst(ttType, tmpValue);
+                                        parent.kind="Var";
+                                    }
+                                    else{//作用域内定义的数组
+                                        Value tmptmpValue=new Value("0");
+                                        System.out.println("faild:"+element.type);
+                                        parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
+                                        parent.kind="Var";
+                                    }
                                     //TODO:不确定正确性
                                     // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
