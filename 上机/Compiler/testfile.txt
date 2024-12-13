@@ -1,7 +1,12 @@
-int main(){
-    const char str1[5]="1\'\\\n";
-    char str2[5]="1\'\\\n";
-    const int arr[5]={1,2,3,4};
-    int arr2[5]={1,2,3,4};
-    char str[2]={1,'\a'};
+char fun(){
+    return 'a';
+}
+
+int main()
+{
+    int a=1,b=1,c=1;
+    if(a==b<=c){
+
+    }
+    return a;
 }

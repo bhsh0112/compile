@@ -132,11 +132,11 @@ public class BasicBlock extends Value{
 		instructions.add(newCmpInst);
 		return newCmpInst;
 	}
-	public Value createZextInst(Value... operands){
+	public Value createZextInst(String varType,Value... operands){
 		// if(operands[0].name.matches("\\d+")||operands[0].name.matches("\\'.\\'")){
 
 		// }
-		ZextInst newZextInst=new ZextInst(operands);
+		ZextInst newZextInst=new ZextInst(varType,operands);
 		instructions.add(newZextInst);
 		return newZextInst;
 	}
@@ -162,7 +162,7 @@ public class BasicBlock extends Value{
 					AddExp tmpAddExp=new AddExp(this);
 					tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+2,2,0,0}), null);
 					Value from=tmpAddExp.value;
-					if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
+					if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
 					else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 					else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 						from.name=CharConst2Int.main(from.name);
@@ -194,7 +194,7 @@ public class BasicBlock extends Value{
 							Value from=tmpAddExp.value;
 							createStoreInst(new VarType(declType),from,ptr);
 						}
-						//TODO:补全
+						//补全
 						int tmpNum=initNum;
 						while(tmpNum<size){
 							Value tmpValue1=new Value("1");
@@ -205,7 +205,7 @@ public class BasicBlock extends Value{
 						}
 						
 					}
-					else if(initNum==1){//TODO:应当只能是字符串
+					else if(initNum==1){
 						String str=symbol.getASTNodeContent(parent, new int[]{2*i+2,5,0,0});
 						int tmpNum=0;
 						for(int j=1;j<str.length()-1;j++){
@@ -235,7 +235,7 @@ public class BasicBlock extends Value{
 							if(addJ) j++;
 							
 						}
-						//TODO:补全
+						//补全
 						while(tmpNum<size){
 							Value tmpValue2=new Value("1");
 							ptr=createGetElementPtrInst(new VarType(declType),ptr,new Value[]{tmpValue2});
@@ -343,7 +343,7 @@ public class BasicBlock extends Value{
 						AddExp tmpAddExp=new AddExp(this);
 						tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+1,2,0,0}), null);
 						Value from=tmpAddExp.value;
-						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
+						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 							from.name=CharConst2Int.main(from.name);
@@ -383,7 +383,7 @@ public class BasicBlock extends Value{
 						// 	createReturnInst(createTruncInst(tmpAddExp.value));
 						// }
 						if(tmpAddExp.type.equals("char")&&this.parentFunction.retType.type.equals("int")){
-							createReturnInst(parentFunction.retType,createZextInst(tmpAddExp.value));
+							createReturnInst(parentFunction.retType,createZextInst("char",tmpAddExp.value));
 						}
 						else if((tmpAddExp.type.equals("charImm")&&this.parentFunction.retType.type.equals("int"))){
 							Value newValue=null;
@@ -737,7 +737,7 @@ public class BasicBlock extends Value{
 				AddExp tmpAddExp=new AddExp(this);
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
-				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst(from);
+				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
 					from.name=CharConst2Int.main(from.name);

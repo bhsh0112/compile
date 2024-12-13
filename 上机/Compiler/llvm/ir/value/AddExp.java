@@ -88,7 +88,6 @@ public class AddExp extends InitVal{
                 buildTreeUnaryExp(ATparent.children.get(2),ASTparent.children.get(1));
             }
             else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("!")){
-                //TODO:是否正确地实现！的功能？
                 this.notFlag=true;
                 // ATparent.addChild(new AddTreeNode("tmp"));
                 buildTreeUnaryExp(ATparent,ASTparent.children.get(1));
@@ -152,7 +151,6 @@ public class AddExp extends InitVal{
                     }
                 }
             } 
-            //TODO:子表达式
             else if(symbol.getASTNodeContent(ASTparent,new int[] {0,0}).equals("(")){
                 buildTreeAddExp(ATparent,symbol.getASTNode(ASTparent, new int[] {0,1,0}));
             }
@@ -166,7 +164,7 @@ public class AddExp extends InitVal{
                 else{
                     ATparent.value=CharConst2Int.main(ATparent.value);
                 }
-                //消除字符常量
+                //TODO:消除字符常量：这似乎不太对
                 ATparent.type="intImm";
                 ATparent.exp=new Value(ATparent.value);
             } 
@@ -308,9 +306,6 @@ public class AddExp extends InitVal{
                                         parent.exp=globalValue.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                         parent.kind="Var";
                                     }
-                                    
-                                    //TODO:不确定正确性
-                                    // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 
                                 else{
@@ -387,27 +382,27 @@ public class AddExp extends InitVal{
                 else{
                     switch(parent.children.get(1).value){
                         case "+":
-                            value=globalValue.createAddInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=globalValue.createAddInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "-":
-                            value=globalValue.createSubInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=globalValue.createSubInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "*": 
-                            value=globalValue.createMulInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=globalValue.createMulInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "/":
-                            value=globalValue.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);    
+                            value=globalValue.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);    
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "%":
-                            value=globalValue.createSremInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=globalValue.createSremInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
@@ -461,8 +456,6 @@ public class AddExp extends InitVal{
                                     // parent.exp=basicBlock.createLoadInst(ttType, tmpValue);
                                     // parent.exp=tmpValue;
                                     parent.kind="Var";
-                                     //TODO:不确定正确性
-                                    //  parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 else{
                                     
@@ -493,14 +486,10 @@ public class AddExp extends InitVal{
                                         parent.exp=basicBlock.createGetElementPtrInst(new VarType(element.type.substring(0,element.type.length()-3)+"R",element.size), tmpValue, new Value[]{tmptmpValue,tmptmpValue});
                                         parent.kind="Var";
                                     }
-                                    //TODO:不确定正确性
-                                    // parent.type=element.type.substring(0,element.type.length()-3);
                                 }
                                 else{
                                     parent.exp=basicBlock.createLoadInst((VarType)tmpType,tmpValue);
                                     parent.kind="Var";
-                                    //TODO:不确定正确性
-                                    // parent.type=element.type;
                                 } 
                                 parent.type=((VarType)tmpType).type;
                                 value=tmpValue;
@@ -563,27 +552,27 @@ public class AddExp extends InitVal{
                 else{
                     switch(parent.children.get(1).value){
                         case "+":
-                            value=basicBlock.createAddInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=basicBlock.createAddInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "-":
-                            value=basicBlock.createSubInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=basicBlock.createSubInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "*": 
-                            value=basicBlock.createMulInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=basicBlock.createMulInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "/":
-                            value=basicBlock.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);    
+                            value=basicBlock.createSdivInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);    
                             parent.exp=value;
                             parent.type="int";
                             break;
                         case "%":
-                            value=basicBlock.createSremInst((left.type.equals("char"))?basicBlock.createZextInst(left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst(right.exp):right.exp);
+                            value=basicBlock.createSremInst((left.type.equals("char"))?basicBlock.createZextInst("char",left.exp):left.exp, (right.type.equals("char"))?basicBlock.createZextInst("char",right.exp):right.exp);
                             parent.exp=value;
                             parent.type="int";
                             break;

@@ -147,11 +147,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             } 
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("slt",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;
@@ -165,11 +165,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             }
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("sgt",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;
@@ -183,11 +183,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             }
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("sle",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;
@@ -201,11 +201,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             } 
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("sge",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;
@@ -219,11 +219,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             }
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("eq",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;
@@ -237,11 +237,11 @@ public class LOrExp extends Value {
             if(CTparent.rightChildren.varType.equals("charImm")){
                 CTparent.rightChildren.value.name=CharConst2Int.main(CTparent.rightChildren.value.name);
             }
-            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.leftChildren.value):CTparent.leftChildren.value;
-            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst(CTparent.rightChildren.value):CTparent.rightChildren.value;
+            Value left=(CTparent.leftChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.leftChildren.value):(CTparent.leftChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.leftChildren.value):CTparent.leftChildren.value;
+            Value right=(CTparent.rightChildren.varType.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",CTparent.rightChildren.value):(CTparent.rightChildren.varType.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",CTparent.rightChildren.value):CTparent.rightChildren.value;
             operands[0]=left;
             operands[1]=right;
-            CTparent.varType="int";
+            CTparent.varType="bool";
             CTparent.value=CTparent.nowBasicBlock.createCmpInst("ne",CTparent.varType, operands);
             
             CTparent.cmpInst=CTparent.value;

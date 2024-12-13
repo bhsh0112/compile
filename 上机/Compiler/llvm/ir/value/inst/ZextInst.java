@@ -10,10 +10,12 @@ import llvm.ir.value.Type.VarType;
 
 public class ZextInst extends Instruction{
     Value value;
+    String varType;
 
-    public ZextInst(Value... operands){
+    public ZextInst(String varType,Value... operands){
         super(operands);
         value=operands[0];
+        this.varType=varType;
         // for(Value v:operands){
 		// 	v.getName();
 		// }
@@ -22,6 +24,7 @@ public class ZextInst extends Instruction{
     
 
     public void output(BufferedWriter writer) throws IOException{
-        writer.write("\t"+getName()+" = zext i8 "+value.getName()+" to i32\n");
+        if(varType.equals("bool")) writer.write("\t"+getName()+" = zext i1 "+value.getName()+" to i32\n");
+        else writer.write("\t"+getName()+" = zext i8 "+value.getName()+" to i32\n");
     }
 }

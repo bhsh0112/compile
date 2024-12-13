@@ -143,11 +143,11 @@ public class GlobalValue extends Value{
 		instructions.add(newLoadInst);
 		return newLoadInst;
 	}
-    public Value createZextInst(Value... operands){
+    public Value createZextInst(String varType,Value... operands){
 		// if(operands[0].name.matches("\\d+")||operands[0].name.matches("\\'.\\'")){
 
 		// }
-		ZextInst newZextInst=new ZextInst(operands);
+		ZextInst newZextInst=new ZextInst(varType,operands);
 		instructions.add(newZextInst);
 		return newZextInst;
 	}

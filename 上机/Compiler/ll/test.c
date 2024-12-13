@@ -1,8 +1,18 @@
+#include <stdio.h>
+int modify_array(int arr[]) {
+    int i=1;
+    char op = '+';
+    if (op == '+') {
+       arr[i] = arr[i] + i;
+    } else {
+        arr[i] = arr[i] - i;
+    }
+    return 0;
+}
 
-const int MAX_SIZE = 10;
-int global_var;
-char str[10]="3\'";
-int main(){
-    printf("%c\n",str[1]);
+int main() {
+    int nums[5] = {1,2};
+    int total = modify_array(nums);
+    printf("%d\n",nums[1]);
     return 0;
 }

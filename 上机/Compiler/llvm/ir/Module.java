@@ -62,8 +62,6 @@ public class Module {
             }
         }
         public static void main(String outputFile,ASTNode ASTRoot) throws IOException{
-            //TODO:getIR
-            
             orderAST(ASTRoot);
             FileWriter filewriter = new FileWriter(outputFile);
             BufferedWriter writer=new BufferedWriter(filewriter); 

@@ -83,7 +83,7 @@ public class PrintfInst extends Instruction{
             if(varTypes.get(i).equals("char")){
                 if(((AddExp)addExps.get(indexValue)).type.equals("char")){
                     // System.out.println("success");
-                    Value tmpZextInst=basicBlock.createZextInst(addExps.get(indexValue).value);
+                    Value tmpZextInst=basicBlock.createZextInst("char",addExps.get(indexValue).value);
                     Value [] operands=new Value[2];
                     ArrayList<VarType> paraTypeList=new ArrayList<>();
                     paraTypeList.add(new VarType("char"));
@@ -117,7 +117,7 @@ public class PrintfInst extends Instruction{
             }
             else if(varTypes.get(i).equals("int")){
                 if(addExps.get(indexValue).type.equals("char")){
-                    Value tmpZextInst=basicBlock.createZextInst(addExps.get(indexValue).value);
+                    Value tmpZextInst=basicBlock.createZextInst("char",addExps.get(indexValue).value);
                     Value [] operands=new Value[2];
                     ArrayList<VarType> paraTypeList=new ArrayList<>();
                     paraTypeList.add(new VarType("int"));
