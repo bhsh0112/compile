@@ -163,6 +163,7 @@ public class BasicBlock extends Value{
 					tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+2,2,0,0}), null);
 					Value from=tmpAddExp.value;
 					if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
+					else if(declType.equals("int")&&tmpAddExp.type.equals("bool")) from=createZextInst("bool",from);
 					else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 					else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 						from.name=CharConst2Int.main(from.name);
@@ -344,6 +345,7 @@ public class BasicBlock extends Value{
 						tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+1,2,0,0}), null);
 						Value from=tmpAddExp.value;
 						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
+						else if(declType.equals("int")&&tmpAddExp.type.equals("bool")) from=createZextInst("bool",from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 							from.name=CharConst2Int.main(from.name);
@@ -384,6 +386,9 @@ public class BasicBlock extends Value{
 						// }
 						if(tmpAddExp.type.equals("char")&&this.parentFunction.retType.type.equals("int")){
 							createReturnInst(parentFunction.retType,createZextInst("char",tmpAddExp.value));
+						}
+						else if(tmpAddExp.type.equals("bool")&&this.parentFunction.retType.type.equals("int")){
+							createReturnInst(parentFunction.retType,createZextInst("bool",tmpAddExp.value));
 						}
 						else if((tmpAddExp.type.equals("charImm")&&this.parentFunction.retType.type.equals("int"))){
 							Value newValue=null;
@@ -738,6 +743,7 @@ public class BasicBlock extends Value{
 				tmpAddExp.llvmAddExp(symbol.getASTNode(father, new int[]{2,0}), null);
 				Value from=tmpAddExp.value;
 				if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
+				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("bool")) from=createZextInst("bool",from);
 				else if(((VarType)tmpType).type.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 				else if(((VarType)tmpType).type.equals("int")&&tmpAddExp.type.equals("charImm")){
 					from.name=CharConst2Int.main(from.name);

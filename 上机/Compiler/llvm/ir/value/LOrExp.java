@@ -121,20 +121,30 @@ public class LOrExp extends Value {
             if(CTparent.parent==null){
                 if(newAddExp.value!=null){
                     if(newAddExp.value.name!=null) {
-                        // System.out.println("null");
                         if(newAddExp.value.name.equals("0")) CTparent.ans="false";
                         else CTparent.ans="true";
                     }
-                    else CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
+                    
+                    else{
+                        Value tmpValue=newAddExp.value;
+                        System.out.println(newAddExp.type);
+                        tmpValue=(newAddExp.type.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",tmpValue):(newAddExp.type.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",tmpValue):tmpValue;
+                        CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne","i32",tmpValue);
+                    } 
                 }
             }
             else if(CTparent.parent.type.equals("and")||CTparent.parent.type.equals("or")){
                 if(newAddExp.value!=null){
+                    System.out.println(newAddExp.type);
                     if(newAddExp.value.name!=null) {
                         if(newAddExp.value.name.equals("0")) CTparent.ans="false";
                         else CTparent.ans="true";
                     }
-                    else CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne",newAddExp.type,newAddExp.value);
+                    else{
+                        Value tmpValue=newAddExp.value;
+                        tmpValue=(newAddExp.type.equals("char"))?CTparent.nowBasicBlock.createZextInst("char",tmpValue):(newAddExp.type.equals("bool"))?CTparent.nowBasicBlock.createZextInst("bool",tmpValue):tmpValue;
+                        CTparent.cmpInst=CTparent.nowBasicBlock.createCmpInst("ne","i32",tmpValue);
+                    } 
                 }
             }
         }

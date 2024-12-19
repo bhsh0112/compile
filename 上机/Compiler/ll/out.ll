@@ -3,41 +3,145 @@ source_filename = "llvm-link"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx13.3.0"
 
-@.str = private unnamed_addr constant [6 x i8] c"error\00", align 1
-@.str.1 = private unnamed_addr constant [7 x i8] c"sucess\00", align 1
-@.str.2 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
-@.str.1.3 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
-@.str.2.4 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
-@.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
-@.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.str.5 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
+@ZERO = dso_local global i32 0
+@ONE = dso_local global i32 1
+@var2 = dso_local global i32 2
+@var3 = dso_local global i32 3
+@.str = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.1 = private unnamed_addr constant [10 x i8] c"21373457\0A\00", align 1
+@.str.2 = private unnamed_addr constant [8 x i8] c"ERROR!\0A\00", align 1
+@.str.3 = private unnamed_addr constant [14 x i8] c"And success!\0A\00", align 1
+@.str.4 = private unnamed_addr constant [10 x i8] c"Or pass!\0A\00", align 1
+@.str.5 = private unnamed_addr constant [15 x i8] c"Test1 Success!\00", align 1
+@.str.6 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
+@.str.1.7 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str.2.10 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
+@.str.3.11 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
+@.str.4.12 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.str.5.15 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 
-define dso_local i8 @fun() {
-  ret i8 97
+define dso_local void @fun() {
+  %1 = alloca i32, align 4
+  store i32 1, ptr %1, align 4
+  %2 = alloca i32, align 4
+  store i32 1, ptr %2, align 4
+  br label %3
+
+3:                                                ; preds = %6, %0
+  %4 = load i32, ptr %2, align 4
+  %5 = icmp slt i32 %4, 1000
+  br i1 %5, label %6, label %9
+
+6:                                                ; preds = %3
+  %7 = load i32, ptr %2, align 4
+  %8 = mul nsw i32 %7, 2
+  store i32 %8, ptr %2, align 4
+  br label %3
+
+9:                                                ; preds = %3
+  %10 = load i32, ptr %2, align 4
+  call void @putstr(ptr @.str)
+  call void @putint(i32 %10)
+  ret void
 }
 
 define dso_local i32 @main() {
-  %1 = icmp eq i32 5436, 0
-  %2 = zext i1 %1 to i32
-  %3 = icmp sge i32 %2, 2
-  br i1 %3, label %4, label %5
-
-4:                                                ; preds = %0
-  call void @putstr(ptr @.str)
-  br label %6
-
-5:                                                ; preds = %0
   call void @putstr(ptr @.str.1)
-  br label %6
+  %1 = load i32, ptr @ZERO, align 4
+  %2 = load i32, ptr @var2, align 4
+  %3 = add nsw i32 %1, %2
+  %4 = load i32, ptr @var3, align 4
+  %5 = load i32, ptr @ONE, align 4
+  %6 = sub nsw i32 %4, %5
+  %7 = icmp eq i32 %3, %6
+  br i1 %7, label %8, label %28
 
-6:                                                ; preds = %5, %4
+8:                                                ; preds = %0
+  %9 = load i32, ptr @ONE, align 4
+  %10 = icmp ne i32 %9, 0
+  br i1 %10, label %11, label %28
+
+11:                                               ; preds = %8
+  %12 = load i32, ptr @ZERO, align 4
+  %13 = icmp ne i32 %12, 0
+  br i1 %13, label %25, label %14
+
+14:                                               ; preds = %11
+  %15 = load i32, ptr @ZERO, align 4
+  %16 = icmp eq i32 %15, 0
+  %17 = zext i1 %16 to i32
+  %18 = icmp ne i32 %17, 0
+  br i1 %18, label %19, label %26
+
+19:                                               ; preds = %14
+  %20 = load i32, ptr @ONE, align 4
+  %21 = add nsw i32 %20, 1
+  %22 = load i32, ptr @var2, align 4
+  %23 = add nsw i32 %21, %22
+  %24 = icmp slt i32 %23, 0
+  br i1 %24, label %25, label %26
+
+25:                                               ; preds = %19, %11
+  call void @putstr(ptr @.str.2)
+  br label %27
+
+26:                                               ; preds = %19, %14
+  call void @putstr(ptr @.str.3)
+  br label %27
+
+27:                                               ; preds = %26, %25
+  br label %28
+
+28:                                               ; preds = %27, %8, %0
+  %29 = load i32, ptr @var3, align 4
+  %30 = icmp ne i32 %29, 3
+  br i1 %30, label %35, label %31
+
+31:                                               ; preds = %28
+  %32 = load i32, ptr @var2, align 4
+  %33 = sub nsw i32 %32, 22
+  %34 = icmp eq i32 %33, -20
+  br i1 %34, label %35, label %50
+
+35:                                               ; preds = %31, %28
+  %36 = load i32, ptr @ONE, align 4
+  %37 = srem i32 %36, 2
+  %38 = add nsw i32 %37, 3
+  %39 = sub nsw i32 %38, 8
+  %40 = load i32, ptr @var3, align 4
+  %41 = add nsw i32 %39, %40
+  %42 = load i32, ptr @var2, align 4
+  %43 = add nsw i32 %41, %42
+  %44 = icmp sle i32 %43, 100
+  br i1 %44, label %48, label %45
+
+45:                                               ; preds = %35
+  %46 = load i32, ptr @ONE, align 4
+  %47 = icmp ne i32 %46, 0
+  br i1 %47, label %48, label %49
+
+48:                                               ; preds = %45, %35
+  call void @putstr(ptr @.str.4)
+  br label %49
+
+49:                                               ; preds = %48, %45
+  br label %50
+
+50:                                               ; preds = %49, %31
+  call void @putstr(ptr @.str.5)
+  call void @fun()
+  call void @fun()
+  call void @fun()
+  call void @fun()
+  call void @fun()
+  call void @fun()
   ret i32 0
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getchar() #0 {
   %1 = alloca i8, align 1
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.2, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.6, ptr noundef %1)
   %3 = load i8, ptr %1, align 1
   %4 = sext i8 %3 to i32
   ret i32 %4
@@ -48,7 +152,7 @@ declare i32 @scanf(ptr noundef, ...) #1
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getint() #0 {
   %1 = alloca i32, align 4
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.3, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.7, ptr noundef %1)
   br label %3
 
 3:                                                ; preds = %6, %0
@@ -70,7 +174,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   store ptr %0, ptr %2, align 8
-  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.3, ptr noundef %3)
+  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.7, ptr noundef %3)
   store i32 0, ptr %4, align 4
   br label %6
 
@@ -85,7 +189,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %12 = load i32, ptr %4, align 4
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds i32, ptr %11, i64 %13
-  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.3, ptr noundef %14)
+  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.7, ptr noundef %14)
   br label %16
 
 16:                                               ; preds = %10
@@ -104,7 +208,7 @@ define void @putint(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.3, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.7, i32 noundef %3)
   ret void
 }
 
@@ -115,7 +219,7 @@ define void @putch(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.6, i32 noundef %3)
   ret void
 }
 
@@ -127,7 +231,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   store i32 %0, ptr %3, align 4
   store ptr %1, ptr %4, align 8
   %6 = load i32, ptr %3, align 4
-  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2.4, i32 noundef %6)
+  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str.2.10, i32 noundef %6)
   store i32 0, ptr %5, align 4
   br label %8
 
@@ -143,7 +247,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   %15 = sext i32 %14 to i64
   %16 = getelementptr inbounds i32, ptr %13, i64 %15
   %17 = load i32, ptr %16, align 4
-  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %17)
+  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.3.11, i32 noundef %17)
   br label %19
 
 19:                                               ; preds = %12
@@ -153,7 +257,7 @@ define void @putarray(i32 noundef %0, ptr noundef %1) #0 {
   br label %8, !llvm.loop !9
 
 22:                                               ; preds = %8
-  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4)
+  %23 = call i32 (ptr, ...) @printf(ptr noundef @.str.4.12)
   ret void
 }
 
@@ -162,7 +266,7 @@ define void @putstr(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5, ptr noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.5.15, ptr noundef %3)
   ret void
 }
 
