@@ -206,7 +206,7 @@ public class BasicBlock extends Value{
 						}
 						
 					}
-					else if(initNum==1){
+					else if(initNum==1){//字符串常量
 						String str=symbol.getASTNodeContent(parent, new int[]{2*i+2,5,0,0});
 						int tmpNum=0;
 						for(int j=1;j<str.length()-1;j++){

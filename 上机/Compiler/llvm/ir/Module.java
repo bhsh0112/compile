@@ -141,7 +141,6 @@ public class Module {
                         }
                         else{//无初值
                             if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==4){//数组
-                                //有用！！！！！！
                                 AddExp newAddExp=new AddExp("tmpAddExp");
                                 int size=Integer.valueOf(newAddExp.llvmAddExp(symbol.getASTNode(parent,new int[] {2*i+1,2,0}), null));
                                 VarType type=new VarType(originType+"R",size);

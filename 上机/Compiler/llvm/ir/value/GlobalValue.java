@@ -58,7 +58,7 @@ public class GlobalValue extends Value{
         int initSize=InitVal.children.size();
         int initNum=0;
         boolean stringConstFlag=false;
-        if(initSize==1){//字符串常量
+        if(initSize==1){
             initNum=1;
             if(symbol.getASTNodeContent(InitVal,new int[] {0}).equals("<Exp>")){
                 InitVal newInitval=new InitVal(type, symbol.getASTNode(InitVal,new int[] {0,0}),this);
