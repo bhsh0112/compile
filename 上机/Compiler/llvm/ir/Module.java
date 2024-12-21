@@ -152,7 +152,7 @@ public class Module {
                                 VarType type=new VarType(originType);
                                 String name=symbol.getASTNodeContent(parent,new int[] {2*i+1,0,0});
                                 GlobalValue newGlobalValue=createGlobalValue(type,name,null);
-                                symbolStack.pushStack(0,originType,"Var",declName,newGlobalValue,0,null);
+                                symbolStack.pushStack(0,originType,"Var",declName,newGlobalValue,0,"0");
                             }
                             
                         }

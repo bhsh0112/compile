@@ -275,7 +275,7 @@ public class AddExp extends InitVal{
                                     parent.kind="Var";
                                     parent.type=((VarType)tmpType).type;
                                 }
-                                else if(element.kind.equals("Const")){
+                                else if(element.immValue!=null){
                                     parent.exp=new Value(element.immValue);
                                     parent.value=element.immValue;
                                     parent.type=(element.immValue.matches("\\d+"))?"intImm":"charImm";

@@ -23,11 +23,18 @@ public class Compiler {
         if (file.exists()) {
             file.delete();
         }
+        file = new File(errorFile);
+        if (file.exists()) {
+            file.delete();
+        }
 
         totleTokens=lexer.main(inputFile,outputFile,errorFile);
         ASTRoot=parser.main(totleTokens,errorFile);
         STTRoot=symbol.main(ASTRoot,errorFile);
-        llvm.ir.Module.main(outputFile,ASTRoot);
+        if(!file.exists()){
+            llvm.ir.Module.main(outputFile,ASTRoot);
+        }
+        
     }
     
 }
