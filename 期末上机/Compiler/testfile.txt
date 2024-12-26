@@ -1,7 +1,5 @@
-char func(){
-    return '1';
-}
 int main(){
-    printf("%c",func());
+    int a=getint();
+    printf("%d\n",a);
     return 0;
 }

@@ -181,7 +181,18 @@ public class parserX {
         if(parser.currentToken.equals("=")){
             addNode(curNode, new TNode("=","leaf",parser.lineNumber));
             parser.get3Token();
-            parserInitVal(curNode);
+            System.out.println(parser.currentToken);
+            if(parser.currentToken.equals("getint")){
+                addNode(curNode, new TNode("getint","leaf",parser.lineNumber));
+                parser.get3Token();
+                if(parser.currentToken.equals("("))addNode(curNode, new TNode("(","leaf",parser.lineNumber));
+                else addNode(curNode, new ENode("j",parser.lineNumber,"error"));
+                parser.get3Token();
+                if(parser.currentToken.equals(")"))addNode(curNode, new TNode(")","leaf",parser.lineNumber));
+                else addNode(curNode, new ENode("j",parser.lineNumber,"error"));
+                
+            }
+            else parserInitVal(curNode);
         }
         else{
             parser.backToken();
@@ -356,6 +367,7 @@ public class parserX {
         } 
     }
     public static void parserBlockItem(ASTNode parent){
+       
         ASTNode curNode = addNode(parent, new NNode("BlockItem"));
         if(isX.isDecl()){
             parserDecl(curNode);

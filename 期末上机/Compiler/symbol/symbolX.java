@@ -61,12 +61,14 @@ public class symbolX {
         }
         else{
             if(parent.name.equals("<VarDecl>")) {
+                
                 String ansVarType;
                 String ansVarName;
                 int childrenNum=parent.children.size();
                 int varNum=(childrenNum-1)/2;
                 String tmpVarType=symbol.getASTNodeContent(parent, new int[]{0,0});
                 String tmpVarName=symbol.getASTNodeContent(parent, new int[]{1,0,0});
+                System.out.println(tmpVarName);
                 ansVarName=tmpVarName;
                 ansVarType=tmpVarType;
                 if(checkX.checkReDefine(symbol.currentSTTQue,ansVarName, ((TNode)symbol.getASTNode(parent, new int[]{1,0,0})).lineNumber)){
@@ -248,6 +250,7 @@ public class symbolX {
                 if(symbol.getASTNodeContent(parent, new int[] {0}).equals("<LVal>")) checkX.checkChangeConst(symbol.getASTNode(parent, new int[] {0}));
             }
             else if(parent.name.equals("<LVal>")) {
+                // System.out.println("error");
                 checkX.checkNoDefine(parent);
             }
             else if(parent.name.equals("<ForStmt>")) {

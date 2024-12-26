@@ -341,18 +341,30 @@ public class BasicBlock extends Value{
 					}
 					else{//变量
 						Value ptr=createAllocaInst(new VarType(declType));
+						Value from=null;
+						// System.out.println(symbol.getASTNodeContent(parent, new int[]{2*i+1,2}));
+						
 						AddExp tmpAddExp=new AddExp(this);
 						tmpAddExp.llvmAddExp(symbol.getASTNode(parent, new int[]{2*i+1,2,0,0}), null);
-						Value from=tmpAddExp.value;
+						from=tmpAddExp.value;
 						if(declType.equals("int")&&tmpAddExp.type.equals("char")) from=createZextInst("char",from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("bool")) from=createZextInst("bool",from);
 						else if(declType.equals("char")&&tmpAddExp.type.equals("int")) from=createTruncInst(from);
 						else if(declType.equals("int")&&tmpAddExp.type.equals("charImm")){
 							from.name=CharConst2Int.main(from.name);
 						}
+						
 						createStoreInst(new VarType(declType),from,ptr);
 						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
 					}
+				}
+				else if(symbol.getASTNodeContent(parent,new int[] {2*i+1,symbol.getASTNode(parent,new int[] {2*i+1}).children.size()-1}).equals(")")){//getint}
+					Value ptr=createAllocaInst(new VarType(declType));
+					Value from=new Value();
+					createCallInst(from, new Function(new ReturnType("int"), "getint", null));
+					System.out.println(from+" "+ptr);
+					createStoreInst(new VarType(declType),from,ptr);
+					Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
 				}
 				else{//无初值
 					if(symbol.getASTNode(parent,new int[] {2*i+1}).children.size()==4){//数组
