@@ -80,7 +80,7 @@ public class isX {
         return isUnaryExp();
     }
     public static boolean isForStmt(){
-        return isVarDecl()||isLVal();
+        return isLVal();
     }
     public static boolean isNumber(){
         return parser.isIntConst(parser.currentToken);

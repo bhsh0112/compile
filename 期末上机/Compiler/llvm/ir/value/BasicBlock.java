@@ -31,7 +31,6 @@ public class BasicBlock extends Value{
 	public BasicBlock afterBasicBlock;//仅for循环用到
 
 	public boolean isStmt=false;
-	public boolean isForStmt1=false;
 
 	public boolean addBrFlag=true;//进continue，break会用到
 
@@ -211,6 +210,7 @@ public class BasicBlock extends Value{
 						String str=symbol.getASTNodeContent(parent, new int[]{2*i+2,5,0,0});
 						int tmpNum=0;
 						for(int j=1;j<str.length()-1;j++){
+							System.out.println(str.charAt(j-1)+" "+str.charAt(j)+" "+str.charAt(j+1));
 							String ans=null;
 							Value tmpValue1=new Value("0");
 							boolean addJ=false;
@@ -351,12 +351,7 @@ public class BasicBlock extends Value{
 							from.name=CharConst2Int.main(from.name);
 						}
 						createStoreInst(new VarType(declType),from,ptr);
-						if(this.isForStmt1){
-							System.out.println("success");
-							Module.symbolStack.pushStack(this.level+1,declType,"Var",declName,ptr,0,null);
-							this.isForStmt1=false;
-						} 
-						else Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
+						Module.symbolStack.pushStack(this.level,declType,"Var",declName,ptr,0,null);
 					}
 				}
 				else{//无初值
@@ -484,7 +479,6 @@ public class BasicBlock extends Value{
 				}
 				else if(((TNode)(symbol.getASTNode(parent,new int[]{0}))).token.equals("for")){
 					BasicBlock ForStmt1=new BasicBlock(),Cond=null,ForStmt2=null,Stmt=new BasicBlock(this.parentFunction,null,this.level,this);
-					ForStmt1.isForStmt1=true;
 					Stmt.isStmt=true;
 					BasicBlock entranceBasicBlock=null;
 					this.afterBasicBlock=new BasicBlock();
@@ -495,10 +489,8 @@ public class BasicBlock extends Value{
 					children.add(ForStmt1);
 					//判断缺省情况
 					if(parent.children.size()==9){//无缺省
-						// System.out.println("success");
 						// ForStmt1=new BasicBlock();
 						ForStmt1.orderAST(symbol.getASTNode(parent, new int[]{2}));
-						System.out.println(Module.symbolStack.peekStack(0).level);
 						//TODO:处理LOrExp
 						LOrExp newLOrExp=new LOrExp(this,symbol.getASTNode(parent, new int[]{4,0}));
 						newLOrExp.first=false;//输出第一个标签
@@ -622,11 +614,7 @@ public class BasicBlock extends Value{
 						ForStmt2.createBrInst(entranceBasicBlock);
 					}
 					if(symbol.getASTNodeContent(parent,new int[]{ parent.children.size()-1,0}).equals("<Block>")) Stmt.orderAST(symbol.getASTNode(parent,new int[]{ parent.children.size()-1,0}));
-					else{
-						Stmt.orderAST(parent.children.get(parent.children.size()-1));
-						//for后单个语句时，特殊地去除for循环内的符号表内容
-						Module.symbolStack.rmCurLevel(this.level+1);
-					} 
+					else Stmt.orderAST(parent.children.get(parent.children.size()-1));
 					//TODO:存在问题
 					if(Stmt.children.size()>0&&(Stmt.children.get(Stmt.children.size()-1)).instructions.size()==0){//防止冗余标签
 						// Stmt.children.get(Stmt.children.size()-1).createBrInst(this.afterBasicBlock);

@@ -156,23 +156,13 @@ public class symbolX {
                 //symbol.funcSymbolTable.add(newQue);
             }
             else if(parent.name.equals("<Block>")) {
-                //新建一个STTNode
                 symbol.currentLevel++;
                 STTQue newQue=(!symbol.addNewNodeFlag)?symbol.funcSymbolTable.get(symbol.funcSymbolTable.size()-1):new STTQue(symbol.currentLevel);
                 symbol.addNewNodeFlag=true;
-                //如果是for循环的Block，且ForStmt中有变量声明，则符号表中加入该变量
-                if(symbol.forStmtElement!=null){ 
-                    newQue.pushQue(symbol.currentLevel,symbol.forStmtElement.name,symbol.forStmtElement.type,symbol.forStmtElement.kind);
-                    symbol.forStmtElement=null;
-                }
-                //当前STTQue指向新建的STTQue
                 symbol.currentSTTQue=newQue;
-                //新建一个STTNode
                 STTNode newSTTNode=new STTNode(symbol.currentSTTQue);
-                //为当前STTNode添加子节点,并更新当前STTNode
                 symbol.currentSTTNode.addChild(newSTTNode);
                 symbol.currentSTTNode=newSTTNode;
-                //当前STTNode的que指向当前STTNode
                 symbol.currentSTTNode.que=symbol.currentSTTQue;
                 //funcDefineFlag=0;
             }
@@ -258,16 +248,10 @@ public class symbolX {
                 if(symbol.getASTNodeContent(parent, new int[] {0}).equals("<LVal>")) checkX.checkChangeConst(symbol.getASTNode(parent, new int[] {0}));
             }
             else if(parent.name.equals("<LVal>")) {
-                //特殊处理For中的情况，因为此时forStmtElement可能还没有被推入栈
                 checkX.checkNoDefine(parent);
             }
             else if(parent.name.equals("<ForStmt>")) {
                 checkX.checkChangeConst(symbol.getASTNode(parent,new int[] {0} ));
-                if(symbol.getASTNodeContent(parent, new int[]{0}).equals("<VarDecl>")){
-                    String tmpName=symbol.getASTNodeContent(parent, new int[] {0,1,0,0});
-                    String tmpType=symbol.getASTNodeContent(parent, new int[] {0,0,0});
-                    symbol.forStmtElement=new Element(symbol.currentLevel+1, tmpName, tmpType, "Var");
-                }
             }
             else if(parent.name.equals("<UnaryExp>")&&symbol.getASTNodeContent(parent, new int[] {0}).equals("<Ident>")) {
                 checkX.checkNoDefine(parent);

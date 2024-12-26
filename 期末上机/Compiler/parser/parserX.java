@@ -570,22 +570,16 @@ public class parserX {
     }
     public static void parserForStmt(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("ForStmt"));
-        if(isX.isVarDecl()){
-            // System.out.println("success");
-            parserVarDecl(curNode);
-            // parser.get3Token();
-        } 
+        
+        parserLVal(curNode);
+        parser.get3Token();
+        if(parser.currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf",parser.lineNumber));
         else{
-            parserLVal(curNode);
-            parser.get3Token();
-            if(parser.currentToken.equals("=")) addNode(curNode, new TNode("=", "leaf",parser.lineNumber));
-            else{
-                parser.backToken();
-                addNode(curNode, new ENode("i",parser.lineNumber,"error"));
-            } 
-            parser.get3Token();
-            parserExp(curNode);
-        }
+            parser.backToken();
+            addNode(curNode, new ENode("i",parser.lineNumber,"error"));
+        } 
+        parser.get3Token();
+        parserExp(curNode);
     }
     public static void parserExp(ASTNode parent){
         ASTNode curNode = addNode(parent, new NNode("Exp"));

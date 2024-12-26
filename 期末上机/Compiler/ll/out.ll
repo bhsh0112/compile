@@ -3,42 +3,28 @@ source_filename = "llvm-link"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx13.3.0"
 
-@.str = private unnamed_addr constant [9 x i8] c"success\0A\00", align 1
-@.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
-@.str.1.2 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str = private unnamed_addr constant [3 x i8] c"%c\00", align 1
+@.str.1 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
 @.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 @.str.5 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 
+define dso_local i8 @func() {
+  ret i8 49
+}
+
 define dso_local i32 @main() {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  br label %2
-
-2:                                                ; preds = %6, %0
-  %3 = load i32, ptr %1, align 4
-  %4 = icmp slt i32 %3, 2
-  br i1 %4, label %5, label %9
-
-5:                                                ; preds = %2
-  call void @putstr(ptr @.str)
-  br label %6
-
-6:                                                ; preds = %5
-  %7 = load i32, ptr %1, align 4
-  %8 = add nsw i32 %7, 1
-  store i32 %8, ptr %1, align 4
-  br label %2
-
-9:                                                ; preds = %2
+  %1 = call i8 @func()
+  %2 = zext i8 %1 to i32
+  call void @putch(i32 %2)
   ret i32 0
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getchar() #0 {
   %1 = alloca i8, align 1
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str, ptr noundef %1)
   %3 = load i8, ptr %1, align 1
   %4 = sext i8 %3 to i32
   ret i32 %4
@@ -49,7 +35,7 @@ declare i32 @scanf(ptr noundef, ...) #1
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define i32 @getint() #0 {
   %1 = alloca i32, align 4
-  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %1)
+  %2 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1, ptr noundef %1)
   br label %3
 
 3:                                                ; preds = %6, %0
@@ -71,7 +57,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   store ptr %0, ptr %2, align 8
-  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %3)
+  %5 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1, ptr noundef %3)
   store i32 0, ptr %4, align 4
   br label %6
 
@@ -86,7 +72,7 @@ define i32 @getarray(ptr noundef %0) #0 {
   %12 = load i32, ptr %4, align 4
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds i32, ptr %11, i64 %13
-  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1.2, ptr noundef %14)
+  %15 = call i32 (ptr, ...) @scanf(ptr noundef @.str.1, ptr noundef %14)
   br label %16
 
 16:                                               ; preds = %10
@@ -105,7 +91,7 @@ define void @putint(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1.2, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %3)
   ret void
 }
 
@@ -116,7 +102,7 @@ define void @putch(i32 noundef %0) #0 {
   %2 = alloca i32, align 4
   store i32 %0, ptr %2, align 4
   %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %3)
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %3)
   ret void
 }
 

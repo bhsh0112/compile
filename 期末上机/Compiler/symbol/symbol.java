@@ -52,8 +52,6 @@ public class symbol {
     public static boolean addNewNodeFlag=true;
     public static boolean gErrorFlag=false;
 
-    public static Element forStmtElement=null;
-
     public static STTNode main(ASTNode ASTRoot,String inputErrorFile){
         errorFile=inputErrorFile;
         STTRoot = new STTNode(new STTQue(1));
